@@ -1,0 +1,32 @@
+<server description="MicroProfile Tutorial Liberty Server">
+    <featureManager>
+        <feature>restfulWS-3.1</feature>
+        <feature>jsonb-3.0</feature>
+        <feature>jsonp-2.1</feature>
+        <feature>cdi-4.0</feature>
+        <feature>persistence-3.1</feature>
+    </featureManager>
+
+    <variable name="http.port" defaultValue="5050" />
+    <variable name="https.port" defaultValue="5051" />
+
+    <httpEndpoint httpPort="${http.port}" httpsPort="${https.port}"
+                  id="defaultHttpEndpoint" host="*" />
+
+    <application location="mp-ecomm-store.war" contextRoot="mp-ecomm-store"/>
+
+    <!-- Derby Library Configuration -->
+    <library id="derbyJDBCLib">
+        <fileset dir="${shared.resource.dir}/" includes="derby*.jar" />
+    </library>
+
+    <!-- Datasource Configuration -->
+    <!-- tag::data-source[] -->
+    <dataSource id="productjpadatasource" jndiName="jdbc/productjpadatasource">
+        <jdbcDriver libraryRef="derbyJDBCLib" />
+        <properties.derby.embedded databaseName="ProductDB" createDatabase="create" />
+    </dataSource>
+    <!-- end::data-source[] -->
+
+
+</server>
