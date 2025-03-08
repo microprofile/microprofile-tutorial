@@ -883,7 +883,3 @@ This chapter explored the MicroProfile Fault Tolerance API and essential fault t
 - **Fallbacks:** Provide meaningful responses during failures.
 
 By leveraging these strategies and combining them effectively, you can design resilient microservices that gracefully handle failures, minimize disruptions, and ensure a seamless user experience.
-
-
-
-
