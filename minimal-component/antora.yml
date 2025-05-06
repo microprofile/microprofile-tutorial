@@ -1,0 +1,5 @@
+name: minimal-component
+title: Minimal Component
+version: latest
+start_page: minimal-component::index.adoc
+start_path: docs

@@ -1,0 +1,319 @@
+== Developing a RESTful Web Service
+
+*Web Services* are very popular nowadays because they allow for building decoupled systems 
+– services can communicate with each other without the knowledge of each other’s implementation details.
+There are many different ways to design and implement web services. One popular way is to use the Representational State Transfer (REST)
+architecture. A Jakarta RESTful Webservice is a web service that uses the *Representational State Transfer (REST)* architecture. 
+This type of web service makes it easy to build modern, scalable web applications. The REST architecture is based on the principle that
+all data and functionality should be accessed through a uniform interface. This makes it easy to develop, test, and deploy web 
+applications.
+  
+To understand this better, let’s create a simple RESTful service to manage a list of products for our sample application, 
+the MicroProfile ecommerce store. This RESTful API will allow client applications to access the product information stored as 
+resources on the server. For example, let’s say you have a product catalog that you want to make available as a web service. 
+With REST, you would create a URL that represents the resources (products) in your catalog. When a client (such as a web browser) 
+requests this URL, the server would return a list of products in JSON format.
+
+=== Creating an Entity class
+
+An Entity class represents a specific object, in our case a product. It contains the product's details id and name, 
+and other properties like price, and quantity. To implement an entity class first, you need to create a `Product`  class, as below:
+
+[source, java]
+----
+// Product.java
+package io.microprofile.tutorial.store.product.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Product {
+   private Long id;
+   private String name;
+   private String description;
+   private Double price;
+}
+----
+
+Explanation: 
+
+* The `Product` class is a Plain Old Java Object (POJO). It has an `id`, `name`, `description` and `price` property. The `id` property is of type `Long`, The `name` and `description` properties are of type `String`. The `price` property is of type `Double`. 
+
+* `@Data` annotation will generate constructors, getters, and setters for all fields. By doing this, 
+you enable the Jackson library to convert your Java objects to JSON and vice versa. All properties must be of `Object` type as well.
+Jackson cannot work with primitive types because they cannot be `null`.
+
+* `@AllArgsConstructor` generates a constructor with one argument for each field in the class. 
+This is useful for instantiating objects with all their fields initialized. 
+
+* `@NoArgsConstructor` generates a default constructor 
+for the class.
+
+=== Creating a Resource class
+
+A resource class represents a collection of related resources. It includes methods for creating, updating, deleting, and retrieving 
+(CRUD) operations on the resources. Let us now create a `ProductResource` class with a `getProducts()` method to return a list of 
+`Product` objects.
+
+[source, java]
+----
+// ProductResource.java
+package io.microprofile.tutorial.store.product.resource;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.microprofile.tutorial.store.product.entity.Product;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/products")
+@ApplicationScoped
+public class ProductResource {
+   private List<Product> products;
+
+   public ProductResource() {
+       products = new ArrayList<>();
+
+       products.add(new Product(Long.valueOf(1L), "iPhone", "Apple iPhone 15", Double.valueOf(999.99)));
+       products.add(new Product(Long.valueOf(2L), "MacBook", "Apple MacBook Air", Double.valueOf(1299.99)));
+   }
+
+   @GET
+   @Produces(MediaType.APPLICATION_JSON)
+   public List<Product> getProducts() {
+       // Return a list of products
+       return products;
+   }   
+}
+----
+  
+Explanation: 
+
+* The `ProductResource` is annotated with `@ApplicationScoped`. This will ensure that only one instance of this class available when the 
+application is running. 
+
+* The `ProductResource` class has a `getProducts()` method, which returns a list of products. This method is annotated with the `@GET` annotation, which maps this method to the `GET` HTTP method. 
+
+* The `@Produces` annotation tells the server that this method produces JSON content. This will return the following JSON response when we make a `GET` request to the `/api/products` endpoint.
+
+* RESTful web services can produce and consume many different media types, including JSON, XML, and HTML. 
+
+* Annotations specify the media type that a method can consume or produce. For example, if a method is annotated with 
+`@Produces(MediaType.APPLICATION_JSON)` it can produce JSON.
+
+=== Creating a Resource class
+
+Create a class named `ProductRestApplication` as per the code below:
+
+[source, java]
+----
+// ProductRestApplication.java
+package io.microprofile.tutorial.store.product;
+
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
+
+@ApplicationPath("/api")
+public class ProductRestApplication extends Application{
+
+}
+---- 
+  
+Explanation: 
+
+* The annotation `@ApplicationPath("/api")` specifies that any RESTful resources registered within this application will be accessed 
+under the base path `/api`. For example, if you have a resource class named `ProductResource` mapped to the path `/products`, it would be accessible at `/api/products`.
+
+=== Building Your Application
+
+You may build the application using the following commands from your project’s root directory:
+
+[source, bash]
+----
+$ mvn compile
+----
+
+The above command will compile your project’s source code.
+
+  
+[source, bash]
+----
+$ mvn test
+----
+
+The above command will run the test using a unit testing framework. These test should not require the code to be packaged and deployed.
+
+  
+[source, bash]
+----
+$mvn package
+----
+  
+The above command will create a deployment package.
+
+=== Deploying your microservices
+
+This section guides you through deploying your newly created product microservice to a runtime environment. Below are some of the general considerations:
+
+==== General Considerations:
+* Runtime Compatibility: Ensure your chosen runtime supports the MicroProfile version used in your project.
+* Packaging: Decide on a packaging format (e.g., WAR file, Docker image).
+* Configuration: Review and adjust any runtime configuration necessary for your service.
+* Deployment Tools: Leverage runtime-specific tools or commands for deployment.
+
+==== Deployment Options
+You can then deploy this application on a MicroProfile compatible server and access the web service at 
+`http://localhost:<port>/<contextRoot>/api/products`. Replace `<port>` with the port number on which the web server or 
+application server is listening. The `<contextRoot>` is a placeholder for the context root of the web application. 
+The context root is part of the URL path that identifies the base path for the application on the web server. 
+
+Below are the steps for popular options. Specific steps will depend on your chosen runtime.
+
+*Open Liberty* 
+
+Package your application as a WAR file using Maven or Gradle by adding the packaging tag in `pom.xml`.
+
+[source, xml]
+----
+<groupId>io.microprofile.tutorial</groupId>
+<artifactId>mp-ecomm-store</artifactId>
+<version>1.0-SNAPSHOT</version>
+<packaging>war</packaging>
+----
+  
+Add a server configuration file at the location /main/liberty/config/server.xml with the content as below:
+
+[source, xml]
+----
+<server description="MicroProfile Tutorial Liberty Server">
+    <featureManager>
+        <feature>restfulWS-3.1</feature>
+        <feature>jsonb-3.0</feature>
+    </featureManager>
+
+    <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
+                  id="defaultHttpEndpoint" host="*" />
+    <webApplication location="mp-ecomm-store.war" contextRoot="${app.context.root}"/>
+</server>
+----
+  
+Add the Open Liberty configuration in the pom.xml as below:
+
+[source, xml]
+----
+<properties>
+   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+   <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+   <maven.compiler.source>17</maven.compiler.source>
+   <maven.compiler.target>17</maven.compiler.target>
+   <!-- Liberty configuration -->
+   <liberty.var.default.http.port>9080</liberty.var.default.http.port>
+   <liberty.var.default.https.port>9443</liberty.var.default.https.port>
+   <liberty.var.app.context.root>mp-ecomm-store</liberty.var.app.context.root>
+ </properties>
+
+Add the Open Liberty build plugin in the pom.xml as below:
+<build>
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.3.2</version>
+        </plugin>
+        <plugin>
+            <groupId>io.openliberty.tools</groupId>
+            <artifactId>liberty-maven-plugin</artifactId>
+            <version>3.8.2</version>
+            <configuration>
+                <serverName>productServer</serverName>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+                <systemPropertyVariables>
+                    <http.port>${liberty.var.default.http.port}</http.port>
+                    <war.name>${liberty.var.app.context.root}</war.name>
+                </systemPropertyVariables>
+            </configuration>
+        </plugin>
+   </plugins>
+</build>
+----
+
+=== Running Your Application
+
+Refer to your runtime’s documentation for instructions on running your MicroProfile application. 
+For example, Consult the Open Liberty documentation for detailed instructions: 
+link:https://openliberty.io/docs/latest/microprofile.html[MicroProfile - Open Liberty Docs]
+Finally, use the following command from the command line or terminal to run the application on Liberty server. 
+
+[source, bash]
+----
+$ mvn liberty:run
+----
+  
+You can also run the following command to start the liberty server in development mode.
+
+[source, bash]
+----
+$ mvn liberty:dev
+---- 
+  
+Assuming your server is running on `http://localhost:9080/`, you can access your service at:
+`http://localhost:9080/mp-ecomm-store/api/products`.
+
+To call this RESTful web service, you can enter the URL in your browser. The response is an array of JSON objects. 
+Each object has an id, name, description and price property. Please note only GET methods can be tested with browsers.
+The response should be
+
+[source, json]
+----
+[{"description":"Apple iPhone 15","id":1,"name":"iPhone","price":999.99},{"description":"Apple MacBook Air","id":2,"name":"MacBook","price":1299.99}]
+----
+  
+This uses an in-memory list; In the next chapter, in a real application you should integrate a database (via Jakarta Persistence API). We will be learning about this in the next chapter. 
+
+*Quarkus*
+
+* Build your application as a native executable or Docker image.
+* Run the generated executable or deploy the Docker image to a container platform.
+* Refer to the Quarkus documentation for deployment guides: link:https://quarkus.io/guides/getting-started[Creating your first application - Quarkus]
+
+*Payara Micro*
+
+* Package your application as a WAR file.
+* Deploy the WAR to a Payara Micro server instance.
+* See the Payara Micro documentation for specific instructions: link:https://www.payara.fish/learn/getting-started-with-payara-micro/[Getting Started with Payara Micro]
+
+*WildFly*
+
+* Package your application as a WAR file.
+* Deploy the WAR to a WildFly server instance.
+* Refer to the WildFly documentation for deployment details: link:https://docs.wildfly.org/31/Developer_Guide.html[WildFly Developer Guide]
+
+*Helidon*
+
+* Choose between Helidon SE (native packaging) or Helidon MP (WAR packaging).
+* Build your application using Gradle.
+* Follow the relevant Helidon documentation for deployment steps: link:https://helidon.io/docs/v4/about/prerequisites[Helidon - Getting Started]
+
+*TomEE*
+
+* Package your application as a WAR file.
+* Deploy the WAR file to the TomEE server instance.
+* Refer to the TomEE documentation for instructions: link:https://tomee.apache.org/latest/examples/serverless-tomee-microprofile.html[Serverless TomEE MicroProfile]
+
+==== Additional Considerations:
+* Containerization: Consider using containerization technologies like Docker and Kubernetes for portability and scalability.
+* Cloud Deployment: Explore cloud platforms like AWS, Azure, or GCP.

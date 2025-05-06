@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Chapter 5: MicroProfile Configuration :: MicroProfile Tutorial</title>
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../..">MicroProfile Tutorial</a>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Chapter 1 - Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter02/chapter02-00.html">Chapter 2 - Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Chapter 3 - Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">Chapter 4 - MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="chapter05.html">Chapter 5 - MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">Chapter 6 - MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">Chapter 7 - MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">Chapter 8 - MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">Chapter 9 - MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">Chapter 10 - MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">Chapter 11 - MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../index.html">MicroProfile Tutorial</a></div>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">MicroProfile Tutorial</a></li>
+    <li><a href="chapter05.html">Chapter 5 - MicroProfile Configuration</a></li>
+  </ul>
+</nav>
+<div class="edit-this-page"><a href="file:///workspaces/microprofile-tutorial/./modules/ROOT/pages/chapter05/chapter05.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Chapter 5: MicroProfile Configuration</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This chapter focuses on MicroProfile Configuration, a key feature that allows developers to externalize configuration properties from their code. You can adapt configuration parameters to different environments (development, testing, production) without altering the core code. It provides flexibility and adaptability for microservices in different environments.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_topics_to_be_covered"><a class="anchor" href="#_topics_to_be_covered"></a>Topics to be covered</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Understanding MicroProfile Configuration</p>
+</li>
+<li>
+<p>Different environments required for Microservices development</p>
+</li>
+<li>
+<p>Working with Various Configuration Sources</p>
+</li>
+<li>
+<p>Key capabilities of MicroProfile Configuration</p>
+</li>
+<li>
+<p>Implementing Configuration Properties</p>
+</li>
+<li>
+<p>Creating a Custom Configuration Source</p>
+</li>
+<li>
+<p>Dynamic Updates and Handling Configuration Change Events</p>
+</li>
+<li>
+<p>Managing Configuration for Different Environments</p>
+</li>
+<li>
+<p>Securing Configuration and Best Practices</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_understanding_microprofile_configuration"><a class="anchor" href="#_understanding_microprofile_configuration"></a>Understanding MicroProfile Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>MicroProfile Configuration</strong> is a specification that allows developers to inject configuration values into applications. The MicroProfile Configuration APIs will enable developers to externalize configuration and access it from within your application. By separating configuration data (like database URLs, API credentials, feature flags) from the codebase, you make it easier to modify these settings without recompiling and redeploying the application.</p>
+</div>
+<div class="paragraph">
+<p>For instance, with MicroProfile Config, you can configure connection settings for a database enhancing flexibility and adaptability across different environments in our MicroProfile e-commerce application. You can update configurations seamlessly, sometimes even while the application is running (for dynamic config sources), minimizing downtime and streamlining deployment processes. This is essential for microservices that may run in diverse setups.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_different_environments_required_for_microservices_development"><a class="anchor" href="#_different_environments_required_for_microservices_development"></a>Different environments required for Microservices development</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When developing microservices, it’s essential to establish various
+environments to accommodate different stages of the development
+lifecycle. Each environment serves distinct purposes, ensuring the
+application is thoroughly tested, secure, and efficient before its
+deployment to production. Below are the critical environments typically
+set up for developing microservices:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Development Environment</strong>—Developers write new code, implement features,
+and perform basic unit testing in this environment, which is where the
+initial development occurs. This environment is usually configured to
+use local or development databases with dummy data for testing. The
+logging level used in this environment is generally verbose for
+debugging purposes.</p>
+</li>
+<li>
+<p><strong>Testing or QA Environment</strong>—This environment is dedicated to rigorous
+testing, including automated tests, integration tests, and manual
+testing by QA engineers to identify bugs or issues. Configuration here
+mirrors production settings as closely as possible and connects to a
+testing database. For error tracing, detailed logging may be enabled in
+this environment.</p>
+</li>
+<li>
+<p><strong>Staging Environment</strong>—This is a production-like environment for final
+testing of the changes before deployment to production. It ensures that
+your microservices perform as expected under production conditions. This
+environment is configured with settings identical to the production
+environment. It typically uses a copy of production data that is
+sanitized of sensitive data.</p>
+</li>
+<li>
+<p><strong>Production Environment</strong>—This is the live environment where the
+microservice is fully deployed and accessible to end-users. It’s
+optimized for security, performance, and reliability and configured to
+access actual user data with all security features fully enabled.
+Performance monitoring tools are also set up here to ensure smooth
+operations.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Using the above set of environments, development teams can streamline
+the development process, enhance quality, and ensure the microservices
+are robust and ready for production use. Your development team may also
+require additional environments for specific needs like automation,
+penetration testing, and stress testing, depending on the unique needs
+of the microservices.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_working_with_various_configuration_sources"><a class="anchor" href="#_working_with_various_configuration_sources"></a>Working with Various Configuration Sources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile Config allows applications to retrieve configuration
+properties from a variety of sources. By default, MicroProfile Config
+includes various built-in configuration sources, but you can also define
+custom sources. Below we discuss how to work with these various
+configuration sources.</p>
+</div>
+<div class="sect2">
+<h3 id="_built_in_configuration_sources"><a class="anchor" href="#_built_in_configuration_sources"></a>Built-in Configuration Sources</h3>
+<div class="paragraph">
+<p>MicroProfile Config defines default configuration sources that are
+automatically enabled:</p>
+</div>
+<div class="paragraph">
+<p><strong>System Properties:</strong> Configuration values defined as system properties
+can be accessed by MicroProfile Config. These properties can be set at
+runtime using the <code>-D</code> flag when starting the JVM.</p>
+</div>
+<div class="paragraph">
+<p><strong>Environment Variables:</strong> Environment variables available in the system
+can be used as configuration sources. They are useful for setting
+configuration properties external to the application, especially in
+containerized environments.</p>
+</div>
+<div class="paragraph">
+<p><strong>MicroProfile Config Properties File:</strong> A properties file named
+<em>microprofile-config.properties</em> can be placed in the <em>META-INF</em> directory
+of your application. This file is particularly useful for setting
+default configuration values that ship with the application.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_types_of_configuration_sources"><a class="anchor" href="#_types_of_configuration_sources"></a>Types of Configuration Sources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A <strong>static configuration source</strong> is the one where the data does not change once the application has started. Examples include the microprofile-config.properties file and most custom implementations that read from a database or a service at startup.</p>
+</div>
+<div class="paragraph">
+<p>On the other hand, <strong>a dynamic configuration source</strong> is one that can change its data at runtime. System properties and some custom implementations that periodically check for changes in a remote configuration service are examples of dynamic sources.</p>
+</div>
+<div class="paragraph">
+<p>MicroProfile Config allows applications to read from these dynamic sources as easily as from static ones. However, whether a configuration source supports dynamic behavior depends on its implementation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_key_capabilities_of_microprofile_configuration"><a class="anchor" href="#_key_capabilities_of_microprofile_configuration"></a>Key capabilities of MicroProfile Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The MicroProfile Configuration specifications offer a set of APIs that
+enable you to handle your application’s configuration efficiently. They
+allow you to easily manage and customize your application’s
+configurations, making it a valuable tool for developers.</p>
+</div>
+<div class="paragraph">
+<p>The MicroProfile Configuration APIs provide the following capabilities
+for managing the configuration settings of your application:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It allows reading configuration values.</p>
+</li>
+<li>
+<p>It allows applications to retrieve configuration values reliably,
+supporting various sources, such as property files, system properties,
+environment variables, and more.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The MicroProfile Configuration API provides several classes, allowing
+easy integration of configuration values. Below is the list of key
+classes and interfaces included in the MicroProfile Configuration API:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Config</code> - the class that is the main entry point to the configuration API
+and provides access to configuration data. The Config class provides
+static methods that can be used to access configuration properties.</p>
+</li>
+<li>
+<p><code>ConfigProvider</code> - a utility class for getting the Config instance. It
+allows retrieving the static instance of the Config object.</p>
+</li>
+<li>
+<p><code>ConfigBuilder</code> - An interface used to create a Config instance manually.
+It can add default sources, converters, and configuration sources.</p>
+</li>
+<li>
+<p><code>ConfigSource</code> - This class represents a source of configuration values.
+It reads configuration data from a specific source, such as system
+properties, environment variables, files, or data stores.</p>
+</li>
+<li>
+<p><code>Property</code> - It represents a key/value pair in the configuration data.</p>
+</li>
+<li>
+<p><code>Converter&lt;T&gt;</code> - This interface implements custom converters that convert
+configuration values from String to any desired type.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These classes and interfaces provide a robust configuration mechanism
+that is easy to use and extend. Developers can leverage these APIs to
+externalize configuration from their applications, making them more
+flexible and more accessible to run in different environments.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_implementing_configuration_properties"><a class="anchor" href="#_implementing_configuration_properties"></a>Implementing Configuration Properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Config API allows you to define configuration properties in many ways, including property files, environment variables, and system properties. To use the Config API, we’ll need to include the following dependency in our <em>pom.xml</em> file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.config&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-config-api&lt;/artifactId&gt;
+  &lt;version&gt;3.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For Gradle, modify your <em>build.gradle</em> file with the following dependency:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">implementation 'org.eclipse.microprofile.config:microprofile-config-api:3.1'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Let’s now modify the <code>getProducts()</code> method to return a <code>jakarta.ws.rs.core.Response</code> object instead of a list of Product entities directly, we can utilize the <code>Response</code> class to build our response.  This approach allows for a more standardized and flexible API response handling, including the ability to set HTTP status codes and headers.</p>
+</div>
+<div class="paragraph">
+<p>Lets create a configuration file with the name <em>microprofile-config.properties</em> and the content as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs"># microprofile-config.properties
+product.maintenanceMode=false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This configuration file should be placed in the <em>src/main/resources/META-INF/</em> directory of your application.</p>
+</div>
+<div class="sect2">
+<h3 id="_reading_configuration_properties"><a class="anchor" href="#_reading_configuration_properties"></a>Reading Configuration Properties</h3>
+<div class="paragraph">
+<p>Next inject this configuration value to a private variable in the ProductResource and consume this within all the operations of this service.</p>
+</div>
+<div class="paragraph">
+<p>MicroProfile Config will automatically detect and use the properties defined in this file, allowing you to externalize configuration and easily adjust the behavior of your application based on the environment in which it is deployed.</p>
+</div>
+<div class="paragraph">
+<p>Below is the updated <code>ProductResource</code> class and <code>getProducts()</code> method:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.product.resource;
+
+import io.microprofile.tutorial.store.product.entity.Product;
+import io.microprofile.tutorial.store.product.repository.ProductRepository;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+
+import java.util.List;
+
+@Path("/products")
+@ApplicationScoped
+public class ProductResource {
+
+   @Inject
+   @ConfigProperty(name="product.maintenanceMode", defaultValue="false")
+   private boolean maintenanceMode;
+
+   @Inject
+   private ProductRepository productRepository;
+
+   @GET
+   @Produces(MediaType.APPLICATION_JSON)
+   @Transactional
+
+   // OpenAPI code
+   // …
+
+   public Response getProducts() {
+
+       List&lt;Product&gt; products = productRepository.findAllProducts();
+
+       // If in maintenance mode, return Service Unavailable status
+       if (maintenanceMode) {
+          return Response
+                  .status(Response.Status.SERVICE_UNAVAILABLE)
+                  .entity("The product catalog service is currently in maintenance mode. Please try again later.")
+                  .build();
+
+       // If products found, return products and OK status
+       } else if (products != null &amp;&amp; !products.isEmpty()) {
+           return Response
+                   .status(Response.Status.OK)
+                   .entity(products).build();
+
+      // If products not found, return Not Found status and message
+      } else {
+          return Response
+                  .status(Response.Status.NOT_FOUND)
+                  .entity("No products found")
+                  .build();
+      }
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Inject</code>: This CDI annotation enables dependency injection. It tells the container to inject an instance of a specified bean at runtime. As we have learnt previously, dependency injection enables loose coupling between classes and their dependencies, making the code more modular, easier to test, and maintain.</p>
+</li>
+<li>
+<p><code>@ConfigProperty(name="product.maintenanceMode", defaultValue="false")</code>: This MicroProfile Config annotation used along with <code>@Inject</code> to inject configuration property values into beans. It allows developers to externalize configuration from the application code, making applications more flexible and environment-agnostic. The <code>name</code> parameter specifies the key of the configuration property to be injected. In this case, <code>product.maintenanceMode</code> is the key for a property that controls whether this service is in maintenance mode. The <code>defaultValue</code> provides a default value to be used if the specified configuration property is not found in any of the configured sources. Here, the default value is <code>false</code>, indicating that, by default, the service is not in maintenance mode unless explicitly configured otherwise.</p>
+</li>
+<li>
+<p><code>private boolean maintenanceMode</code>: This field is set to the value of the <code>product.maintenanceMode</code> configuration property. Due to the <code>defaultValue ="false"</code>, if the configuration is not specified elsewhere, <code>maintenanceMode</code> will be <code>false</code>, meaning the service operates normally.</p>
+</li>
+<li>
+<p><code>private ProductRepository productRepository</code>: This field is injected with an instance of ProductRepository.  This class abstracts the data access operations for products. This injection decouples the class from the specific implementation of the repository, making the code more modular and easier to adapt or replace parts of it in the future.</p>
+</li>
+<li>
+<p>The <code>getProducts()</code> method retrieves all products from the repository by calling <code>productRepository.findAllProducts()</code>, which queries the database to retrieve a list of all available products.
+Before proceeding to return the list of products, the method checks the <code>maintenanceMode</code> flag. If <code>maintenanceMode</code> is <code>true</code>, the service is currently undergoing maintenance, and thus, it is not appropriate to perform regular operations. The method constructs and returns a Response with a <code>503 Service Unavailable</code> HTTP status code, along with a message indicating that the product catalog service is in maintenance mode.</p>
+</li>
+<li>
+<p>If the service is not in maintenance mode, then the method checks if the list of retrieved products is not <code>null</code> and not empty.</p>
+</li>
+<li>
+<p>If products are found, it constructs a Response with a status of <code>200 OK</code> and includes the list of products as the response entity. This indicates a successful operation where product data is found and returned.</p>
+</li>
+<li>
+<p>If the products list is`null` or empty, indicating no products were found, the method constructs and returns a <code>Response</code> with a <code>404 Not Found</code> status code and a message stating that no products were found.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When we deploy the application and invoke the <code>/api/products</code> endpoint, we should see the list of products as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[{"description":"Apple iPhone 15 Pro","id":1,"name":"iPhone 15 Pro","price":999.0}]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_specifying_default_values_for_a_configproperty"><a class="anchor" href="#_specifying_default_values_for_a_configproperty"></a>Specifying Default Values for a <code>ConfigProperty</code></h3>
+<div class="paragraph">
+<p>For non-critical properties, providing a default value using the defaultValue attribute of the @ConfigProperty annotation ensures that your application has a fallback option. We can specify a default value to be used if the property does not exist as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class ProductResource {
+
+   @Inject
+   @ConfigProperty(name="product.maintenanceMode", defaultValue="false")
+   private boolean maintenanceMode;
+   …</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the example above , the <code>false</code> default value will be used if the <code>product.maintenanceMode</code> property does not exist.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_type_conversion_in_configproperty"><a class="anchor" href="#_type_conversion_in_configproperty"></a>Type Conversion in <code>ConfigProperty</code></h3>
+<div class="paragraph">
+<p><code>ConfigProperty</code> also supports type conversion, so we can inject our configuration data into fields of any type:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">   @Inject
+   @ConfigProperty(name="product.maintenanceMode", defaultValue="false")
+   private boolean maintenanceMode;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example, the <code>product.maintenanceMode</code> property will be converted to an <code>Boolean</code> before it is injected into the <code>maintenanceMode</code> field.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_converting_configuration_data_to_a_pojo"><a class="anchor" href="#_converting_configuration_data_to_a_pojo"></a>Converting Configuration data to a POJO</h3>
+<div class="paragraph">
+<p>We can also use the Config API to convert our configuration data to a POJO:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+
+public class MyApplication {
+    @Inject
+    private MaintenanceMessage message;
+}
+
+
+public class MaintenanceMessage {
+    @ConfigProperty(name="product.maintenanceMessage")
+    private String message;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example, we’re injecting a property named "product.maintenanceMessage" into the message field of our MaintenanceMessage class.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_creating_a_custom_configsource"><a class="anchor" href="#_creating_a_custom_configsource"></a>Creating a Custom <code>ConfigSource</code></h3>
+<div class="paragraph">
+<p>As we saw, the Config API makes it easy to inject configuration properties into an application. The Config API defines a contract for config implementations. A ConfigSource is used to read configuration data from a particular source. For example, we could create a ConfigSource that reads configuration data from a file.</p>
+</div>
+<div class="paragraph">
+<p><code>ConfigSource</code> interface has the following methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>String getName()</code> : Returns the name of the ConfigSource.</p>
+</li>
+<li>
+<p><code>int getOrdinal()</code> : Returns the ordinal of the ConfigSource. Ordinals are used to determine the precedence of ConfigSources. A higher ordinal means a higher precedence.</p>
+</li>
+<li>
+<p><code>Map&lt;String, String&gt; getProperties()</code> : Returns a map of the properties in this ConfigSource. The keys in the map are the property names, and the values are the property values.</p>
+</li>
+<li>
+<p><code>getValue(String propertyName)</code> : Returns the value of the given property. If the property is not found, this method returns null.</p>
+</li>
+<li>
+<p><code>Set getPropertyNames()</code> : Returns a Set of the property names in this ConfigSource.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Let’s implement a feature in our MicroProfile e-Commerce application to integrate payment gateway configuration dynamically by creating a PaymentServiceConfigSource (a custom ConfigSource) which could fetch API keys and endpoints. This would ensure that payment service configurations are up-to-date and can be changed without redeploying the application.</p>
+</div>
+<div class="paragraph">
+<p>The following is an implementation of a <code>ConfigSource</code> that reads configuration data from a file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.config;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.eclipse.microprofile.config.spi.ConfigSource;
+
+public class PaymentServiceConfigSource implements ConfigSource{
+
+   private Map&lt;String, String&gt; properties = new HashMap&lt;&gt;();
+
+   public PaymentServiceConfigSource() {
+       // Load payment service configurations dynamically
+       // This example uses hardcoded values for demonstration
+       properties.put("payment.gateway.apiKey", "secret_api_key");
+       properties.put("payment.gateway.endpoint", "https://api.paymentgateway.com");
+   }
+
+   @Override
+   public Map&lt;String, String&gt; getProperties() {
+       return properties;
+   }
+
+   @Override
+   public String getValue(String propertyName) {
+       return properties.get(propertyName);
+   }
+
+   @Override
+   public String getName() {
+       return "PaymentServiceConfigSource";
+   }
+
+   @Override
+   public int getOrdinal() {
+       // Ensuring high priority to override default configurations if necessary
+       return 600;
+   }
+
+   @Override
+   public Set&lt;String&gt; getPropertyNames() {
+       // Return the set of all property names available in this config source
+       return properties.keySet();}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above code snippet demonstrates MicroProfile Config&#8217;s flexibility in integrating with various external configuration providers. This enables applications to load configurations from sources beyond the default system properties, environment variables, and microprofile-config.properties files. This capability is crucial for modern applications that may need to pull configuration from dynamic sources like cloud services, databases, or custom APIs.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+When integrating with external configuration providers, it’s essential to consider security aspects, especially when dealing with sensitive configuration data. Use secure communication channels (e.g., HTTPS) to retrieve configuration from external services. Manage access control meticulously to prevent unauthorized access to sensitive configuration. Consider encrypting sensitive configuration values and decrypting them within your ConfigSource or application logic.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_registering_a_configsource"><a class="anchor" href="#_registering_a_configsource"></a>Registering a <code>ConfigSource</code></h3>
+<div class="paragraph">
+<p>To register a custom <code>ConfigSource</code> implementation with MicroProfile Config, you need to include the fully qualified class name of your custom <code>ConfigSource</code> in this resource file <em>/META-INF/services/org.eclipse.microprofile.config.spi.ConfigSource</em>.</p>
+</div>
+<div class="paragraph">
+<p>This <code>PaymentService</code> would be a part of the e-Commerce application, handling payment transactions by utilizing configurations that determine which payment gateway to use and how to authenticate with it. By externalizing these configurations, the e-Commerce platform can easily switch payment providers or update API keys without needing to adjust the codebase, providing flexibility and enhancing security.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_accessing_the_configuration_data"><a class="anchor" href="#_accessing_the_configuration_data"></a>Accessing the Configuration Data</h3>
+<div class="paragraph">
+<p>First, create a class to represent the payment information sent by clients as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.entity;
+
+import java.math.BigDecimal;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class PaymentDetails {
+   private String cardNumber;
+   private String cardHolderName;
+   private String expirationDate; // Format MM/YY
+   private String securityCode;
+   private BigDecimal amount;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>PaymentDetails</code> class succinctly encapsulates the necessary attributes for processing payments. This class can be used to pass payment details for processing payments, validating card details, and logging transaction information.</p>
+</div>
+<div class="paragraph">
+<p>Next, implement the <code>PaymentService</code> class, which utilizes MicroProfile Config to inject the necessary configurations. It represents a simple service that could call a payment gateway API using the configurations provided by the custom <code>ConfigSource</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.config.inject.ConfigProperty;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+
+@Path("/authorize")
+@RequestScoped
+public class PaymentService {
+
+    @Inject
+    @ConfigProperty(name = "payment.gateway.apiKey")
+    private String apiKey;
+
+    @Inject
+    @ConfigProperty(name = "payment.gateway.endpoint")
+    private String endpoint;
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response processPayment(PaymentDetails paymentDetails) {
+        // Example logic to call the payment gateway API
+        System.out.println("Processing payment with details: " + paymentDetails.toString());
+        System.out.println("Calling payment gateway API at: " + endpoint);
+        // Assuming a successful payment operation for demonstration purposes
+        // Actual implementation would involve calling the payment gateway and handling the response
+
+        // Dummy response for successful payment processing
+        String result = "{\"status\":\"success\", \"message\":\"Payment processed successfully.\"}";
+        return Response.ok(result, MediaType.APPLICATION_JSON).build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Explanation:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Path("/authorize")</code>: Defines the base URI for the RESTful service. This class will handle requests made to URIs that start with <code>/payment/api/authorize</code>.</p>
+</li>
+<li>
+<p><code>@RequestScoped</code>: Indicates that a new instance of <code>PaymentService</code> is created for each HTTP request.</p>
+</li>
+<li>
+<p><code>@POST</code>: Specifies that the <code>processPayment</code> method will respond to HTTP POST requests, which is appropriate for operations that change server state (in this case, processing a payment).</p>
+</li>
+<li>
+<p><code>@Consumes(MediaType.APPLICATION_JSON)</code>: Indicates that the method expects requests to have a payload formatted as JSON, aligning with how payment details might be sent.</p>
+</li>
+<li>
+<p><code>@Produces(MediaType.APPLICATION_JSON)</code>: Specifies that the method produces JSON-formatted responses, useful for indicating the result of the payment processing operation.</p>
+</li>
+<li>
+<p><code>Response processPayment(PaymentDetails paymentDetails)</code>: The method now returns a Response object, allowing for more flexible HTTP response handling. The PaymentDetails parameter would be a POJO (Plain Old Java Object) representing the payment information sent by the client.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The clients can call to process payments through the e-Commerce application using this RESTful web service endpoint. The actual logic for calling the payment gateway API and handling the response would be implemented within this method, utilizing the injected configuration properties for authentication and endpoint URL.</p>
+</div>
+<div class="paragraph">
+<p><code>ConfigSources</code> are hierarchical, which means that we can override properties from one <code>ConfigSource</code> with another <code>ConfigSource</code>. For example, we could create a <code>ConfigSource</code> that reads configuration data from a file, and another <code>ConfigSource</code> that reads configuration data from system properties. The system properties would take precedence over the file-based <code>ConfigSource</code>, which would take precedence over the default <code>ConfigSource</code>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Property getProperty(String propertyName)</code> : Returns information about the given property. If the property is not found, this method returns <code>null</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_enabling_microprofile_config_in_open_liberty"><a class="anchor" href="#_enabling_microprofile_config_in_open_liberty"></a>Enabling MicroProfile Config in Open Liberty</h3>
+<div class="paragraph">
+<p>Open Liberty requires a <code>server.xml</code> file for server configuration. This file should be located at <code>/src/main/liberty/config/server.xml</code> within your project. To enable MicroProfile Config, you need to include the <code>mpConfig</code> feature in the <code>&lt;featureManager&gt;</code> section.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;server description="MicroProfile Tutorial Server"&gt;
+  &lt;featureManager&gt;
+    &lt;feature&gt;mpConfig-3.1&lt;/feature&gt; &lt;!-- Use the appropriate version --&gt;
+    &lt;!-- Include other features as needed --&gt;
+  &lt;/featureManager&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_managing_configuration_for_different_environments"><a class="anchor" href="#_managing_configuration_for_different_environments"></a>Managing Configuration for Different Environments</h3>
+<div class="paragraph">
+<p>Managing configurations for different environments is a crucial aspect of modern application development, especially in microservices architectures where applications may run in development, testing, staging, and production environments with varying configurations. MicroProfile Config provides the flexibility to handle environment-specific configurations efficiently. Here’s how to manage configurations for different environments using MicroProfile Config:</p>
+</div>
+<div class="paragraph">
+<p><strong>Use of Profiles</strong>: MicroProfile Config does not explicitly define the concept of profiles for managing environment-specific configurations. However, developers can implement a profile-like mechanism using custom ConfigSource implementations or by organizing configuration properties in a way that differentiates them by environment. For instance, you could prefix configuration keys with the environment name:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>dev.database.url</code></p>
+</li>
+<li>
+<p><code>test.database.url</code></p>
+</li>
+<li>
+<p><code>prod.database.url</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Then, you can programmatically or conditionally load configurations based on the active environment.</p>
+</div>
+<div class="paragraph">
+<p><strong>Environment Variables and System Properties</strong>: Leveraging environment variables and system properties is a common and effective way to provide environment-specific configurations. MicroProfile Config automatically includes ConfigSources for both system properties and environment variables, allowing for easy overrides of configurations per environment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String databaseUrl = ConfigProvider.getConfig().getValue("database.url", String.class);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Custom ConfigSources</strong>: For more complex scenarios or to integrate with external configuration management systems (e.g., Consul, Etcd, AWS Parameter Store), you can implement custom ConfigSources. These sources can dynamically load configurations based on the environment, either by connecting to external services or by loading environment-specific files:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class MyEnvironmentConfigSource implements ConfigSource {
+    // Implementation that loads configurations based on the detected environment
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Configuration Isolation</strong>: It’s essential to isolate configurations for different environments to prevent accidental leaks of sensitive information (e.g., production database credentials). This can be achieved by using:
+- separate configuration files for each environment, stored securely and only accessible by the application running in that environment.
+- Utilizing external secrets management tools to store sensitive configurations, with access controlled by the environment.</p>
+</div>
+<div class="paragraph">
+<p><strong>CI/CD Integration</strong>: Integrate environment-specific configuration management into your CI/CD pipelines. Ensure that the correct configurations are applied automatically as part of the deployment process for each environment.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_strategies_for_handling_configuration_change_events"><a class="anchor" href="#_strategies_for_handling_configuration_change_events"></a>Strategies for Handling Configuration Change Events</h3>
+<div class="paragraph">
+<p>Although direct support for configuration change events is not provided by MicroProfile Config specification itself, applications can implement their mechanisms or use external libraries to achieve this functionality. To implement dynamic updates in your MicroProfile Config usage, you might need to adopt one of the following approaches:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Manual Refresh:</strong> Provide a mechanism (e.g., an admin-restricted endpoint) to manually trigger a refresh of the configuration. This approach gives control over when changes are applied but requires manual intervention.</p>
+</li>
+<li>
+<p><strong>Polling</strong>: Implement a scheduler that periodically checks certain configuration properties for changes. This approach is straightforward but might introduce latency between the actual change and its detection.</p>
+</li>
+<li>
+<p><strong>Event-driven Updates</strong>: If your configuration source supports event notifications (for example, a database trigger or a cloud service event), you can set up listeners that update your application’s configuration in response to these events.</p>
+</li>
+<li>
+<p><strong>Application-level Event Handling</strong>: Design your application components to subscribe to a custom event bus or notification system. When a configuration change is detected (via polling or custom ConfigSource), publish an event to this bus, triggering subscribed components to update their configurations.</p>
+</li>
+<li>
+<p><strong>Custom Configuration Source</strong>: Develop a custom ConfigSource that includes logic to listen for changes in the underlying configuration store (such as a database, filesystem, or cloud service). This ConfigSource can then notify the application of changes, prompting it to refresh configuration properties.</p>
+</li>
+<li>
+<p><strong>Runtime Extensions</strong>: Some MicroProfile runtimes may offer extensions that support dynamic configuration and change event handling. Check the documentation of your runtime environment for such features and best practices for their usage.</p>
+</li>
+<li>
+<p><strong>Framework/Library Support</strong>: Use a third-party library or framework that extends MicroProfile Config with change event support. These libraries might offer annotations or listener interfaces to react to configuration changes automatically.</p>
+</li>
+<li>
+<p><strong>External Configuration Management Tools</strong>: Utilize configuration management tools or services that offer webhook or messaging functionalities to notify your application of configuration changes. Upon receiving a notification, the application can reload its configuration context.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>While MicroProfile Config provides the mechanisms to read from dynamic configuration sources, it does not specify a standard way to listen for changes in configuration properties directly within its API as of version 3.1. Applications need to implement their logic or use additional libraries/frameworks to detect changes in configuration sources and react accordingly.</p>
+</div>
+<div class="paragraph">
+<p>However, some implementations of MicroProfile Config might offer extensions or additional functionalities to support configuration change events. For example, an application can poll a configuration source at intervals to detect changes or use a notification system that triggers configuration reloads.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_best_practices_and_securing_configuration_in_microprofile_config"><a class="anchor" href="#_best_practices_and_securing_configuration_in_microprofile_config"></a>Best Practices and Securing Configuration in MicroProfile Config</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here are some recommended practices for using MicroProfile Config:</p>
+</div>
+<div class="paragraph">
+<p><strong>Graceful Configuration Reloads</strong>: Ensure that your application can gracefully handle configuration reloads, especially in critical components that depend on configuration properties for their operation.</p>
+</div>
+<div class="paragraph">
+<p><strong>Minimize Performance Impact</strong>: Design your dynamic configuration update mechanism to minimize performance impacts, especially if using polling mechanisms.</p>
+</div>
+<div class="paragraph">
+<p><strong>Secure Configuration Management</strong>: When implementing custom solutions for dynamic configuration, pay attention to security aspects, particularly if configurations include sensitive information. Securing sensitive configuration properties is crucial for maintaining the security and integrity of applications.</p>
+</div>
+<div class="paragraph">
+<p><strong>Encrypt Sensitive Configuration Values</strong>: Sensitive information, such as passwords, tokens, and API keys, should be encrypted in the configuration source. Decryption can be handled programmatically within the application or through integration with external secrets management systems.</p>
+</div>
+<div class="paragraph">
+<p><strong>Use Environment-Specific Configuration Files</strong>: Separate configuration files for different environments (development, testing, production) can help minimize the risk of exposing sensitive data. For instance, development configurations might use placeholder values, whereas production configurations access secrets from a secure vault or environment variables.</p>
+</div>
+<div class="paragraph">
+<p><strong>Leverage External Secrets Management</strong>: Integrating with external secrets management tools (like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault) ensures that sensitive configurations are stored securely and accessed dynamically at runtime. These tools provide mechanisms to control access to secrets and often include auditing capabilities.</p>
+</div>
+<div class="paragraph">
+<p><strong>Use Environment Variables for Sensitive Values</strong>: Environment variables can be a secure way to provide configuration to applications, especially for containerized or cloud-native applications. This approach leverages the underlying platform’s security model to protect sensitive information.</p>
+</div>
+<div class="paragraph">
+<p><strong>Implement Access Control</strong>: Ensure that only authorized personnel have access to configuration files, especially those containing sensitive information. Use file permissions, access control lists (ACLs), or similar mechanisms provided by the operating system or hosting environment.</p>
+</div>
+<div class="paragraph">
+<p><strong>Audit and Monitor Configuration Access</strong>: Regularly audit access to configuration files and monitor for unauthorized access attempts. This can help detect potential security breaches and ensure that only authorized changes are made to the configuration.</p>
+</div>
+<div class="paragraph">
+<p><strong>Configuration Validation</strong>: Validate configuration data at startup to ensure that it meets the application’s expected format and values. This step can prevent configuration errors and detect tampering or unauthorized changes.</p>
+</div>
+<div class="paragraph">
+<p><strong>Keep Configuration Data Updated</strong>: Regularly review and update configuration data to ensure that it reflects the current operational and security needs. Remove unused properties and update secrets periodically to reduce the risk of compromise.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_summary"><a class="anchor" href="#_summary"></a>Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Dynamic configuration management is essential for modern applications, providing the flexibility to adapt to changing environments without downtime. Although MicroProfile Config as of version 3.1 does not define a standard for handling configuration change events directly, applications can still achieve this by combining MicroProfile Config with custom logic or additional tools designed for dynamic configuration management. Always consult the documentation of your MicroProfile implementation to learn about supported features and extensions related to dynamic configuration and change events.</p>
+</div>
+<div class="paragraph">
+<p>While the MicroProfile Config specification provides a powerful and flexible framework for configuration management, handling dynamic updates and configuration change events may require additional custom development or the use of external tools. By considering the strategies mentioned above, developers can effectively manage configuration changes, ensuring their microservices remain responsive and resilient in dynamic environments.</p>
+</div>
+<div class="paragraph">
+<p>The MicroProfile Config specification offers a robust and adaptable framework for managing application configurations. By implementing MicroProfile Config, developers can effectively manage configuration changes, ensuring their microservices remain responsive and resilient in dynamic environments.</p>
+</div>
+<div class="paragraph">
+<p>Integrating external configuration providers with MicroProfile Config extends the flexibility and dynamism of configuration management in microservices architectures. By implementing custom ConfigSources, applications can seamlessly adapt to various environments and configuration paradigms, pulling configuration data from virtually any source.</p>
+</div>
+<div class="paragraph">
+<p>Handling missing or invalid configurations in MicroProfile Config involves using default values, optional properties, custom ConfigSource implementations, and appropriate exception handling. By following these practices, you can ensure that your application remains robust and flexible, even in the face of configuration challenges.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

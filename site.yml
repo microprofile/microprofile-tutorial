@@ -1,0 +1,18 @@
+site:
+  title: MicroProfile Tutorial
+  start_page: microprofile-tutorial::index.adoc
+
+content:
+  sources:
+    - url: .
+      start_path: .
+
+ui:
+  bundle:
+    url: https://github.com/ttelang/microprofile-documentation-ui/releases/download/latest/ui-bundle.zip
+output:
+  dir: ./build/site
+
+runtime:
+  log:
+    level: debug

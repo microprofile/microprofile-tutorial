@@ -33,7 +33,7 @@ To install JDK, follow the steps below:
 
 [source, bash]
 ----
-java -version
+java -version.
 ----
 
 You should an output similar to the one below: 
@@ -48,7 +48,7 @@ This confirms that JDK 17 has been successfully installed on your system.
 
 NOTE: For most MicroProfile implementations, JDK 11 or later is recommended. In 
 this tutorial, we will be using JDK 17. While OpenJDK is used here, other JDK 
-providers such as Oracle JDK, Amazon Corretto, Azul Zulu, OpenJ9 also offer 
+providers such as Oracle JDK, Amazon Corretto, and Azul Zulu also offer 
 compatible JDK distributions.
 
 === Build Tools (Maven or Gradle)
@@ -59,7 +59,7 @@ Build tools like link:https://maven.apache.org/[Apache Maven] or link:https://gr
 
 * *Gradle*: Offers a flexible, script-based build configuration, allowing for highly customized build processes. Gradle is renowned for its superior performance, due to its incremental builds  and caching mechanisms. It's a great choice for complex projects requiring customization.
 
-IMPORTANT: If your existing project's build uses Maven wrapper (`mvnw`) or Gradle wrapper (`gradlew`), you don't have to install any of these build tools. These wrappers help ensure a consistent build environment without requiring the build tools to be installed on your system. 
+IMPORTANT: If your existing project's build uses Maven wrapper (`mvnw`) or Gradle wrapper (`gradlew`), you don't to install any of these build tools. These wrappers help ensure a consistent build environment without requiring the build tools to be installed on your system. 
 
 ==== Installing Apache Maven
 
@@ -164,7 +164,7 @@ MicroProfile applications need a runtime that supports MicroProfile specificatio
 
 ==== Open Liberty 
 
-link:https://openliberty.io/[Open Liberty] is a flexible server framework from IBM that supports MicroProfile, allowing developers to build microservices and cloud-native applications with ease. Open Liberty is known for its dynamic updates and lightweight design, which enhances developer productivity and application performance.
+link:https://openliberty.io/[Open Liberty] is a flexible server framework from IBM that supports MicroProfile, allowing developers to build microservices and cloud-native applications with ease.Open Liberty is known for its dynamic updates and lightweight design, which enhances developer productivity and application performance.
 
 link:https://openliberty.io/start/[Downloading Open Liberty] page provides access to its latest releases and documentation to help you set up your environment. 
 

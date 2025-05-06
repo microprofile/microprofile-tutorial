@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: MicroProfile Tutorial</title>
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../..">MicroProfile Tutorial</a>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Chapter 1 - Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter02-00.html">Chapter 2 - Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Chapter 3 - Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">Chapter 4 - MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">Chapter 5 - MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">Chapter 6 - MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">Chapter 7 - MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">Chapter 8 - MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">Chapter 9 - MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">Chapter 10 - MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">Chapter 11 - MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../index.html">MicroProfile Tutorial</a></div>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+</nav>
+<div class="edit-this-page"><a href="file:///workspaces/microprofile-tutorial/./modules/ROOT/pages/chapter02/chapter02-05.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<div class="sect1">
+<h2 id="_package_structure"><a class="anchor" href="#_package_structure"></a>Package Structure</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Table below provides an overview of the package structure and their purposes within a typical Java-based
+microservices architecture.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Package</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">dto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Data Transfer Objects (DTOs) are used to transfer data between processes, such as from your service to a REST endpoint. They often mirror entity classes but can be tailored to the needs of the client to avoid over-fetching or under-fetching data.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">entity</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Entity classes represent the domain model and are typically mapped to database tables. These are the core classes that represent the business data and are often used with ORM tools like JPA.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">repository</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interfaces in this package abstract the data layer, making it easier to perform CRUD operations without dealing with database intricacies directly. This follows the Repository pattern. Data access layer, interacting with databases or other storage mechanisms (e.g., ProductRepository, CustomerRepository).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Service classes contain the core business logic. They interact with repositories to fetch and persist data and perform operations specific to the business requirements. (e.g., ProductService, OrderService, InventoryService).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">resource</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">REST resource classes (sometimes called controllers in other frameworks) are the entry points for HTTP requests. They interact with service classes to process these requests. Interfaces defining endpoints for REST services (e.g., ProductResource, ShoppingCartResource).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">common</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This package contains classes and interfaces that are shared across different microservices, such as utility classes, common configuration, exception handling, and security-related classes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">client</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">For microservices to communicate with each other, they often use HTTP clients. This package contains interfaces or classes annotated for use with MicroProfile Rest Client or similar, facilitating easy communication between your services.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">config</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration classes for MicroProfile Config.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">exception</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Custom exceptions for error handling (e.g., ProductNotFoundException, PaymentFailedException).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">util</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Helper and utility classes.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Base Package</strong>: <code>io.microprofile.tutorial.store</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-plaintext hljs" data-lang="plaintext">io.microprofile.tutorial.store
+├── product
+│    ├── resource
+│    ├── config
+│    ├── exception
+│    ├── entity
+│    ├── repository
+│    ├── service
+│    └── util
+├── cart
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── client
+│    ├── exception
+│    └── util
+├── user
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+├── inventory
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+├── order
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+├── payment
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+└── shipment
+     ├── resource
+     ├── entity
+     ├── service
+     ├── repository
+     ├── exception
+     └── util
+----</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>TODO: Current package structure is just a proposal will update after completing the source code for all chapters</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

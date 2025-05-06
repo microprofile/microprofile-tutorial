@@ -1,0 +1,88 @@
+== Testing your microservice
+
+Testing your microservice is critical for ensuring the reliability and robustness of your microservice. Maven, being a powerful project build management tool, simplifies this process by automating the test execution.
+To create tests for your microservice, start by creating a class called `ProductResourceTest`, which contains unit tests for the `ProductResource` class as below:
+
+[source, java]
+----
+// ProductResourceTest.java
+package io.microprofile.tutorial.store.product.resource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import io.microprofile.tutorial.store.product.entity.Product;
+
+public class ProductResourceTest {
+  private ProductResource productResource;
+
+   @BeforeEach
+   void setUp() {
+       productResource = new ProductResource();
+   }
+
+   @AfterEach
+   void tearDown() {
+       productResource = null;
+   }
+
+   @Test
+   void testGetProducts() {
+       List<Product> products = productResource.getProducts();
+
+       assertNotNull(products);
+       assertEquals(2, products.size());
+   }
+}
+----
+
+Explanation: 
+
+Below are the assertions to test the `getProducts()` method of `ProductService`:
+* The `assertNotNull(products)`; assertion checks that products are not `null`. It ensures the method returns a list, even if it’s empty. 
+* The `assertEquals(2, products.size())`; assertion verifies that the list contains two products.
+
+=== Running Unit Tests with Maven
+
+To run the unit tests defined in ProductResourceTest, follow these steps:
+
+* Open a Terminal or Command Prompt: Navigate to the root directory of your project where the pom.xml file is located. This file contains the Maven project definition, including dependencies and test configurations.
+
+* Execute the Maven Test Command: Enter the following command to initiate the execution of the unit tests:
+
+[source, shell]
+----
+$ mvn test
+----
+
+This command tells Maven to execute the test phase of the build lifecycle. Maven will compile the test source code, execute the test cases, and provide a summary of the test execution results.
+
+* Review Test Results: After running the tests, Maven displays the results in the terminal. Look for the Tests run:, Failures:, and Errors: summaries to assess the outcome. For the ProductResourceTest class, ensure that the test methods execute successfully and meet the expected assertions:
+
+* Addressing Failures: If any tests fail, Maven will highlight these failures in the output. Use this information to identify and fix issues in your code. Review the failing tests' output for details on the assertion failures and adjust your microservice implementation accordingly.
+
+* Rerun Tests: After making any necessary changes to your microservice code, rerun the tests using the mvn test command to verify that all issues have been resolved and that your microservice behaves as expected.
+
+By following these steps, you can leverage Maven to efficiently run and manage unit tests for your microservice, ensuring its functionality and reliability before deployment.
+
+== Next Steps
+
+Now that you have a basic MicroProfile service, consider exploring further:
+
+* Adding configuration with MicroProfile Config
+* Implementing health checks using MicroProfile Health
+* Enhancing your service with MicroProfile Fault Tolerance
+
+=== Resources
+
+* MicroProfile Official Website: https://microprofile.io/
+* MicroProfile GitHub Repository: https://github.com/eclipse/microprofile
+* MicroProfile Documentation and Guides: link:https://microprofile.io/documentation/[MicroProfile Official documentation]
+
+After completing this chapter, you should have a basic understanding of MicroProfile and how to start building microservices with it. Continue exploring the specifications and capabilities of MicroProfile to fully leverage its power in your microservices architecture.

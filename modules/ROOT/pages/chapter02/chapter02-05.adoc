@@ -1,0 +1,99 @@
+== Package Structure 
+
+The Table below provides an overview of the package structure and their purposes within a typical Java-based 
+microservices architecture.
+  
+[options="header"]
+|===
+|Package |Description
+
+|dto
+|Data Transfer Objects (DTOs) are used to transfer data between processes, such as from your service to a REST endpoint. They often mirror entity classes but can be tailored to the needs of the client to avoid over-fetching or under-fetching data.
+
+|entity
+|Entity classes represent the domain model and are typically mapped to database tables. These are the core classes that represent the business data and are often used with ORM tools like JPA.
+
+|repository
+|Interfaces in this package abstract the data layer, making it easier to perform CRUD operations without dealing with database intricacies directly. This follows the Repository pattern. Data access layer, interacting with databases or other storage mechanisms (e.g., ProductRepository, CustomerRepository).
+
+|service
+|Service classes contain the core business logic. They interact with repositories to fetch and persist data and perform operations specific to the business requirements. (e.g., ProductService, OrderService, InventoryService).
+
+|resource
+|REST resource classes (sometimes called controllers in other frameworks) are the entry points for HTTP requests. They interact with service classes to process these requests. Interfaces defining endpoints for REST services (e.g., ProductResource, ShoppingCartResource).
+
+|common
+|This package contains classes and interfaces that are shared across different microservices, such as utility classes, common configuration, exception handling, and security-related classes.
+
+|client
+|For microservices to communicate with each other, they often use HTTP clients. This package contains interfaces or classes annotated for use with MicroProfile Rest Client or similar, facilitating easy communication between your services.
+
+|config
+|Configuration classes for MicroProfile Config.
+
+|exception
+|Custom exceptions for error handling (e.g., ProductNotFoundException, PaymentFailedException).
+
+|util
+|Helper and utility classes.
+|===
+
+
+*Base Package*: `io.microprofile.tutorial.store`
+
+[source, plaintext]
+io.microprofile.tutorial.store
+├── product
+│    ├── resource
+│    ├── config
+│    ├── exception
+│    ├── entity
+│    ├── repository
+│    ├── service
+│    └── util
+├── cart
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── client
+│    ├── exception
+│    └── util
+├── user
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+├── inventory
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+├── order
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+├── payment
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+└── shipment
+     ├── resource
+     ├── entity
+     ├── service
+     ├── repository
+     ├── exception
+     └── util
+----
+
+TODO: Current package structure is just a proposal will update after completing the source code for all chapters
