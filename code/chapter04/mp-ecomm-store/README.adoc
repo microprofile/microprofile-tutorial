@@ -1,0 +1,189 @@
+= MicroProfile Ecommerce Store
+:toc: macro
+:toclevels: 3
+:icons: font
+:source-highlighter: highlight.js
+:experimental:
+
+toc::[]
+
+== Overview
+
+The MicroProfile E-Commere Store is a modern Jakarta EE 10 application built with MicroProfile 6.1 specifications and running on Open Liberty. Its product catalog service provides a RESTful API for product catalog management with enhanced MicroProfile features.
+
+This project demonstrates the key capabilities of MicroProfile OpenAPI.
+
+== Features
+
+* *RESTful API* using Jakarta RESTful Web Services
+* *OpenAPI Documentation* with Swagger UI
+
+== MicroProfile Features Implemented
+
+=== MicroProfile OpenAPI
+
+The application provides OpenAPI documentation for its REST endpoints. API documentation is generated automatically from annotations in the code:
+
+[source,java]
+----
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+@Operation(summary = "Get all products", description = "Returns a list of all products")
+@APIResponses({
+    @APIResponse(responseCode = "200", description = "List of products", 
+                content = @Content(mediaType = "application/json", 
+                schema = @Schema(implementation = Product.class)))
+})
+public Response getAllProducts() {
+    // Implementation
+}
+----
+
+The OpenAPI documentation is available at: `/openapi` (in various formats) and `/openapi/ui` (Swagger UI)
+
+=== MicroProfile Config
+
+The application uses MicroProfile Config to externalize configuration:
+
+[source,properties]
+----
+mp.openapi.scan=true
+----
+
+This enables scanning of OpenAPI annotations in the application.
+
+== Project Structure
+
+[source]
+----
+mp-ecomm-store/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── io/microprofile/tutorial/store/
+│   │   │       └── product/
+│   │   │           ├── entity/          # Domain entities
+│   │   │           ├── resource/        # REST resources
+│   │   │           └── ProductRestApplication.java
+│   │   ├── liberty/
+│   │   │   └── config/
+│   │   │       └── server.xml          # Liberty server configuration
+│   │   ├── resources/
+│   │   │   └── META-INF/
+│   │   │       └── microprofile-config.properties
+│   │   └── webapp/                     # Web resources
+│   └── test/                           # Test classes
+└── pom.xml                             # Maven build file
+----
+
+== Getting Started
+
+=== Prerequisites
+
+* JDK 17+
+* Maven 3.8+
+
+=== Building and Running
+
+To build and run the application:
+
+[source,bash]
+----
+# Clone the repository
+git clone https://github.com/yourusername/liberty-rest-app.git
+cd code/mp-ecomm-store
+
+# Build the application
+mvn clean package
+
+# Run the application
+mvn liberty:run
+----
+
+=== Testing the Application
+
+==== Testing MicroProfile Features
+
+[source,bash]
+----
+
+# OpenAPI documentation
+curl -X GET http://localhost:5050/openapi
+----
+
+To view the Swagger UI, open the following URL in your browser:
+http://localhost:5050/openapi/ui
+
+== Server Configuration
+
+The application uses the following Liberty server configuration:
+
+[source,xml]
+----
+<server description="MicroProfile Tutorial Liberty Server">
+    <featureManager>
+        <platform>jakartaEE-10.0</platform>
+        <platform>microProfile-6.1</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>mpConfig</feature>
+        <feature>mpOpenAPI</feature>
+    </featureManager>
+
+    <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
+                  id="defaultHttpEndpoint" host="*" />
+    <webApplication location="mp-ecomm-store.war" contextRoot="${app.context.root}"/>
+</server>
+----
+
+== Development
+
+=== Adding a New Endpoint
+
+To add a new endpoint:
+
+1. Create a new method in the `ProductResource` class
+2. Add appropriate Jakarta Restful Web Service annotations
+3. Add OpenAPI annotations for documentation
+4. Implement the business logic
+
+Example:
+
+[source,java]
+----
+@GET
+@Path("/search")
+@Produces(MediaType.APPLICATION_JSON)
+@Operation(summary = "Search products", description = "Search products by name")
+@APIResponses({
+    @APIResponse(responseCode = "200", description = "Products matching search criteria")
+})
+public Response searchProducts(@QueryParam("name") String name) {
+    List<Product> matchingProducts = products.stream()
+        .filter(p -> p.getName().toLowerCase().contains(name.toLowerCase()))
+        .collect(Collectors.toList());
+    return Response.ok(matchingProducts).build();
+}
+----
+
+== Troubleshooting
+
+=== Common Issues
+
+* *OpenAPI documentation not available*: Make sure `mp.openapi.scan=true` is set in the properties file
+
+=== Logs
+
+Server logs can be found at:
+
+[source]
+----
+target/liberty/wlp/usr/servers/defaultServer/logs/
+----
+
+== Resources
+
+* https://microprofile.io/[MicroProfile]
+

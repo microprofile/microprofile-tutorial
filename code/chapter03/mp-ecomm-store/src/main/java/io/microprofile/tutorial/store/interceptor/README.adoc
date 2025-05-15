@@ -1,0 +1,298 @@
+= Logging Interceptor Documentation
+
+== Overview
+
+The logging interceptor provides automatic method entry/exit logging with execution time tracking for your MicroProfile application. It's implemented using CDI interceptors.
+
+== How to Use
+
+=== 1. Apply to Entire Class
+
+Add the `@Logged` annotation to any class that you want to have all methods logged:
+
+[source,java]
+----
+import io.microprofile.tutorial.store.interceptor.Logged;
+
+@ApplicationScoped
+@Logged
+public class MyService {
+    // All methods in this class will be logged
+}
+----
+
+=== 2. Apply to Individual Methods
+
+Add the `@Logged` annotation to specific methods:
+
+[source,java]
+----
+import io.microprofile.tutorial.store.interceptor.Logged;
+
+@ApplicationScoped
+public class MyService {
+    
+    @Logged
+    public void loggedMethod() {
+        // This method will be logged
+    }
+    
+    public void nonLoggedMethod() {
+        // This method will NOT be logged
+    }
+}
+----
+
+== Log Format
+
+The interceptor logs the following information:
+
+=== Method Entry
+[listing]
+----
+INFO: Entering method: com.example.MyService.myMethod with parameters: [param1, param2]
+----
+
+=== Method Exit (Success)
+[listing]
+----
+INFO: Exiting method: com.example.MyService.myMethod, execution time: 42ms, result: resultValue
+----
+
+=== Method Exit (Exception)
+[listing]
+----
+SEVERE: Exception in method: com.example.MyService.myMethod, execution time: 17ms, exception: Something went wrong
+----
+
+== Configuration
+
+The logging interceptor uses the standard Java logging framework. You can configure the logging level and handlers in your project's `logging.properties` file.
+
+== Configuration Files
+
+The logging interceptor requires proper configuration files for Jakarta EE CDI interceptors and Java Logging. This section describes the necessary configuration files and their contents.
+
+=== beans.xml
+
+This file is required to enable CDI interceptors in your application. It must be located in the `WEB-INF` directory.
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="https://jakarta.ee/xml/ns/jakartaee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/beans_4_0.xsd"
+       version="4.0"
+       bean-discovery-mode="all">
+    <interceptors>
+        <class>io.microprofile.tutorial.store.interceptor.LoggingInterceptor</class>
+    </interceptors>
+</beans>
+----
+
+Key points about `beans.xml`:
+
+* The `<interceptors>` element registers our LoggingInterceptor class
+* `bean-discovery-mode="all"` ensures that all beans are discovered
+* Jakarta EE 10 uses version 4.0 of the beans schema
+
+=== logging.properties
+
+This file configures Java's built-in logging facility. It should be placed in the `src/main/resources` directory.
+
+[source,properties]
+----
+# Global logging properties
+handlers=java.util.logging.ConsoleHandler
+.level=INFO
+
+# Configure the console handler
+java.util.logging.ConsoleHandler.level=INFO
+java.util.logging.ConsoleHandler.formatter=java.util.logging.SimpleFormatter
+
+# Simplified format for the logs
+java.util.logging.SimpleFormatter.format=[%1$tF %1$tT] %4$s %2$s - %5$s %6$s%n
+
+# Set logging level for our application packages
+io.microprofile.tutorial.store.level=INFO
+----
+
+Key points about `logging.properties`:
+
+* Sets up a console handler for logging output
+* Configures a human-readable timestamp format
+* Sets the application package logging level to INFO
+* To see more detailed logs, change the package level to FINE or FINEST
+
+=== web.xml
+
+The `web.xml` file is the deployment descriptor for Jakarta EE web applications. While not directly required for the interceptor, it provides important context.
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+    <display-name>MicroProfile E-Commerce Store</display-name>
+    
+    <!-- Optional: Configure logging parameters -->
+    <context-param>
+        <param-name>java.util.logging.config.file</param-name>
+        <param-value>WEB-INF/classes/logging.properties</param-value>
+    </context-param>
+</web-app>
+----
+
+Key points about `web.xml`:
+
+* Jakarta EE 10 uses web-app version 6.0
+* You can optionally specify the logging configuration file location
+* No special configuration is needed for CDI interceptors as they're managed by `beans.xml`
+
+=== Loading Configuration at Runtime
+
+To ensure your logging configuration is loaded at application startup, the application class loads it programmatically:
+
+[source,java]
+----
+@ApplicationPath("/api")
+public class ProductRestApplication extends Application {
+    private static final Logger LOGGER = Logger.getLogger(ProductRestApplication.class.getName());
+    
+    public void init(@Observes @Initialized(ApplicationScoped.class) Object init) {
+        try {
+            // Load logging configuration
+            InputStream inputStream = ProductRestApplication.class
+                .getClassLoader()
+                .getResourceAsStream("logging.properties");
+                
+            if (inputStream != null) {
+                LogManager.getLogManager().readConfiguration(inputStream);
+                LOGGER.info("Custom logging configuration loaded");
+            } else {
+                LOGGER.warning("Could not find logging.properties file");
+            }
+        } catch (Exception e) {
+            LOGGER.severe("Failed to load logging configuration: " + e.getMessage());
+        }
+    }
+}
+----
+
+== Demo Implementation
+
+A demonstration class `LoggingDemoService` is provided to showcase how the logging interceptor works. You can find this class in the `io.microprofile.tutorial.store.demo` package.
+
+=== Demo Features
+
+* Selective method logging with `@Logged` annotation
+* Example of both logged and non-logged methods in the same class
+* Exception handling demonstration
+
+[source,java]
+----
+@ApplicationScoped
+public class LoggingDemoService {
+    
+    // This method will be logged because of the @Logged annotation
+    @Logged
+    public String loggedMethod(String input) {
+        // Method logic
+        return "Processed: " + input;
+    }
+    
+    // This method will NOT be logged since it doesn't have the @Logged annotation
+    public String nonLoggedMethod(String input) {
+        // Method logic
+        return "Silently processed: " + input;
+    }
+    
+    /**
+     * Example of a method with exception that will be logged
+     */
+    @Logged
+    public void methodWithException() throws Exception {
+        throw new Exception("This exception will be logged by the interceptor");
+    }
+}
+----
+
+=== Testing the Demo
+
+A test class `LoggingInterceptorTest` is available in the test directory that demonstrates how to use the `LoggingDemoService`. Run the test to see how methods with the `@Logged` annotation have their execution logged, while methods without the annotation run silently.
+
+== Running the Interceptor
+
+=== Unit Testing
+
+To run the interceptor in unit tests:
+
+[source,bash]
+----
+mvn test -Dtest=io.microprofile.tutorial.store.interceptor.LoggingInterceptorTest
+----
+
+The test validates that:
+
+1. The logged method returns the expected result
+2. The non-logged method also functions correctly
+3. Exception handling and logging works as expected
+
+You can check the test results in:
+[listing]
+----
+/target/surefire-reports/io.microprofile.tutorial.store.interceptor.LoggingInterceptorTest.txt
+----
+
+=== In Production Environment
+
+For the interceptor to work in a real Liberty server environment:
+
+1. Make sure `beans.xml` is properly configured in `WEB-INF` directory:
++
+[source,xml]
+----
+<beans xmlns="https://jakarta.ee/xml/ns/jakartaee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/beans_4_0.xsd"
+       version="4.0"
+       bean-discovery-mode="all">
+    <interceptors>
+        <class>io.microprofile.tutorial.store.interceptor.LoggingInterceptor</class>
+    </interceptors>
+</beans>
+----
+
+2. Deploy your application to Liberty:
++
+[source,bash]
+----
+mvn liberty:run
+----
+
+3. Access your REST endpoints (e.g., `/api/products`) to trigger the interceptor logging
+
+4. Check server logs:
++
+[source,bash]
+----
+cat target/liberty/wlp/usr/servers/mpServer/logs/messages.log
+----
+
+=== Performance Considerations
+
+* Logging at INFO level for all method entries/exits can significantly increase log volume
+* Consider using FINE or FINER level for detailed method logging in production
+* For high-throughput methods, consider disabling the interceptor or using sampling
+
+=== Customizing the Interceptor
+
+You can customize the LoggingInterceptor by:
+
+1. Modifying the log format in the `logMethodCall` method
+2. Changing the log level for different events
+3. Adding filters to exclude certain parameter types or large return values
+4. Adding MDC (Mapped Diagnostic Context) information for tracking requests across methods
