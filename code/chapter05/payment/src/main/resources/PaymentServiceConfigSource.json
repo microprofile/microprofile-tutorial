@@ -1,0 +1,4 @@
+{
+    "payment.gateway.apiKey": "secret_api_key",
+    "payment.gateway.endpoint": "https://api.paymentgateway.com"
+}

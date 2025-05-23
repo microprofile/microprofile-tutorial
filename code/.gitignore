@@ -1,0 +1,83 @@
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Liberty
+.liberty/
+.factorypath
+wlp/
+liberty/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse
+.apt_generated/
+.settings/
+.project
+.classpath
+.factorypath
+.metadata/
+bin/
+tmp/
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Test reports (keeping XML reports)
+target/surefire-reports/junitreports/
+target/surefire-reports/old/
+target/site/
+target/failsafe-reports/
+
+# JaCoCo coverage reports except the main report
+target/jacoco/
+!target/site/jacoco/index.html
+
+# Miscellaneous
+*.swp
+*.bak
+*.tmp
+*~
+.DS_Store
+Thumbs.db

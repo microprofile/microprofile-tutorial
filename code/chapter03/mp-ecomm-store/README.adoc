@@ -1,0 +1,384 @@
+= MicroProfile E-Commerce Store
+:toc: macro
+:toclevels: 3
+:icons: font
+
+toc::[]
+
+== Overview
+
+This project is a MicroProfile-based e-commerce application that demonstrates RESTful API development using Jakarta EE 10 and MicroProfile 6.1 running on Open Liberty.
+
+The application follows a layered architecture with separate resource (controller) and service layers, implementing standard CRUD operations for product management.
+
+== Technology Stack
+
+* *Jakarta EE 10*: Core enterprise Java platform
+* *MicroProfile 6.1*: Microservices specifications
+* *Open Liberty*: Lightweight application server
+* *JUnit 5*: Testing framework
+* *Maven*: Build and dependency management
+* *Lombok*: Reduces boilerplate code
+
+== Project Structure
+
+[source]
+----
+mp-ecomm-store/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── io/microprofile/tutorial/store/
+│   │   │       ├── product/
+│   │   │       │   ├── entity/        # Domain entities
+│   │   │       │   ├── resource/      # REST endpoints
+│   │   │       │   └── service/       # Business logic
+│   │   │       └── ...
+│   │   └── liberty/config/           # Liberty server configuration
+│   └── test/
+│       └── java/
+│           └── io/microprofile/tutorial/store/
+│               └── product/
+│                   ├── resource/      # Resource layer tests
+│                   └── service/       # Service layer tests
+└── pom.xml                            # Maven project configuration
+----
+
+== Key Components
+
+=== Entity Layer
+
+The `Product` entity represents a product in the e-commerce system:
+
+[source,java]
+----
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Product {
+    private Long id;
+    private String name;
+    private String description;
+    private Double price;
+}
+----
+
+=== Service Layer
+
+The `ProductService` class encapsulates business logic for product management:
+
+[source,java]
+----
+@ApplicationScoped
+public class ProductService {
+    // Repository of products (in-memory list for demo purposes)
+    private List<Product> products = new ArrayList<>();
+    
+    // Constructor initializes with sample data
+    public ProductService() {
+        products.add(new Product(1L, "iPhone", "Apple iPhone 15", 999.99));
+        products.add(new Product(2L, "MacBook", "Apple MacBook Air", 1299.0));
+    }
+    
+    // CRUD operations: getAllProducts(), getProductById(), createProduct(), 
+    // updateProduct(), deleteProduct()
+    // ...
+}
+----
+
+=== Resource Layer
+
+The `ProductResource` class exposes RESTful endpoints:
+
+[source,java]
+----
+@ApplicationScoped
+@Path("/products")
+public class ProductResource {
+    private ProductService productService;
+
+    @Inject
+    public ProductResource(ProductService productService) {
+        this.productService = productService;
+    }
+    
+    // REST endpoints for CRUD operations
+    // ...
+}
+----
+
+== API Endpoints
+
+[cols="3,2,3,5"]
+|===
+|HTTP Method |Endpoint |Request Body |Description
+
+|GET
+|`/products`
+|None
+|Retrieve all products
+
+|GET
+|`/products/{id}`
+|None
+|Retrieve a specific product by ID
+
+|POST
+|`/products`
+|Product JSON
+|Create a new product
+
+|PUT
+|`/products/{id}`
+|Product JSON
+|Update an existing product
+
+|DELETE
+|`/products/{id}`
+|None
+|Delete a product
+|===
+
+=== Example Requests
+
+==== Create a product
+[source,bash]
+----
+curl -X POST http://localhost:5050/mp-ecomm-store/api/products \
+  -H "Content-Type: application/json" \
+  -d '{"id": 3, "name": "AirPods", "description": "Apple AirPods Pro", "price": 249.99}'
+----
+
+==== Get all products
+[source,bash]
+----
+curl http://localhost:5050/mp-ecomm-store/api/products
+----
+
+==== Get product by ID
+[source,bash]
+----
+curl http://localhost:5050/mp-ecomm-store/api/products/1
+----
+
+==== Update a product
+[source,bash]
+----
+curl -X PUT http://localhost:5050/mp-ecomm-store/api/products/1 \
+  -H "Content-Type: application/json" \
+  -d '{"id": 1, "name": "iPhone Pro", "description": "Apple iPhone 15 Pro", "price": 1199.99}'
+----
+
+==== Delete a product
+[source,bash]
+----
+curl -X DELETE http://localhost:5050/mp-ecomm-store/api/products/1
+----
+
+== Testing
+
+The project includes comprehensive unit tests for both resource and service layers.
+
+=== Service Layer Testing
+
+Service layer tests directly verify the business logic:
+
+[source,java]
+----
+@Test
+void testGetAllProducts() {
+    List<Product> products = productService.getAllProducts();
+    
+    assertNotNull(products);
+    assertEquals(2, products.size());
+}
+----
+
+=== Resource Layer Testing
+
+The project uses two approaches for testing the resource layer:
+
+==== Integration Testing
+
+This approach tests the resource layer with the actual service implementation:
+
+[source,java]
+----
+@Test
+void testGetAllProducts() {
+    Response response = productResource.getAllProducts();
+    
+    assertNotNull(response);
+    assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    
+    List<Product> products = (List<Product>) response.getEntity();
+    assertNotNull(products);
+    assertEquals(2, products.size());
+}
+----
+
+== Running the Tests
+
+Run tests using Maven:
+
+[source,bash]
+----
+mvn test
+----
+
+Run a specific test class:
+
+[source,bash]
+----
+mvn test -Dtest=ProductResourceTest
+----
+
+Run a specific test method:
+
+[source,bash]
+----
+mvn test -Dtest=ProductResourceTest#testGetAllProducts
+----
+
+== Building and Running
+
+=== Building the Application
+
+[source,bash]
+----
+mvn clean package
+----
+
+=== Running with Liberty Maven Plugin
+
+[source,bash]
+----
+mvn liberty:run
+----
+
+== Maven Configuration
+
+The project uses Maven for dependency management and build automation. Below is an overview of the key configurations in the `pom.xml` file:
+
+=== Properties
+
+[source,xml]
+----
+<properties>
+    <!-- Java Compiler Configuration -->
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+
+    <!-- Liberty Server Configuration -->
+    <liberty.var.default.http.port>5050</liberty.var.default.http.port>
+    <liberty.var.default.https.port>5051</liberty.var.default.https.port>
+    <liberty.var.app.context.root>mp-ecomm-store</liberty.var.app.context.root>
+</properties>
+----
+
+=== Dependencies
+
+The project includes several key dependencies:
+
+==== Runtime Dependencies
+
+[source,xml]
+----
+<!-- Jakarta EE API -->
+<dependency>
+    <groupId>jakarta.platform</groupId>
+    <artifactId>jakarta.jakartaee-api</artifactId>
+    <version>10.0.0</version>
+    <scope>provided</scope>
+</dependency>
+
+<!-- MicroProfile API -->
+<dependency>
+    <groupId>org.eclipse.microprofile</groupId>
+    <artifactId>microprofile</artifactId>
+    <version>6.1</version>
+    <type>pom</type>
+    <scope>provided</scope>
+</dependency>
+
+<!-- Lombok for reducing boilerplate code -->
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.18.26</version>
+    <scope>provided</scope>
+</dependency>
+----
+
+==== Testing Dependencies
+
+[source,xml]
+----
+<!-- JUnit 5 for testing -->
+<dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <version>5.9.3</version>
+    <scope>test</scope>
+</dependency>
+
+<!-- JAX-RS implementation for testing -->
+<dependency>
+    <groupId>org.glassfish.jersey.core</groupId>
+    <artifactId>jersey-common</artifactId>
+    <version>3.1.3</version>
+    <scope>test</scope>
+</dependency>
+----
+
+=== Build Plugins
+
+The project uses the following Maven plugins:
+
+[source,xml]
+----
+<!-- Liberty Maven Plugin for running the application -->
+<plugin>
+    <groupId>io.openliberty.tools</groupId>
+    <artifactId>liberty-maven-plugin</artifactId>
+    <version>3.11.2</version>
+    <configuration>
+        <serverName>mpServer</serverName>
+    </configuration>
+</plugin>
+
+<!-- Maven WAR Plugin for packaging -->
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-war-plugin</artifactId>
+    <version>3.4.0</version>
+</plugin>
+
+<!-- Maven Surefire Plugin for running tests -->
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>3.1.2</version>
+</plugin>
+----
+
+== Development Best Practices
+
+This project demonstrates several Java enterprise development best practices:
+
+* *Separation of Concerns*: Distinct layers for entities, business logic, and REST endpoints
+* *Dependency Injection*: Using CDI for loose coupling between components
+* *Unit Testing*: Comprehensive tests for business logic and API endpoints
+* *RESTful API Design*: Following REST principles for resource naming and HTTP methods
+* *Error Handling*: Proper HTTP status codes for different scenarios
+
+== Future Enhancements
+
+* Add persistence layer with a database
+* Implement validation for request data
+* Add OpenAPI documentation
+* Implement MicroProfile Config for externalized configuration
+* Add MicroProfile Health for health checks
+* Implement MicroProfile Metrics for monitoring
+* Implement MicroProfile Fault Tolerance for resilience
+* Add authentication and authorization
