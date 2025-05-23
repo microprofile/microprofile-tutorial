@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: MicroProfile Tutorial</title>
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../..">MicroProfile Tutorial</a>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Chapter 1 - Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter02-00.html">Chapter 2 - Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Chapter 3 - Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">Chapter 4 - MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">Chapter 5 - MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">Chapter 6 - MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">Chapter 7 - MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">Chapter 8 - MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">Chapter 9 - MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">Chapter 10 - MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">Chapter 11 - MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../index.html">MicroProfile Tutorial</a></div>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+</nav>
+<div class="edit-this-page"><a href="file:///workspaces/microprofile-tutorial/./modules/ROOT/pages/chapter02/chapter02-04.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<div class="sect1">
+<h2 id="_testing_your_microservice"><a class="anchor" href="#_testing_your_microservice"></a>Testing your microservice</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Testing your microservice is critical for ensuring the reliability and robustness of your microservice. Maven, being a powerful project build management tool, simplifies this process by automating the test execution.
+To create tests for your microservice, start by creating a class called <code>ProductResourceTest</code>, which contains unit tests for the <code>ProductResource</code> class as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// ProductResourceTest.java
+package io.microprofile.tutorial.store.product.resource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import io.microprofile.tutorial.store.product.entity.Product;
+
+public class ProductResourceTest {
+  private ProductResource productResource;
+
+   @BeforeEach
+   void setUp() {
+       productResource = new ProductResource();
+   }
+
+   @AfterEach
+   void tearDown() {
+       productResource = null;
+   }
+
+   @Test
+   void testGetProducts() {
+       List&lt;Product&gt; products = productResource.getProducts();
+
+       assertNotNull(products);
+       assertEquals(2, products.size());
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="paragraph">
+<p>Below are the assertions to test the <code>getProducts()</code> method of <code>ProductService</code>:
+* The <code>assertNotNull(products)</code>; assertion checks that products are not <code>null</code>. It ensures the method returns a list, even if it’s empty.
+* The <code>assertEquals(2, products.size())</code>; assertion verifies that the list contains two products.</p>
+</div>
+<div class="sect2">
+<h3 id="_running_unit_tests_with_maven"><a class="anchor" href="#_running_unit_tests_with_maven"></a>Running Unit Tests with Maven</h3>
+<div class="paragraph">
+<p>To run the unit tests defined in ProductResourceTest, follow these steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Open a Terminal or Command Prompt: Navigate to the root directory of your project where the pom.xml file is located. This file contains the Maven project definition, including dependencies and test configurations.</p>
+</li>
+<li>
+<p>Execute the Maven Test Command: Enter the following command to initiate the execution of the unit tests:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ mvn test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This command tells Maven to execute the test phase of the build lifecycle. Maven will compile the test source code, execute the test cases, and provide a summary of the test execution results.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Review Test Results: After running the tests, Maven displays the results in the terminal. Look for the Tests run:, Failures:, and Errors: summaries to assess the outcome. For the ProductResourceTest class, ensure that the test methods execute successfully and meet the expected assertions:</p>
+</li>
+<li>
+<p>Addressing Failures: If any tests fail, Maven will highlight these failures in the output. Use this information to identify and fix issues in your code. Review the failing tests' output for details on the assertion failures and adjust your microservice implementation accordingly.</p>
+</li>
+<li>
+<p>Rerun Tests: After making any necessary changes to your microservice code, rerun the tests using the mvn test command to verify that all issues have been resolved and that your microservice behaves as expected.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>By following these steps, you can leverage Maven to efficiently run and manage unit tests for your microservice, ensuring its functionality and reliability before deployment.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_next_steps"><a class="anchor" href="#_next_steps"></a>Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that you have a basic MicroProfile service, consider exploring further:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Adding configuration with MicroProfile Config</p>
+</li>
+<li>
+<p>Implementing health checks using MicroProfile Health</p>
+</li>
+<li>
+<p>Enhancing your service with MicroProfile Fault Tolerance</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_resources"><a class="anchor" href="#_resources"></a>Resources</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>MicroProfile Official Website: <a href="https://microprofile.io/" class="bare">https://microprofile.io/</a></p>
+</li>
+<li>
+<p>MicroProfile GitHub Repository: <a href="https://github.com/eclipse/microprofile" class="bare">https://github.com/eclipse/microprofile</a></p>
+</li>
+<li>
+<p>MicroProfile Documentation and Guides: <a href="https://microprofile.io/documentation/">MicroProfile Official documentation</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>After completing this chapter, you should have a basic understanding of MicroProfile and how to start building microservices with it. Continue exploring the specifications and capabilities of MicroProfile to fully leverage its power in your microservices architecture.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

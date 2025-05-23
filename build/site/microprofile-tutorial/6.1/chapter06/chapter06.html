@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chapter 6: MicroProfile Health :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/microprofile-tutorial/6.1/chapter06/chapter06.html">
+    <link rel="prev" href="../chapter05/chapter05.html">
+    <link rel="next" href="../chapter07/chapter07.html">
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" />      <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5WLCZXC');</script>
+    <!-- End Google Tag Manager -->  
+    <script>var uiRootPath = '../../../_'</script>
+    <script>!function (theme) {
+        if (theme === 'dark') document.documentElement.classList.add('theme-dark')
+      }(localStorage && localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)') && 'dark'))
+    </script>
+    <!-- Add Eclipse Foundation cookie consent to site for GA -->
+    <script src="//www.eclipse.org/eclipse.org-common/themes/solstice/public/javascript/vendor/cookieconsent/default.min.js"></script>
+      </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a id="site-title" class="navbar-item" href="https://microprofile.io">MicroProfile Tutorial</a>
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="../../../microprofile-tutorial/6.1/microprofile-tutorial.pdf">Download</a>
+          </span>
+        </div>
+      </div>
+      <div class="navbar-theme-switcher">
+        <span class="switch" title="Switch between Light and Dark Theme">
+          <input id="theme-switcher-checkbox" type="checkbox" />
+          <label for="theme-switcher-checkbox">Dark Theme</label>
+        </span>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="6.1">
+  <div class="toolbar"></div>
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Preface</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter02/chapter02-00.html">Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="chapter06.html">MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">6.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">MicroProfile Tutorial</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">6.1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">MicroProfile Tutorial</a></li>
+    <li><a href="chapter06.html">MicroProfile Health</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///workspaces/microprofile-tutorial/./modules/ROOT/pages/chapter06/chapter06.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Chapter 6: MicroProfile Health</h1>
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a>Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This chapter provides an in-depth exploration of MicroProfile Health, a critical component for ensuring the reliability and
+availability of microservices. This specification aims to enhance the observability of microservices in a cloud environment
+where automatic scaling, failover, and recovery are essential for maintaining service availability and reliability. In this
+chapter, we will learn about different types of health checks and standard health indicators provided by MicroProfile.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="topics-to-be-covered"><a class="anchor" href="#topics-to-be-covered"></a>Topics to be covered:</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Overview of MicroProfile Health</p>
+</li>
+<li>
+<p>Key Concepts</p>
+</li>
+<li>
+<p>Types of Health Checks</p>
+</li>
+<li>
+<p>Exposing Health Checks</p>
+</li>
+<li>
+<p>Steps for Implementing Health Checks</p>
+</li>
+<li>
+<p>Integration with CDI</p>
+</li>
+<li>
+<p>Accessing Health Checks</p>
+</li>
+<li>
+<p>Kubernetes Probe Configuration</p>
+</li>
+<li>
+<p>Best Practices for Effective Health Checks</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overview-of-microprofile-health"><a class="anchor" href="#overview-of-microprofile-health"></a>Overview of MicroProfile Health</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The MicroProfile Health specification offers a standardized mechanism for microservices to report their health status. In the
+context of microservices, "health"  refers to the ability of a microservice to perform its functions correctly and efficiently.
+The health check mechanism is crucial for operating microservices in a cloud or containerized environment where automated processes
+need to make decisions about whether to restart a failing service, reroute traffic away from an unhealthy service, or take
+other actions to maintain overall system reliability.</p>
+</div>
+<div class="paragraph">
+<p>Let’s delve into the essentials of MicroProfile Health, its importance, and how it works.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="key-concepts"><a class="anchor" href="#key-concepts"></a>Key Concepts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>At its core, the MicroProfile Health specification defines a mechanism for microservices to report their health status via HTTP.
+These health checks can be used by external systems to verify the operational status of the services. This is crucial in modern cloud
+environments where automated processes continuously monitor service health, initiate failover procedures, and manage load balancing
+to ensure high availability and reliability.</p>
+</div>
+<div class="sect2">
+<h3 id="health-check"><a class="anchor" href="#health-check"></a>Health Check</h3>
+<div class="paragraph">
+<p>A <strong>health check</strong> is a test that can be used to determine the health of an application or service. This mechanism is implemented via
+standard HTTP endpoints that respond with the health status of the service. These endpoints are typically exposed at predefined paths,
+such as <code>/health</code>, <code>/health/live</code> (for liveness), <code>/health/ready</code> (for readiness), and <code>/health/started</code> (for startup). Health status is
+communicated through a simple JSON format, which can be easily interpreted by humans and machines. Applications servers that support
+MicroProfile may offer built-in mechanisms or simplified configurations to define such health checks.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="types-of-health-checks"><a class="anchor" href="#types-of-health-checks"></a>Types of Health Checks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile Health Check defines three main types of health checks, each with its own annotation to indicate the MicroProfile Health
+runtime about the type of check being performed, allowing it to execute and report health check responses appropriately. These are:</p>
+</div>
+<div class="sect2">
+<h3 id="liveness-checks"><a class="anchor" href="#liveness-checks"></a>Liveness Checks</h3>
+<div class="paragraph">
+<p>Liveness checks help to determine if a microservice is in a state where it can perform its functions correctly. A failing liveness
+check suggests that the microservice is in a broken state, and the only way to recover might be to restart the microservice. This
+  type of health check is crucial for detecting deadlocks, infinite loops, or any conditions that render the microservice unresponsive
+or dysfunctional. Liveness checks are annotated with <code>@Liveness</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="readiness-checks"><a class="anchor" href="#readiness-checks"></a>Readiness Checks</h3>
+<div class="paragraph">
+<p>Readiness checks are used to determine if a microservice is ready to process requests. If a readiness check fails, it indicates that
+the microservice should not receive any inbound requests because it’s not ready to handle them properly. This can be due to the
+application still initializing, waiting for dependencies, or any other condition that would prevent it from correctly processing
+incoming requests. Readiness checks are annotated with <code>@Readiness</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="startup-checks"><a class="anchor" href="#startup-checks"></a>Startup Checks</h3>
+<div class="paragraph">
+<p>Startup checks are designed for verifying the microservice’s health immediately after it has started. This type of check is useful
+for applications that require additional initialization time or need to perform certain actions before they are ready to serve requests.
+Including startup checks in the health checking mechanism is crucial because if we hit the liveness probe before the application is fully
+initialized, it could cause a continuous restart loop. Startup checks provide a mechanism to postpone other health checks until certain
+startup conditions are fulfilled. This ensures that readiness and liveness probes are not prematurely activated, allowing the microservice
+adequate time to complete its initialization processes, such as loading configurations, establishing database connections, or performing
+necessary pre-service tasks.These checks are annotated with <code>@Startup</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="exposing-health-checks"><a class="anchor" href="#exposing-health-checks"></a>Exposing Health Checks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Health checks are exposed via HTTP endpoints automatically without additional configuration needed from the developer’s side. The runtime
+environment provides these endpoints:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>/health</code>: Aggregates all health check responses.</p>
+</li>
+<li>
+<p><code>/health/live</code>: Returns responses from liveness checks.</p>
+</li>
+<li>
+<p><code>/health/ready</code>: Returns responses from readiness checks.</p>
+</li>
+<li>
+<p><code>/health/started</code>: Returns responses from startup checks.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These endpoints return a JSON object containing the overall status (UP or DOWN) and individual health check responses, including their names,
+statuses, and optional data.</p>
+</div>
+<div class="sect2">
+<h3 id="example-json-response"><a class="anchor" href="#example-json-response"></a>Example JSON Response</h3>
+<div class="paragraph">
+<p>For example a <code>LivenessCheck</code>, if accessed via <code>/health/live</code>, the JSON response might look something like this when the service is healthy:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "status": "UP",
+  "checks": [
+    {
+      "name": "LivenessCheck",
+      "status": "UP"
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the service is unhealthy, the "status" field would be "DOWN", and additional data might be provided to indicate the cause of the health check failure.
+Each type of health check is implemented as a procedure annotated with the respective annotation. Each procedure returns a <code>HealthCheckResponse</code> indicating
+the health status (UP or DOWN) and optionally includes additional details. Implementing these health check types in microservices architecture ensures
+that services are only used when they are in a healthy state and can correctly process requests. This enhances the overall reliability and
+maintainability of applications.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="standard-health-check"><a class="anchor" href="#standard-health-check"></a>Standard Health Check</h3>
+<div class="paragraph">
+<p>Applications can implement multiple health checks of each kind. The overall health status reported by the application is a logical AND of all individual
+health checks. A special endpoint <code>/health</code> aggregates the results from all three types of checks.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="implementing-and-exposing-health-check"><a class="anchor" href="#implementing-and-exposing-health-check"></a>Implementing and Exposing Health Check</h3>
+<div class="paragraph">
+<p>To implement health checks for microservices using MicroProfile Health, you would generally follow a pattern to define health check procedures that align with the services' operational characteristics. The Health Check API allows us to expose information about the health of our application. This information can be used by load balancers and other tools to determine if an application is healthy.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-healthcheck-interface"><a class="anchor" href="#the-healthcheck-interface"></a>The <code>HealthCheck</code> interface</h3>
+<div class="paragraph">
+<p>The <code>HealthCheck</code> functional interface uses CDI beans with annotations (<code>@Liveness</code>, <code>@Readiness</code>, and, <code>@Startup</code>) to mark a class as a health checker for liveness, readiness and startup. They are automatically discovered and registered by the runtime. Implementations of this interface are expected to be provided by applications.</p>
+</div>
+<div class="paragraph">
+<p>The Health Check API defines a contract for health check implementations. A health check is a Java class that implements the HealthCheck functional interface:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.eclipse.microprofile.health;
+
+@FunctionalInterface
+public interface HealthCheck {
+  HealthCheckResponse call();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can check out the actual code here - <a href="https://github.com/eclipse/microprofile-health/blob/main/api/src/main/java/org/eclipse/microprofile/health/HealthCheck.java" class="bare">https://github.com/eclipse/microprofile-health/blob/main/api/src/main/java/org/eclipse/microprofile/health/HealthCheck.java</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-healthcheckresponse-class"><a class="anchor" href="#the-healthcheckresponse-class"></a>The <code>HealthCheckResponse</code> class</h3>
+<div class="paragraph">
+<p>The <code>HealthCheckResponse</code> class is used to represent the result of a health check invocation. It contains information about the health check, such as name, state (up or down), and data that can be used for troubleshooting.</p>
+</div>
+<div class="paragraph">
+<p>The <code>call()</code> method of <code>HealthCheck</code> interface is used to perform the actual health check and return a <code>HealthCheckResponse</code> object:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.eclipse.microprofile.health;
+
+public class HealthCheckResponse {
+
+   private static final Logger LOGGER =    Logger.getLogger(HealthCheckResponse.class.getName());
+
+    // the name of the health check.
+    private final String name;
+
+    // the outcome of the health check
+    private final Status status;
+
+    // information about the health check.
+    private final Optional&lt;Map&lt;String, Object&gt;&gt; data;
+
+    // Status enum definition
+    public enum Status {
+        UP, DOWN
+    }
+
+   // Getters
+    public String getName() {
+        return name;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public Optional&lt;Map&lt;String, Object&gt;&gt; getData() {
+        return data;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The provided code snippet offers a conceptual and simplified implementation of the <code>HealthCheckResponse</code> class to illustrate how health check responses can be structured within the MicroProfile Health framework. To view the actual <code>HealthCheckResponse</code> class source code, please visit: <a href="https://github.com/eclipse/microprofile-health/blob/main/api/src/main/java/org/eclipse/microprofile/health/HealthCheckResponse.java" class="bare">https://github.com/eclipse/microprofile-health/blob/main/api/src/main/java/org/eclipse/microprofile/health/HealthCheckResponse.java</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-healthcheckresponsebuilder-class"><a class="anchor" href="#the-healthcheckresponsebuilder-class"></a>The <code>HealthCheckResponseBuilder</code> class</h3>
+<div class="paragraph">
+<p>The <code>HealthCheckResponseBuilder</code> abstract class provides a fluent API for constructing instances of <code>HealthCheckResponse</code>. This means you can chain method calls to set various properties of the response in a single statement, improving code readability and maintainability.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.eclipse.microprofile.health;
+
+public abstract class HealthCheckResponseBuilder {
+
+    // Sets the name of the health check response.
+    public abstract HealthCheckResponseBuilder name(String name) {
+        this.name = name;
+    }
+
+    // Sets the status of the health check to UP
+    public abstract HealthCheckResponseBuilder up();
+
+    // Sets the status of the health check to DOWN
+    public abstract HealthCheckResponseBuilder down();
+
+    // Adds additional string data to the health check response
+    public HealthCheckResponseBuilder withData(String key, String value);
+
+    // Adds additional numeric data to the health check response
+    public HealthCheckResponseBuilder withData(String key, long value);
+
+    // Sets the status of the health check response
+    public abstract HealthCheckResponseBuilder status(boolean up);
+
+    // Builds and returns the HealthCheckResponse instance
+    public abstract HealthCheckResponse build();
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above code snippet offers a conceptual and simplified definition of the <code>HealthCheckResponseBuilder</code> abstract class to illustrate how health check responses can be structured within the MicroProfile Health framework. For the actual <code>HealthCheckResponseBuilder</code> abstract class source code, please visit: <a href="https://github.com/eclipse/microprofile-health/blob/main/api/src/main/java/org/eclipse/microprofile/health/HealthCheckResponseBuilder.java" class="bare">https://github.com/eclipse/microprofile-health/blob/main/api/src/main/java/org/eclipse/microprofile/health/HealthCheckResponseBuilder.java</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="steps-for-implementing-health-checks"><a class="anchor" href="#steps-for-implementing-health-checks"></a>Steps for Implementing Health Checks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Below are the steps for implementing Health Checks for each of the microservices:</p>
+</div>
+<div class="paragraph">
+<p>Add MicroProfile Health Dependency: To utilize MicroProfile Health in a Java project, include the MicroProfile Health API dependency in your <em>pom.xml</em> or <em>build.gradle</em> file.</p>
+</div>
+<div class="paragraph">
+<p>For maven, add:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.health&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-health-api&lt;/artifactId&gt;
+  &lt;version&gt;4.0.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For gradle, add:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">implementation 'org.eclipse.microprofile.health:microprofile-health-api:4.0.1'</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+When implementing MicroProfile Health checks, including the MicroProfile Health API dependency in your project is not enough. You need an actual implementation on the classpath. This could be a MicroProfile-compatible server runtime such as Open Liberty, Quarkus, Payara Micro, or WildFly. Without an implementation present at runtime, the application will not be able to execute health checks.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The health information can be used by other tools to help keep our application running well.</p>
+</div>
+<div class="sect2">
+<h3 id="implementing-health-checks"><a class="anchor" href="#implementing-health-checks"></a>Implementing Health Checks</h3>
+<div class="paragraph">
+<p>Health checks in MicroProfile are implemented as CDI beans that implement the <code>HealthCheck</code> interface. Each health check procedure is a method that returns a <code>HealthCheckResponse</code>. You can define different types of health checks (readiness, liveness, and startup) depending on the type of check by annotating the health check class with <code>@Readiness</code>, <code>@Liveness</code>, or <code>@Startup</code>. These methods return a <code>HealthCheckResponse</code> object, which includes the health check status (UP or DOWN) and additional metadata about the health check.</p>
+</div>
+<div class="paragraph">
+<p>Readiness Check:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.product.health;
+
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Readiness;
+
+import io.microprofile.tutorial.store.product.entity.Product;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
+@Readiness
+@ApplicationScoped
+public class ProductServiceHealthCheck implements HealthCheck {
+
+    @PersistenceContext
+    EntityManager entityManager;
+
+    @Override
+    public HealthCheckResponse call() {
+        if (isDatabaseConnectionHealthy()) {
+            return HealthCheckResponse.named("ProductServiceReadinessCheck")
+                    .up()
+                    .build();
+        } else {
+            return HealthCheckResponse.named("ProductServiceReadinessCheck")
+                    .down()
+                    .build();
+        }
+    }
+
+    private boolean isDatabaseConnectionHealthy(){
+        try {
+            // Perform a lightweight query to check the database connection
+            entityManager.find(Product.class, 1L);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Database connection is not healthy: " + e.getMessage());
+            return false;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Liveness Check:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.product.health;
+
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
+import org.eclipse.microprofile.health.Liveness;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@Liveness
+@ApplicationScoped
+public class ProductServiceLivenessCheck implements HealthCheck {
+
+   @Override
+   public HealthCheckResponse call() {
+       Runtime runtime = Runtime.getRuntime();
+       long maxMemory = runtime.maxMemory(); // Maximum amount of memory the JVM will attempt to use
+       long allocatedMemory = runtime.totalMemory(); // Total memory currently allocated to the JVM
+       long freeMemory = runtime.freeMemory(); // Amount of free memory within the allocated memory
+       long usedMemory = allocatedMemory - freeMemory; // Actual memory used
+       long availableMemory = maxMemory - usedMemory; // Total available memory
+
+       long threshold = 100 * 1024 * 1024; // threshold: 100MB
+
+     	 // Including diagnostic data in the response
+       HealthCheckResponseBuilder responseBuilder = HealthCheckResponse.named("systemResourcesLiveness")
+            .withData("FreeMemory", freeMemory)
+            .withData("MaxMemory", maxMemory)
+            .withData("AllocatedMemory", allocatedMemory)
+            .withData("UsedMemory", usedMemory)
+            .withData("AvailableMemory", availableMemory);
+
+        if (availableMemory &gt; threshold) {
+            // The system is considered live
+            responseBuilder = responseBuilder.up();
+        } else {
+            // The system is not live.
+            responseBuilder = responseBuilder.down();
+        }
+
+        return responseBuilder.build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above code uses the HealthCheckResponseBuilder to construct the response. Depending on the outcome of <code>checkDatabaseConnection()</code>, the health check response is marked either "up" or "down", and relevant data is added to the response using <code>.withData(key, value)</code>. This approach allows for rich, descriptive health check responses that can convey detailed status information, not just binary up/down states.</p>
+</div>
+<div class="paragraph">
+<p>Startup Check:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.product.health;
+
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+
+import jakarta.ejb.Startup;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceUnit;
+
+@Startup
+@ApplicationScoped
+public class ProductServiceStartupCheck implements HealthCheck{
+
+    @PersistenceUnit
+    private EntityManagerFactory emf;
+
+    @Override
+    public HealthCheckResponse call() {
+        if (emf != null &amp;&amp; emf.isOpen()) {
+            return HealthCheckResponse.up("ProductServiceStartupCheck");
+        } else {
+            return HealthCheckResponse.down("ProductServiceStartupCheck");
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="integration-with-cdi"><a class="anchor" href="#integration-with-cdi"></a>Integration with CDI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The specification also emphasizes the importance of integrating health checks with the application’s Context and Dependency Injection (CDI) context, enabling health check procedures to be automatically discovered and invoked by the runtime.
+MicroProfile Health thus provides a robust and standardized way to implement health checks, facilitating the management and orchestration of microservices in a cloud environment.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="accessing-health-checks"><a class="anchor" href="#accessing-health-checks"></a>Accessing Health Checks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once defined, these health check procedures are automatically discovered and invoked by the MicroProfile Health runtime. They are accessible through standardized HTTP endpoints provided by MicroProfile Health (<code>/health</code>, <code>/health/live</code>, <code>/health/ready</code>, <code>/health/started</code>) and can be used by orchestration tools (like Kubernetes) or monitoring systems to manage and monitor the health of your microservices.</p>
+</div>
+<div class="paragraph">
+<p>This approach allows you to tailor health checks to the operational specifics of each microservice, providing a robust mechanism for observing and managing your application’s health in a cloud-native environment.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kubernetes-probe-configuration"><a class="anchor" href="#kubernetes-probe-configuration"></a>Kubernetes Probe Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Integrating MicroProfile Health checks with Kubernetes probes allows you to leverage Kubernetes' native capabilities to manage the lifecycle of your containers based on their current health status. Specifically, you can map Liveness, Readiness, and Startup probes in Kubernetes to the corresponding health check types defined by the MicroProfile Health specification.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a basic overview of how each type of MicroProfile Health check maps to Kubernetes probes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Liveness Probes:</strong> Determine if a container is running and healthy. If a liveness probe fails, Kubernetes will kill the container and create a new one based on the restart policy.</p>
+</li>
+<li>
+<p>*Readiness Probes: Determine if a container is ready to serve traffic. If a readiness probe fails, Kubernetes will stop sending traffic to that container until it passes again.</p>
+</li>
+<li>
+<p><strong>Startup Probes:</strong> Determine if a container application has started. These are useful for applications that have a long startup time to prevent them from being killed by Kubernetes before they are up and running.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To configure these probes in your Kubernetes pod, you can use the livenessProbe, readinessProbe, and startupProbe fields in your container specification. Here&#8217;s an example of how you might define a readiness probe in your Kubernetes pod configuration, that utilizes a MicroProfile Health endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: mp-pod
+spec:
+  containers:
+  - name: my-mp-app
+    image: myimage:v1
+ports:
+- containerPort: 8080
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 8080
+  initialDelaySeconds: 15
+  timeoutSeconds: 2
+  periodSeconds: 5
+  failureThreshold: 3</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the above example, the readinessProbe is configured to make an HTTP GET request to the <code>/health/ready</code> endpoint, which is the default endpoint provided by MicroProfile Health for readiness checks. Similarly, you can configure livenessProbe and startupProbe by specifying <code>/health/live</code> and <code>/health/startup</code> endpoints respectively.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s important to adjust the <code>initialDelaySeconds</code>, <code>timeoutSeconds</code>, <code>periodSeconds</code>, and <code>failureThreshold</code> according to the specifics of your application to ensure that Kubernetes accurately reflects the state of your containers based on its health checks.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="best-practices-for-effective-health-checks"><a class="anchor" href="#best-practices-for-effective-health-checks"></a>Best Practices for Effective Health Checks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here are some best practices for implementing and utilizing health checks effectively:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Clearly Define Health Check Types</strong>: Use readiness, liveness, and startup checks appropriately to reflect the state of your microservices. This helps in accurately signaling the service’s ability to handle traffic and its current operational state.</p>
+</li>
+<li>
+<p><strong>Implement Meaningful Health Checks</strong>: Ensure that your health checks meaningfully reflect the operational aspects they are intended to monitor. Avoid trivial checks that do not accurately represent the service’s health.</p>
+</li>
+<li>
+<p><strong>Utilize Health Check Responses</strong>: Make effective use of the health check responses, including the UP/DOWN status and additional metadata. This information can be valuable for logging and reporting on the health state of your services.</p>
+</li>
+<li>
+<p><strong>Secure Health Check Endpoints</strong>: Consider the security of your health check endpoints, especially if they expose sensitive details about the application’s state.</p>
+</li>
+<li>
+<p><strong>Monitor Health Check Performance</strong>: Health checks should be lightweight and not introduce significant overhead. Monitor the performance of your health checks and optimize as needed to prevent impacting the application’s performance.</p>
+</li>
+<li>
+<p><strong>Logging Health Check Results</strong>: Implementing logging within your health check procedures can provide insights into the health status over time. Log entries can be made when health check statuses change or when significant health-related events occur.</p>
+</li>
+<li>
+<p><strong>Reporting and Alerting</strong>: Based on logged health check results, implement reporting mechanisms to visualize the health over time and set up alerting for when health checks fail. This could be integrated with existing monitoring and alerting tools.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>By following these best practices, you can effectively implement and expose health checks in your MicroProfile applications, improving observability and reliability, especially in cloud-native environments.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary"><a class="anchor" href="#summary"></a>Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This chapter provided a comprehensive overview of MicroProfile Health, emphasizing its critical role in enhancing the observability and reliability of microservices within cloud environments. Key topics included an introduction to the MicroProfile Health specification, detailed explanations of health check types (liveness, readiness, and startup checks), and guidance on implementing, exposing, and effectively utilizing these health checks.</p>
+</div>
+<div class="paragraph">
+<p>The essence of MicroProfile Health lies in its standardized mechanism for microservices to report health status via HTTP endpoints, facilitating automated decision-making processes like scaling, failover, and recovery in cloud or containerized environments. The specification defines three primary types of health checks: liveness, readiness, and startup checks, each designed to assess different aspects of a microservice&#8217;s operational status.</p>
+</div>
+<div class="paragraph">
+<p>Implementing health checks involves creating procedures annotated with the respective health check annotations. These procedures return a HealthCheckResponse indicating the service&#8217;s health status (UP or DOWN). These checks are automatically exposed via predefined HTTP endpoints, allowing easy integration with orchestration tools like Kubernetes.</p>
+</div>
+<div class="paragraph">
+<p>The chapter also touched on best practices for effective health checks, including defining meaningful checks, utilizing health check responses, handling failures gracefully, and securing health check endpoints. In conclusion, MicroProfile Health offers a robust framework for monitoring and managing the health of microservices, ensuring that services remain reliable and available in dynamic cloud environments. By following the guidelines and best practices outlined in this chapter, developers can effectively implement and leverage health checks to maintain the overall health of their applications.</p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="../chapter05/chapter05.html">MicroProfile Configuration</a></span>
+  <span class="next"><a href="../chapter07/chapter07.html">MicroProfile Metrics</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
+  </body>
+</html>

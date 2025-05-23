@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Chapter 2: Getting Started with MicroProfile :: MicroProfile Tutorial</title>
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../..">MicroProfile Tutorial</a>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Chapter 1 - Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="chapter02-00.html">Chapter 2 - Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Chapter 3 - Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">Chapter 4 - MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">Chapter 5 - MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">Chapter 6 - MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">Chapter 7 - MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">Chapter 8 - MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">Chapter 9 - MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">Chapter 10 - MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">Chapter 11 - MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../index.html">MicroProfile Tutorial</a></div>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">MicroProfile Tutorial</a></li>
+    <li><a href="chapter02-00.html">Chapter 2 - Getting Started with MicroProfile</a></li>
+  </ul>
+</nav>
+<div class="edit-this-page"><a href="file:///workspaces/microprofile-tutorial/./modules/ROOT/pages/chapter02/chapter02-00.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Chapter 2: Getting Started with MicroProfile</h1>
+<div class="sect1">
+<h2 id="_introduction"><a class="anchor" href="#_introduction"></a>Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this chapter, you&#8217;ll embark on your MicroProfile journey! We will guide you through creating your first microservice, equipping you with the essential understanding to leverage this robust framework for building modern, cloud-native applications. This journey begins with setting up your development environment, then diving into creating a microservice.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_topics_covered"><a class="anchor" href="#_topics_covered"></a>Topics Covered</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Development Environment Setup</p>
+</li>
+<li>
+<p>Configuring Build Tools</p>
+</li>
+<li>
+<p>Initializing a New MicroProfile Project</p>
+</li>
+<li>
+<p>Choosing Right Modules for your Application</p>
+</li>
+<li>
+<p>Building a RESTful service</p>
+</li>
+<li>
+<p>Deployment</p>
+</li>
+<li>
+<p>Testing your microservices</p>
+</li>
+<li>
+<p>Exploring Further with MicroProfile</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_development_environment_setup"><a class="anchor" href="#_development_environment_setup"></a>Development Environment Setup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s begin by preparing your workspace for MicroProfile development:</p>
+</div>
+<div class="sect2">
+<h3 id="_java_development_kit_jdk"><a class="anchor" href="#_java_development_kit_jdk"></a>Java Development Kit (JDK)</h3>
+<div class="paragraph">
+<p>MicroProfile, a Java framework, runs on the Java Virtual Machine (JVM), making the Java Development Kit (JDK) an essential component of your development environment.</p>
+</div>
+<div class="paragraph">
+<p>To install JDK, follow the steps below:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Download</strong>: Visit the official <a href="https://openjdk.org/">OpenJDK</a> website and download the JDK version compatible with your operating system.</p>
+</li>
+<li>
+<p><strong>Install</strong>: Follow the installation instructions provided on this official <a href="https://openjdk.org/install/">OpenJDK Installation</a> guide.</p>
+</li>
+<li>
+<p><strong>Verify</strong>: After Installation, run the following command in your command line or terminal to verify the Installation:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -version</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should an output similar to the one below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>openjdk 17.0.10 2024-01-16 LTS
+OpenJDK Runtime Environment Microsoft-8902769 (build 17.0.10+7-LTS)
+OpenJDK 64-Bit Server VM Microsoft-8902769 (build 17.0.10+7-LTS, mixed mode,
+sharing)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This confirms that JDK 17 has been successfully installed on your system.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For most MicroProfile implementations, JDK 11 or later is recommended. In
+this tutorial, we will be using JDK 17. While OpenJDK is used here, other JDK
+providers such as Oracle JDK, Amazon Corretto, Azul Zulu, OpenJ9 also offer
+compatible JDK distributions.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_build_tools_maven_or_gradle"><a class="anchor" href="#_build_tools_maven_or_gradle"></a>Build Tools (Maven or Gradle)</h3>
+<div class="paragraph">
+<p>Build tools like <a href="https://maven.apache.org/">Apache Maven</a> or <a href="https://gradle.org/">Gradle</a> are commonly used for managing project dependencies and building Java applications. You can install the one that best fits your project needs. Here&#8217;s a brief overview to help you decide:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Apache Maven</strong>: Known for its convention-over-configuration approach, Maven is a popular choice due to its simple project setup and extensive plugin repository.</p>
+</li>
+<li>
+<p><strong>Gradle</strong>: Offers a flexible, script-based build configuration, allowing for highly customized build processes. Gradle is renowned for its superior performance, due to its incremental builds  and caching mechanisms. It&#8217;s a great choice for complex projects requiring customization.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+If your existing project&#8217;s build uses Maven wrapper (<code>mvnw</code>) or Gradle wrapper (<code>gradlew</code>), you don&#8217;t have to install any of these build tools. These wrappers help ensure a consistent build environment without requiring the build tools to be installed on your system.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_installing_apache_maven"><a class="anchor" href="#_installing_apache_maven"></a>Installing Apache Maven</h4>
+<div class="paragraph">
+<p>To install Maven follow the steps below:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Visit the <a href="https://https://maven.apache.org/install.html">Installing Apache Maven</a> web page to download the latest version.</p>
+</li>
+<li>
+<p>Follow the installation instructions provided on the site.</p>
+</li>
+<li>
+<p>Verify the Maven installation by running this command in your terminal or command line.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>mvn -v</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see output similar to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Apache Maven 3.9.6 (bc0240f3c744dd6b6ec2920b3cd08dcc295161ae)
+Maven home: /usr/local/sdkman/candidates/maven/current
+Java version: 17.0.10, vendor: Microsoft, runtime: /usr/lib/jvm/msopenjdk-current
+Default locale: en_US, platform encoding: UTF-8
+OS name: "linux", version: "6.2.0-1019-azure", arch: "amd64", family: "unix"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After Maven is installed, you can configure the <em>pom.xml</em> file in your project to include the MicroProfile dependencies.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_gradle"><a class="anchor" href="#_gradle"></a>Gradle</h4>
+<div class="paragraph">
+<p>To install Gradle follow the step below:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Visit the <a href="https://gradle.org/install/">Gradle | Installation</a> web page to download the latest version.</p>
+</li>
+<li>
+<p>Follow the installation instructions provided on the site.</p>
+</li>
+<li>
+<p>Verify the installation by running this command in your terminal or command line.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>gradle -version</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see output similar to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Welcome to Gradle 8.6!
+
+Here are the highlights of this release:
+ - Configurable encryption key for configuration cache
+ - Build init improvements
+ - Build authoring improvements
+
+For more details see https://docs.gradle.org/8.6/release-notes.html
+
+------------------------------------------------------------
+Gradle 8.6
+------------------------------------------------------------
+
+Build time:   2024-02-02 16:47:16 UTC
+Revision:     d55c486870a0dc6f6278f53d21381396d0741c6e
+
+Kotlin:       1.9.20
+Groovy:       3.0.17
+Ant:          Apache Ant(TM) version 1.10.13 compiled on January 4 2023
+JVM:          17.0.10 (Microsoft 17.0.10+7-LTS)
+OS:           Linux 6.2.0-1019-azure amd64</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After Gradle is installed, you can configure the <em>build.gradle</em> file in your project to include the MicroProfile dependencies.</p>
+</div>
+<div class="paragraph">
+<p>Whether you opt for Maven&#8217;s stability and convention or Gradle&#8217;s flexibility and performance, understanding how to configure and use your chosen build tool is important for MicroProfile development.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_integrated_development_environments"><a class="anchor" href="#_integrated_development_environments"></a>Integrated Development Environments</h3>
+<div class="paragraph">
+<p>Integrated Development Environments (IDEs) enhance developer productivity by providing a rich set of features and extensions such as project boostraping, dependency management, intelligent code completion, configuration assistance, test runners, build, hot deployment and debugging tools. For MicroProfile development, the choice of IDE can significantly affect your development speed and efficiency. Below is a list of popular IDEs and their key features related to Java and MicroProfile development:</p>
+</div>
+<div class="sect3">
+<h4 id="_eclipse_for_enterprise_java_and_web_developers"><a class="anchor" href="#_eclipse_for_enterprise_java_and_web_developers"></a>Eclipse for Enterprise Java and Web Developers</h4>
+<div class="paragraph">
+<p><em>Overview</em>: <a href="https://www.eclipse.org/downloads/packages/release/2023-12/r/eclipse-ide-enterprise-java-and-web-developers">Eclipse for Enterprise Java and Web Developers</a> is a widely used IDE for Java development, offering extensive support for Java EE, Jakarta EE, and MicroProfile, among other technologies.</p>
+</div>
+<div class="paragraph">
+<p><em>Getting Started</em>: The official Eclipse documentation containing instructions about creating Java projects - <a href="https://help.eclipse.org/latest/topic/org.eclipse.jdt.doc.user/gettingStarted/qs-3.htm">Creating your first Java Project</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_intellij_idea"><a class="anchor" href="#_intellij_idea"></a>IntelliJ IDEA</h4>
+<div class="paragraph">
+<p><em>Overview</em>:  <a href="https://www.jetbrains.com/idea/">IntelliJ IDEA</a> by JetBrains supports a wide range of programming languages and frameworks, including Java, Kotlin, and frameworks like Spring, Jakarta EE, and MicroProfile.</p>
+</div>
+<div class="paragraph">
+<p><em>Getting Started</em>: Refer to this IntelliJ IDEA guide on <a href="https://www.jetbrains.com/help/idea/2024.1/creating-and-running-your-first-java-application.html">Creating a Java Project Using IntelliJ IDEA 2024.1</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_apache_netbeans"><a class="anchor" href="#_apache_netbeans"></a>Apache NetBeans</h4>
+<div class="paragraph">
+<p><em>Overview</em>: <a href="https://netbeans.apache.org/front/main/">NetBeans</a> is an open-source IDE that supports Java development, including Java SE, Java EE, JavaFX, and more.</p>
+</div>
+<div class="paragraph">
+<p><em>Getting Started</em>: Check out this <a href="https://netbeans.apache.org/tutorial/main/kb/docs/java/quickstart/">NetBeans Java Quick Start Tutorial</a> for a tutorial on creating a Java application.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_visual_studio_code"><a class="anchor" href="#_visual_studio_code"></a>Visual Studio Code</h4>
+<div class="paragraph">
+<p><em>Overview</em>: <a href="https://code.visualstudio.com/">Visual Studio Code</a> is a lightweight, powerful source code editor that supports Java development through extensions.</p>
+</div>
+<div class="paragraph">
+<p><em>Getting Started</em>: To start with Java in VS Code, follow this <a href="https://code.visualstudio.com/docs/java/java-tutorial">Getting Started with Java in VS Code</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>Selecting an IDE should be based on personal preference, as the best choice varies depending on individual needs, familiarity, and the specific features that enhance your productivity. Each IDE offers unique advantages for MicroProfile development.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_setting_up_microprofile_runtime"><a class="anchor" href="#_setting_up_microprofile_runtime"></a>Setting up MicroProfile Runtime</h3>
+<div class="paragraph">
+<p>MicroProfile applications need a runtime that supports MicroProfile specifications or a MicroProfile-compatible server to run your applications. Below are some popular options, each with unique features tailored to different needs:</p>
+</div>
+<div class="sect3">
+<h4 id="_open_liberty"><a class="anchor" href="#_open_liberty"></a>Open Liberty</h4>
+<div class="paragraph">
+<p><a href="https://openliberty.io/">Open Liberty</a> is a flexible server framework from IBM that supports MicroProfile, allowing developers to build microservices and cloud-native applications with ease. Open Liberty is known for its dynamic updates and lightweight design, which enhances developer productivity and application performance.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://openliberty.io/start/">Downloading Open Liberty</a> page provides access to its latest releases and documentation to help you set up your environment.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_quarkus"><a class="anchor" href="#_quarkus"></a>Quarkus</h4>
+<div class="paragraph">
+<p><a href="https://quarkus.io/">Quarkus</a> is known for its container-first approach, offering fast startup times and low memory footprint. It aims to optimize Java for Kubernetes and cloud environments</p>
+</div>
+<div class="paragraph">
+<p>This <a href="https://quarkus.io/guides/getting-started">Getting Started with Quarkus</a> page will guide you through creating your first Quartus project and exploring its cloud-native capabilities.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_payara_micro"><a class="anchor" href="#_payara_micro"></a>Payara Micro</h4>
+<div class="paragraph">
+<p><a href="https://www.payara.fish/products/payara-micro/">Payara Micro</a>  is a lightweight middleware platform suited for containerized Jakarta EE and MicroProfile applications.</p>
+</div>
+<div class="paragraph">
+<p>The <a href="https://www.payara.fish/downloads/payara-platform-community-edition/">Payara Platform Community Edition</a> enables easy packaging of applications into a single, runnable JAR file, simplifying deployment and scaling in cloud environments. This site about Payara Platform Community Edition offers downloads and documentation to get started.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_wildfly"><a class="anchor" href="#_wildfly"></a>WildFly</h4>
+<div class="paragraph">
+<p><a href="https://www.wildfly.org/">WildFly</a> is a flexible, lightweight, managed application runtime that offers full Jakarta EE and MicroProfile support. WildFly is designed for scalability and flexibility in both traditional and cloud-native environments.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://www.wildfly.org/downloads/">WildFly Downloads</a> page offers the latest versions and documentation to get you started.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_helidon"><a class="anchor" href="#_helidon"></a>Helidon</h4>
+<div class="paragraph">
+<p>Developed by Oracle, <a href="https://helidon.io/">Helidon</a> MP implements MicroProfile specifications. It provides a familiar programming model for Jakarta EE developers and enables efficient microservice development.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://helidon.io/docs/">Helidon Documentation</a> provides comprehensive resources to help developers get started with the framework, understand its core concepts, and develop microservices efficiently.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_apache_tomee"><a class="anchor" href="#_apache_tomee"></a>Apache TomEE</h4>
+<div class="paragraph">
+<p><a href="https://tomee.apache.org/">Apache TomEE</a> integrates several Apache projects with Apache Tomcat to provide a Jakarta EE environment. It offers support for MicroProfile, allowing developers to build and deploy microservices using the well-known Jakarta EE technologies with additional MicroProfile capabilities.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://tomee.apache.org/download.html">TomEE Downloads</a> and <a href="https://tomee.apache.org/microprofile-6.0/javadoc/">TomEE MicroProfile Documentation</a> page provide the necessary resources to get started with TomEE for MicroProfile development.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_microprofile_starter"><a class="anchor" href="#_microprofile_starter"></a>MicroProfile Starter</h3>
+<div class="paragraph">
+<p>To kickstart your MicroProfile project, use the MicroProfile Starter to generate a sample project with your chosen server and specifications. This tool provides a customizable project structure and generates necessary boilerplate code and configuration.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Visit the <a href="https://start.microprofile.io/">MicroProfile</a> Starter page - the official website for generating the MicroProfile project templates.</p>
+</li>
+<li>
+<p>Provide a <code>groupId</code> for your project, it&#8217;s an identifier for your project and should be unique to avoid conflicts with other libraries or projects.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Its recommended convention is to start your <code>groupId</code> with the reverse domain name of your organization (for example, <code>io.microprofile</code>).
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Enter the 'artifactID', which is the name of your project (e.g., 'mp-ecomm-store').</p>
+</li>
+<li>
+<p>Select the <strong>Java SE version</strong> your project will use.</p>
+</li>
+<li>
+<p>Select the <strong>MicroProfile version</strong> you want to use. Ideally, you should choose the latest version for the most up-to-date features but also consider the runtime’s support.</p>
+</li>
+<li>
+<p>Select the specifications you want to include in your project. These could be Config, Fault Tolerance, JWT Auth, Metrics, Health, Open API, Open Tracing, Rest Client. Choose what is relevant to your application.</p>
+</li>
+<li>
+<p>Click the <em>Download</em> button.</p>
+</li>
+<li>
+<p>Unzip the generated project and import it into your IDE.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This completes the development environment setup. Now we are all set to begin development using MicroProfile.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+At the time of writing this tutorial, the latest MicroProfile released version was 6.1. The MicroProfile Starter does not currently support this version. Hence, we will not be using MicroProfile Starter to generate the project structure.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

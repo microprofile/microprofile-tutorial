@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chapter 3: Jakarta EE 10 Core Profile :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/microprofile-tutorial/6.1/chapter03/chapter03.html">
+    <link rel="prev" href="../chapter02/chapter02-00.html">
+    <link rel="next" href="../chapter04/chapter04.html">
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" />      <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5WLCZXC');</script>
+    <!-- End Google Tag Manager -->  
+    <script>var uiRootPath = '../../../_'</script>
+    <script>!function (theme) {
+        if (theme === 'dark') document.documentElement.classList.add('theme-dark')
+      }(localStorage && localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)') && 'dark'))
+    </script>
+    <!-- Add Eclipse Foundation cookie consent to site for GA -->
+    <script src="//www.eclipse.org/eclipse.org-common/themes/solstice/public/javascript/vendor/cookieconsent/default.min.js"></script>
+      </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a id="site-title" class="navbar-item" href="https://microprofile.io">MicroProfile Tutorial</a>
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="../../../microprofile-tutorial/6.1/microprofile-tutorial.pdf">Download</a>
+          </span>
+        </div>
+      </div>
+      <div class="navbar-theme-switcher">
+        <span class="switch" title="Switch between Light and Dark Theme">
+          <input id="theme-switcher-checkbox" type="checkbox" />
+          <label for="theme-switcher-checkbox">Dark Theme</label>
+        </span>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="6.1">
+  <div class="toolbar"></div>
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Preface</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter02/chapter02-00.html">Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="chapter03.html">Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">6.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">MicroProfile Tutorial</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">6.1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">MicroProfile Tutorial</a></li>
+    <li><a href="chapter03.html">Jakarta EE 10 Core Profile</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///workspaces/microprofile-tutorial/./modules/ROOT/pages/chapter03/chapter03.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Chapter 3: Jakarta EE 10 Core Profile</h1>
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a>Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This chapter delves into the <strong>Jakarta EE 10 Core Profile</strong>, a specification designed specifically for microservices and cloud-native apps. <strong>Jakarta EE</strong> is a comprehensive framework within the Java ecosystem for crafting enterprise-grade applications. Complementing this, <strong>MicroProfile</strong> addresses the intricacies of microservices development, such as configuration management, fault tolerance, health checks, and monitoring. The foundation of MicroProfile is built on the strong and established standards of Jakarta EE, which ensures smooth integration of these modern APIs with the enterprise Java landscape.</p>
+</div>
+<div class="paragraph">
+<p>In this chapter, through practical examples, we will explore the critical features of the Jakarta EE 10 Core Profile that are most relevant to microservices development, including Contexts and Dependency Injection (CDI), Jakarta RESTful Web Services (Jakarta REST, formerly JAX-RS), JSON Binding and JSON Processing.</p>
+</div>
+<div class="paragraph">
+<p>By the end of this chapter, you will gain a comprehensive understanding of Jakarta EE 10 Core Profile as a foundational platform for developing microservices with MicroProfile. You will be able to appreciate the pivotal role of Jakarta EE in the MicroProfile ecosystem and how its core functionalities develop scalable, resilient, and portable cloud-native applications.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="topics-to-be-covered"><a class="anchor" href="#topics-to-be-covered"></a>Topics to be covered:</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Understanding the Jakarta EE 10 Core Profile</p>
+</li>
+<li>
+<p>Key Specifications in Core Profile</p>
+</li>
+<li>
+<p>Managing Component Dependencies</p>
+</li>
+<li>
+<p>Handling HTTP Methods and Resources</p>
+</li>
+<li>
+<p>Best Practices for Building Robust and Scalable Applications</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="understanding-the-jakarta-ee-10-core-profile"><a class="anchor" href="#understanding-the-jakarta-ee-10-core-profile"></a>Understanding the Jakarta EE 10 Core Profile</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Jakarta EE 10 Core Profile is a streamlined subset of the full Jakarta EE platform explicitly designed for building lightweight microservices and cloud-native applications. It provides a standardized foundation for smaller runtime environments, comprising of a curated selection of Jakarta EE specifications:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Jakarta Annotations</strong>: Enables developers to decorate their code with metadata to influence system configuration and behavior, making the code concise, readable, and maintainable.</p>
+</li>
+<li>
+<p><strong>Jakarta Contexts and Dependency Injection Lite</strong>: Facilitates the management of lifecycle contexts of stateful components and the injection of dependencies.</p>
+</li>
+<li>
+<p><strong>Jakarta Interceptors</strong>: Offers a means to intercept business method invocations and lifecycle events, ideal for implementing cross-cutting concerns such as logging.</p>
+</li>
+<li>
+<p><strong>Jakarta JSON Processing and Jakarta JSON Binding</strong>: Simplifies the parsing, generation, and binding of JSON data for Java objects, crucial for RESTful service communication.</p>
+</li>
+<li>
+<p><strong>Jakarta REST</strong>: Provides a framework for creating web services according to the REST architectural pattern, enhancing web API development.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="key-specifications-in-jakarta-ee-10-core-profile"><a class="anchor" href="#key-specifications-in-jakarta-ee-10-core-profile"></a>Key Specifications in Jakarta EE 10 Core Profile</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s delve deeper into some of the specifications included in the Jakarta Core Profile to understand their importance and functionality:</p>
+</div>
+<div class="sect2">
+<h3 id="jakarta-annotations"><a class="anchor" href="#jakarta-annotations"></a>Jakarta Annotations</h3>
+<div class="paragraph">
+<p>This specification simplifies the code by reducing the need for external configuration files and making the intentions behind code clear. Annotations are extensively used across various Jakarta EE specifications.</p>
+</div>
+<div class="sect3">
+<h4 id="key-features"><a class="anchor" href="#key-features"></a>Key Features</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Simplification of Configuration</strong>: Annotations reduce the need for XML configuration files, making the setup more straightforward and less error-prone.</p>
+</li>
+<li>
+<p><strong>Enhanced Readability and Maintenance</strong>: Code decorated with annotations is easier to read and maintain, as the configuration is co-located with the code it configures.</p>
+</li>
+<li>
+<p><strong>Wide Adoption</strong>: Used across the Jakarta EE platform for a variety of purposes, including dependency injection, defining REST endpoints, and configuring beans.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jakarta-contexts-and-dependency-injection-cdi-cdi-lite"><a class="anchor" href="#jakarta-contexts-and-dependency-injection-cdi-cdi-lite"></a>Jakarta Contexts and Dependency Injection (CDI) - CDI Lite</h3>
+<div class="paragraph">
+<p>CDI is the specification that unifies the Jakarta EE platform by providing a consistent way to manage the lifecycle of stateful components and their interactions. The CDI Lite section of the specification is tailored for environments where full CDI support may be too heavyweight, such as microservices and serverless deployments.</p>
+</div>
+<div class="sect3">
+<h4 id="key-features-of-contexts-and-dependency-injection-cdi-cdi-lite"><a class="anchor" href="#key-features-of-contexts-and-dependency-injection-cdi-cdi-lite"></a>Key Features of Contexts and Dependency Injection (CDI) - CDI Lite</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Type-safe Dependency Injection</strong>: Enables the injection of beans in a type-safe manner, reducing runtime errors and improving developer productivity.</p>
+</li>
+<li>
+<p><strong>Contextual Lifecycle Management</strong>: Manages the lifecycle of beans according to well-defined contexts, simplifying state management across different scopes.</p>
+</li>
+<li>
+<p><strong>Interceptors</strong>: Supports the use of interceptors for adding behavior to beans or for altering their behavior in a non-invasive manner.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The <a href="https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/cdi/cdi-basic/cdi-basic.html">CDI Lite Tutorial</a> is an invaluable resource, if you are looking to gain a solid foundation in CDI Lite and its role within the Jakarta EE ecosystem, especially in the context of building lightweight microservices and cloud-native applications. It will take you through the basics, advanced features, and the practical application of CDI Lite, equipping you with the knowledge to make the most out of this powerful specification.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jakarta-interceptors"><a class="anchor" href="#jakarta-interceptors"></a>Jakarta Interceptors</h3>
+<div class="paragraph">
+<p>Jakarta Interceptors allow developers to define methods that intercept business method invocations and lifecycle events on Jakarta EE components. This is particularly useful for implementing cross-cutting concerns such as logging, transactions, security, and more, without cluttering business logic.</p>
+</div>
+<div class="sect3">
+<h4 id="key-features-of-jakarta-interceptors"><a class="anchor" href="#key-features-of-jakarta-interceptors"></a>Key Features of Jakarta Interceptors</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Separation of Concerns</strong>: Helps in separating cross-cutting concerns (like logging, transaction management, and security) from business logic.</p>
+</li>
+<li>
+<p><strong>Reusability</strong>: Interceptors can be defined once and applied to multiple beans, promoting code reuse.</p>
+</li>
+<li>
+<p><strong>Configurability</strong>: Interceptors can be enabled, disabled, or reordered through configuration, offering flexibility in their application.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For an in-depth understanding of Jakarta Interceptors, We highly recommend you to read the <a href="https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/supporttechs/interceptors/interceptors.html">Jakarta Interceptors Tutorial</a>. This tutorial  covers everything from basic concepts to advanced usage scenarios, providing a solid foundation for effectively utilizing interceptors in your projects.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jakarta-json-processing"><a class="anchor" href="#jakarta-json-processing"></a>Jakarta JSON Processing</h3>
+<div class="paragraph">
+<p>Jakarta JSON Processing (JSON-P) is a specification in the Jakarta EE platform that provides a portable API to parse, generate, transform, and query JSON data in a Java application. It is part of the larger ecosystem of Jakarta EE specifications designed to facilitate the development of enterprise applications with support for modern data formats and protocols, including JSON, which is widely used in web services and RESTful APIs.</p>
+</div>
+<div class="sect3">
+<h4 id="key-features-of-jakarta-json-processing"><a class="anchor" href="#key-features-of-jakarta-json-processing"></a>Key Features of Jakarta JSON Processing</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Parsing and Generation</strong>: JSON-P allows for both the parsing of JSON data into a Java representation and the generation of JSON data from Java objects. This can be done using either a streaming API for efficiency with large data sets or a more intuitive object model API for ease of use.</p>
+</li>
+<li>
+<p><strong>Object Model API</strong>: This API provides a way to build or manipulate JSON data using a DOM-like tree structure. It enables developers to create, access, and modify JSON data in a flexible manner.</p>
+</li>
+<li>
+<p><strong>Streaming API</strong>: The streaming API (JsonParser and JsonGenerator) offers a lower-level, event-based approach to parsing and generating JSON. It is highly efficient, making it suitable for processing large volumes of JSON data with minimal memory overhead.</p>
+</li>
+<li>
+<p><strong>Data Binding</strong>: While JSON-P itself does not directly support data binding (converting between JSON and Java POJOs), it lays the groundwork for such functionality, which is further extended by Jakarta JSON Binding (JSON-B).</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For an in-depth exploration of Jakarta JSON Processing, including understanding JSON&#8217;s syntax, its applications in web services, and the programming models for manipulating JSON data, readers are encouraged to visit the Jakarta EE tutorial. This tutorial offers comprehensive guidance on both the object and streaming models for JSON data handling, suitable for beginners and advanced users alike. Learn more at the <a href="https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/web/jsonp/jsonp.html">Jakarta EE
+Documentation on JSON Processing</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jakarta-json-binding"><a class="anchor" href="#jakarta-json-binding"></a>Jakarta JSON Binding</h3>
+<div class="paragraph">
+<p>Jakarta JSON Binding (JSON-B) is a specification within the Jakarta EE platform that provides a high-level API for converting (binding) Java objects to and from JSON documents. It sits on top of Jakarta JSON Processing (JSON-P) and offers a more convenient way to work with JSON data than manually parsing and generating JSON using JSON-P&#8217;s lower-level APIs. JSON-B is designed to simplify the task of serializing Java objects into JSON and deserializing JSON into Java objects, making it an essential tool for developing modern Java enterprise applications that interact with web services, RESTful APIs, and microservices.</p>
+</div>
+<div class="sect3">
+<h4 id="key-features-of-jakarta-json-binding"><a class="anchor" href="#key-features-of-jakarta-json-binding"></a>Key Features of Jakarta JSON Binding</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Automatic Binding</strong>: JSON-B can automatically bind Java objects to JSON and vice versa without requiring manual parsing, significantly simplifying code and reducing boilerplate.</p>
+</li>
+<li>
+<p><strong>Customization</strong>: It provides annotations that allow developers to customize the serialization and deserialization process, such as changing property names in JSON, including or excluding specific fields, and handling custom data types.</p>
+</li>
+<li>
+<p><strong>Support for Java Generics</strong>: JSON-B can handle complex objects, including those that use Java Generics, ensuring type safety during the binding process.
+Integration with JSON-P: JSON-B is built on top of JSON-P and can seamlessly integrate with it, allowing developers to mix high-level object binding with low-level JSON processing as needed.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you are interested in diving deeper into the specifics of JSON Binding, We highly recommend you to visit the Jakarta EE tutorial. It provides detailed insights into how JSON Binding works, including the processes for converting Java objects to JSON and vice versa. This knowledge is crucial for effectively managing JSON data in Java-based enterprise applications. Learn more at the <a href="https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/web/jsonb/jsonb.html">Jakarta EE Documentation on JSON Binding</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jakarta-restful-web-services"><a class="anchor" href="#jakarta-restful-web-services"></a>Jakarta RESTful Web Services</h3>
+<div class="paragraph">
+<p>Jakarta RESTful Web Services(Jakarta REST) is a specification for creating web services according to the Representational State Transfer (REST) architectural pattern. It provides annotations to define resources and operations, making it straightforward to develop APIs for web applications.</p>
+</div>
+<div class="sect3">
+<h4 id="key-features-of-jakarta-restful-web-services"><a class="anchor" href="#key-features-of-jakarta-restful-web-services"></a>Key Features of Jakarta RESTful Web Services</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Annotation-driven Development</strong>: Simplifies the creation of web services by using annotations to define resources, HTTP methods, and response types.</p>
+</li>
+<li>
+<p><strong>Flexible Data Format Support</strong>: While JSON is commonly used, JAX-RS supports a variety of data formats, providing flexibility in API design.</p>
+</li>
+<li>
+<p><strong>Client API</strong>: Includes a client API for creating HTTP requests to RESTful services, facilitating communication between microservices.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The Jakarta EE 10 Core Profile&#8217;s focus on these specifications underscores its aim to provide a lightweight, yet comprehensive platform for developing modern Java applications suited for microservices architectures and cloud-native environments.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For those looking to master developing RESTful Web Services, we strongly encourage you to explore <a href="https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/websvcs/jaxrs/jaxrs.html">Jakarta RESTful Web Services Tutorial</a>. This comprehensive tutorial offers a deep dive into the Jakarta RESTful Web Services specification, demonstrating how to create, deploy, and manage RESTful services efficiently.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="managing-component-dependencies"><a class="anchor" href="#managing-component-dependencies"></a>Managing Component Dependencies</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Jakarta Annotations and CDI plays a central role in integrating different Jakarta EE specifications, such as Jakarta Persistence API (formerly JPA) for database operations and Jakarta RESTful Web Services (formerly JAX-RS) for web services. Let&#8217;s now enhance the product microservices we developed previously.</p>
+</div>
+<div class="paragraph">
+<p>Jakarta Annotations is used for defining RESTful services and injecting dependencies. For instance, in our product microservices, we can update the <code>Product</code> and <code>ProductRepository</code> class to include annotations that facilitate entity management and dependency injection:</p>
+</div>
+<div class="sect2">
+<h3 id="entity-class"><a class="anchor" href="#entity-class"></a>Entity class</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.product.entity;
+
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.validation.constraints.NotNull;
+
+
+@Entity
+@Table(name = "Product")
+@NamedQuery(name = "Product.findAllProducts", query = "SELECT p FROM Product p")
+@NamedQuery(name = "Product.findProductById", query = "SELECT p FROM Product p WHERE p.id = :id")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Product {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @NotNull
+    private String name;
+
+    @NotNull
+    private String description;
+
+    @NotNull
+    private Double price;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Entity</code> and <code>@Table(name = "Product")</code>: These annotations declare the class as a Jakarta Persistence entity and map it to a database table named "Product".</p>
+</li>
+<li>
+<p><code>@Id</code> and <code>@GeneratedValue</code>: These annotations denote the <code>id</code> field as the primary key of the entity and indicate that its value should be generated automatically.</p>
+</li>
+<li>
+<p><code>@NotNull</code>: This annotation from Jakarta Bean Validation ensures that the <code>name</code>, <code>description</code>, and <code>price</code> fields cannot be <code>null</code>, enforcing data integrity at the application level.</p>
+</li>
+<li>
+<p><code>@NamedQuery</code>: These annotations define Jakarta Persistence API named queries for common operations, such as retrieving all products or finding a product by its ids. These can be used throughout the application to interact with the database in a consistent manner.</p>
+</li>
+<li>
+<p><code>@Data</code>, <code>@AllArgsConstructor</code>, and <code>@NoArgsConstructor</code>: These annotations from Project Lombok automatically generate boilerplate code such as getters, setters, a no-arguments constructor, and an all-arguments constructor. This keeps the entity class concise and focused on its fields and annotations related to Jakarta Persistence.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="repository-class"><a class="anchor" href="#repository-class"></a>Repository class</h3>
+<div class="paragraph">
+<p>The <code>ProductRepository</code> class serves as a bridge between the application&#8217;s business logic layer and the database, performing CRUD (Create, Read, Update, Delete) operations on <code>Product</code> entities. It exemplifies the separation of concerns, a fundamental principle in enterprise Java applications, by cleanly segregating the data access logic from the business logic.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.product.repository;
+
+import java.util.List;
+
+import io.microprofile.tutorial.store.product.entity.Product;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
+@RequestScoped
+public class ProductRepository {
+
+   @PersistenceContext(unitName = "product-unit")
+   private EntityManager em;
+
+   public void createProduct(Product product) {
+       em.persist(product);
+   }
+
+   public Product updateProduct(Product product) {
+       return em.merge(product);
+   }
+
+   public void deleteProduct(Product product) {
+       em.remove(product);
+   }
+
+   public List&lt;Product&gt; findAllProducts() {
+       return em.createNamedQuery("Product.findAllProducts",
+       Product.class).getResultList();
+   }
+
+   public Product findProductById(Long id) {
+       return em.find(Product.class, id);
+   }
+
+   public List&lt;Product&gt; findProduct(String name, String description, Double price) {
+       return em.createNamedQuery("Event.findProduct", Product.class)
+           .setParameter("name", name)
+           .setParameter("description", description)
+           .setParameter("price", price).getResultList();
+   }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ProductRepository</code>: This class utilizes Jakarta Persistence API (JPA) for database operations, encapsulating the CRUD (Create, Read, Update, Delete) operations along with methods to find products by various criteria.</p>
+</li>
+<li>
+<p><code>@RequestScoped</code>: This CDI annotation for ProductRepository class indicates that an instance of this class is created for each HTTP request to ensure that database operations are handled within the context of a single request.</p>
+</li>
+<li>
+<p><code>@PersistenceContext</code>: This annotation injects an entity manager instance, em, specifying the persistence unit product-unit. The entity manager is
+the primary JPA interface for database interactions.</p>
+</li>
+<li>
+<p>The methods createProduct(), updateProduct(), deleteProduct(), findAllProducts(), and findProductById() methods define CRUD operations that might be performed by the repository. These methods utilize the EntityManager instance to persist, merge, remove, and query for product entities.</p>
+</li>
+<li>
+<p>The EntityManager is responsible for managing the persistence context and performing CRUD operations on the entities.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>ProductRepository</code> serves as a foundational example for developers to understand how to construct a data access layer in a MicroProfile application, emphasizing the significance of CDI in managing component lifecycles and dependencies, as well as showcasing the application of Jakarta Persistence for Object Relational Mapping(ORM) based data access.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="lifecycle-management-of-beans-in-jakarta-ee"><a class="anchor" href="#lifecycle-management-of-beans-in-jakarta-ee"></a>Lifecycle Management of Beans in Jakarta EE</h3>
+<div class="paragraph">
+<p>CDI defines several built-in scopes to manage the lifecycle of beans, each corresponding to a specific context within the application. When a bean is needed, the CDI container automatically creates it within its defined scope, manages its lifecycle, and destroys it when the context ends. This process is largely transparent to the developer, simplifying development.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+To learn more about using built-in scopes in CDI for the lifecycle management of beans, We highly recommend visiting the <a href="https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/cdi/cdi-basic/cdi-basic.html#_using_scopes">Using Scopes</a> section of the Jakarta EE Tutorial. This resource provides valuable insights into each scope and how to use them effectively in your applications.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="handling-http-methods-and-resources"><a class="anchor" href="#handling-http-methods-and-resources"></a>Handling HTTP Methods and Resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Jakarta RESTful Web Services annotations are utilized to define endpoints for the web services, facilitating the creation and management of RESTful APIs. The <code>ProductResource</code> class demonstrates this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.product.resource;
+
+
+import java.util.List;
+
+
+import io.microprofile.tutorial.store.product.entity.Product;
+import io.microprofile.tutorial.store.product.repository.ProductRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+
+
+@Path("/products")
+@ApplicationScoped
+public class ProductResource {
+
+
+    @Inject
+    private ProductRepository productRepository;
+
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public List&lt;Product&gt; getProducts() {
+        // Return a list of products
+        return productRepository.findAllProducts();
+    }
+
+
+    // Additional endpoint methods
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>@ApplicaitonScoped</code> is an CDI annotation that specifies that the bean is application-scoped, meaning there will be a single instance of <code>ProductResource</code> for the entire application, which promotes better resource utilization and performance.</p>
+</div>
+<div class="paragraph">
+<p>The <code>@Inject</code> annotation is commonly used in CDI to inject instances into the application classes without needing to do manual lookups or new instance creations. For example, When <code>ProductResource</code> needed a repository to fetch products from a database, we used <code>@Inject</code> to incorporate that repository seamlessly.</p>
+</div>
+<div class="paragraph">
+<p><code>@Path</code> and <code>@GET</code>: Defines the URI path and HTTP method for accessing the <code>getProducts</code> endpoint.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="defining-restful-apis"><a class="anchor" href="#defining-restful-apis"></a>Defining RESTful APIs</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When creating a REST API, you typically start by defining the resources that your API will expose. A unique URI identifies each resource. You then define the operations that can be performed on each resource. These operations are typically CRUD operations: create, read, update, and delete.
+Let us now create a RESTful API to manage a list of products for a store. This RESTful API allows client applications to access the product stored as resources on the server.</p>
+</div>
+<div class="paragraph">
+<p>The API is implemented using Jakarta EE and REST architectural style. The API has the following methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>GET /api/products</code>: Retrieves a list of products</p>
+</li>
+<li>
+<p><code>POST /api/products</code>: Creates a new product, the product details are provided as JSON in the request body</p>
+</li>
+<li>
+<p><code>PUT /api/products</code>: Updates an existing product, the updated product details are provided as JSON in the request body</p>
+</li>
+<li>
+<p><code>DELETE /api/products/chapter03</code>: Deletes a product, the product id is provided in the request URL path</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Multiple annotations can be used together in a single method to support multiple media types. For example, When both <code>@Consumes(MediaType.APPLICATION_JSON)</code> and <code>@Produces(MediaType.APPLICATION_XML)</code> are used together in a single method, then the method can consume JSON and produce XML.</p>
+</div>
+<div class="paragraph">
+<p>Table 3-1 shows a list of some of the popular Media types along with their constant fields in <code>jakarta.ws.rs.core.MediaType</code> class and corresponding HTTP ContentType:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Media Type</th>
+<th class="tableblock halign-left valign-top">Constant Field</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>application/json</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MediaType.APPLICATION_JSON</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON format, used for representing structured data.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>application/xml</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MediaType.APPLICATION_XML</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">XML format, used for representing structured data in XML format.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>text/xml</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MediaType.TEXT_XML</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">XML format, primarily used for XML data that is human-readable.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>text/plain</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MediaType.TEXT_PLAIN</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Plain text format, used for unstructured text data.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>text/html</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MediaType.TEXT_HTML</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTML format, used for markup data that can be rendered by web browsers.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>application/octet-stream</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MediaType.APPLICATION_OCTET_STREAM</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Binary data stream, used for transmitting files or streaming.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>application/x-www-form-urlencoded</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MediaType.APPLICATION_FORM_URLENCODED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Web form format, used for submitting form data in HTTP requests.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>multipart/form-data</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>MediaType.MULTIPART_FORM_DATA</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multipart format, used for uploading files through web forms.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>application/vnd.api+json</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Custom</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON API format, a specification for how clients should request and modify resources.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>application/hal+json</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Custom</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hypertext Application Language (HAL) JSON format, used for linking between resources in APIs.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="implementing-rest-apis-for-managing-products-data"><a class="anchor" href="#implementing-rest-apis-for-managing-products-data"></a>Implementing REST APIs for Managing Products Data</h3>
+<div class="paragraph">
+<p>After having successfully performed the development and testing of the GET method of <code>ProductResource</code> to fetch the list of product resources. Let’s now call the create, update and delete methods for our Products REST API. For this you only need to add additional methods of our <code>ProductResource</code> class.</p>
+</div>
+<div class="sect3">
+<h4 id="creating-a-product"><a class="anchor" href="#creating-a-product"></a>Creating a Product</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@POST
+@Consumes(MediaType.APPLICATION_JSON)
+@Transactional
+public Response createProduct(Product product) {
+   System.out.println("Creating product");
+   productRepository.createProduct(product);
+   return Response.status(Response.Status.CREATED)
+         .entity("New product created").build();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="paragraph">
+<p>The <code>createProduct()</code> method is annotated with <code>@POST</code>, which means it can be invoked via an HTTP POST request. The <code>@Consumes(MediaType.APPLICATION_JSON)</code> annotation says it will consume JSON data. This method takes a single parameter, which is of type <code>Product`</code>. This parameter will be populated with the data sent in the HTTP POST request. The method creates a new Product object and adds it to the list of products. Finally, the method returns a <code>Response</code> object with a status code of 201 (Created) and a message indicating that a new product has been created.</p>
+</div>
+<div class="sect4">
+<h5 id="verifying-the-post-request"><a class="anchor" href="#verifying-the-post-request"></a>Verifying the POST request</h5>
+<div class="paragraph">
+<p>You can use a REST client such as <a href="https://www.postman.com/">Postman</a> or the cURL command line utility to test the HTTP methods (including PUT, POST, DELETE). To verify the POST request, you can use the following cURL command. This sends  a JSON object representing a new product to your microservice.</p>
+</div>
+<div class="paragraph">
+<p>Command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl -H 'Content-Type: application/json' -d '{ "id": "3", "name":"iPhone 14", "description":"Apple iPhone 14", "price":"799.99"}' -X POST http://localhost:9080/mp-ecomm-store/api/products</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">New product created</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This command specifies the content type as JSON and sends a data payload representing a product with an ID of 3, the name "iPhone 14", a description of "Apple iPhone 14", and a price of 799.99. The <code>-X POST</code> parameter indicates that this is a POST request. Upon successful execution, your service should process this data and add the new product to the database.</p>
+</div>
+<div class="paragraph">
+<p>Next you can verify the addition of the new product, by calling the GET method using cURL or browser as described previously to list all products. This request should now return an updated list of products, including the newly added product.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">$ curl http://localhost:9080/mp-ecomm-store/api/products</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="updating-a-product"><a class="anchor" href="#updating-a-product"></a>Updating a Product</h3>
+<div class="paragraph">
+<p>Updating existing product information is a common operation for RESTful services managing a catalog of items. The <code>PUT</code> request method is designed for these scenarios, allowing you to modify an existing product&#8217;s details. The code snippet below demonstrates updating the product:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@PUT
+@Consumes(MediaType.APPLICATION_JSON)
+@Transactional
+public Response updateProduct(Product product) {
+   // Update an existing product
+   Response response;
+   System.out.println("Updating product");
+   Product updatedProduct = productRepository.updateProduct(product);
+
+   if (updatedProduct != null) {
+       response = Response.status(Response.Status.OK)
+                .entity("Product updated").build();
+   } else {
+       response = Response.status(Response.Status.NOT_FOUND)
+               .entity("Product not found").build();
+   }
+   return response;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>@PUT</code> annotation defines that the method <code>updateProduct()</code> can be invoked via an HTTP PUT request.</p>
+</li>
+<li>
+<p>As in the POST method, the <code>@Consumes(MediaType.APPLICATION_JSON)</code> annotation specifies the method will consume JSON data. This method takes a single parameter, which is of type <code>Product</code>. This parameter will be populated with the data sent in the HTTP PUT request. The method updates the product with the same id as the one sent in the request.</p>
+</li>
+<li>
+<p>If a product with the same id is not found, the method returns a 404 (Not Found) error. Finally, the method returns a <code>Response</code> object with a status code of 204 (No Content) and a message indicating that an existing product has been updated.</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="verifying-the-put-request"><a class="anchor" href="#verifying-the-put-request"></a>Verifying the PUT request</h4>
+<div class="paragraph">
+<p>To test the PUT request, you can use the following cURL command.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">$ curl -H 'Content-Type: application/json' -d '{ "id": "3","name":"iPhone14", "description":"Apple iPhone 14", "price":"749"}' -X PUT  http://localhost:5050/mp-ecomm-store/api/products</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next you can verify the updation of the new product, by calling the GET method using cURL or browser as described previously to list all products.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">$ curl http://localhost:9080/mp-ecomm-store/api/products</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deleting-a-product"><a class="anchor" href="#deleting-a-product"></a>Deleting a Product</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@DELETE
+@Path("products/{id}")
+public Response deleteProduct(@PathParam("id") Long id) {
+     // Delete a product
+     Response response;
+     System.out.println("Deleting product with id: " + id);
+     Product product = productRepository.findProductById(id);
+     if (product != null) {
+         productRepository.deleteProduct(product);
+         response = Response.status(Response.Status.OK)
+                 .entity("Product deleted").build();
+     } else {
+        response = Response.status(Response.Status.NOT_FOUND)
+                .entity("Product not found").build();
+     }
+     return response;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>@DELETE</code> annotation defines that the method <code>deleteProduct()</code> can be invoked via an HTTP DELETE request.</p>
+</li>
+<li>
+<p>The @Path annotation specifies the id path parameter that will be used to identify which product to delete. This method takes a single parameter of type <code>Long</code> and is annotated with the <code>@PathParam</code> annotation. This parameter will be populated with the <code>id</code> path parameter from the HTTP DELETE request.</p>
+</li>
+<li>
+<p>The method deletes the product with the same <code>id</code> as the one sent in the request. If a product with the same id is not found, the method returns a 404 (Not Found) error. Finally, the method returns a Response object with a status code of 204 (No Content) and a message indicating that an existing product has been deleted.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The code demonstrated in this chapter is not production quality. It was highly simplified to explain to you the fundamental principles of the REST API. In the upcoming chapters, you will be further building upon this code. By implementing many features from the latest MicroProfile and Jakarta EE standards, you would be making it more a robust microservice that is also cloud-ready. You would also learn to containerize, scale, deploy and manage this application.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary"><a class="anchor" href="#summary"></a>Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This chapter has laid a solid foundation on the Jakarta EE 10 Core Profile, emphasizing its crucial role in the development of microservices using MicroProfile. By delving into key specifications and through practical implementation examples, you have been equipped with the necessary knowledge to utilize the Jakarta EE 10 Core Profile&#8217;s features for creating scalable, resilient, and portable cloud-native applications.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, this chapter guided you through the creation of RESTful web services using Jakarta EE Restful Web Services APIs, providing an overview of REST (Representational State Transfer), it aimed to familiarize you with the basics of REST, enabling you to create and deploy a RESTful web service independently.</p>
+</div>
+<div class="paragraph">
+<p>As we move forward, the next chapter will delve deeper into the REST architectural pattern, exploring standard conventions, design considerations, and best practices. It will cover many advanced concepts essential for building RESTful web services tailored for cloud-native and microservices-based applications, preparing you for more sophisticated aspects of modern application development.</p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="../chapter02/chapter02-00.html">Getting Started with MicroProfile</a></span>
+  <span class="next"><a href="../chapter04/chapter04.html">MicroProfile OpenAPI</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
+  </body>
+</html>

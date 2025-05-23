@@ -1,0 +1,508 @@
+= Jakarta EE 10 Core Profile
+:doctype: book
+:id: chapter03
+
+== Introduction
+
+This chapter delves into the *Jakarta EE 10 Core Profile*, a specification designed specifically for microservices and cloud-native apps. *Jakarta EE* is a comprehensive framework within the Java ecosystem for crafting enterprise-grade applications. Complementing this, *MicroProfile* addresses the intricacies of microservices development, such as configuration management, fault tolerance, health checks, and monitoring. The foundation of MicroProfile is built on the strong and established standards of Jakarta EE, which ensures smooth integration of these modern APIs with the enterprise Java landscape.
+
+In this chapter, through practical examples, we will explore the critical features of the Jakarta EE 10 Core Profile that are most relevant to microservices development, including Contexts and Dependency Injection (CDI), Jakarta RESTful Web Services (Jakarta REST, formerly JAX-RS), JSON Binding and JSON Processing.
+
+By the end of this chapter, you will gain a comprehensive understanding of Jakarta EE 10 Core Profile as a foundational platform for developing microservices with MicroProfile. You will be able to appreciate the pivotal role of Jakarta EE in the MicroProfile ecosystem and how its core functionalities develop scalable, resilient, and portable cloud-native applications.
+
+== Topics to be covered:
+
+* Understanding the Jakarta EE 10 Core Profile
+
+* Key Specifications in Core Profile
+
+* Managing Component Dependencies
+
+* Handling HTTP Methods and Resources
+
+* Best Practices for Building Robust and Scalable Applications
+
+== Understanding the Jakarta EE 10 Core Profile
+
+The Jakarta EE 10 Core Profile is a streamlined subset of the full Jakarta EE platform explicitly designed for building lightweight microservices and cloud-native applications. It provides a standardized foundation for smaller runtime environments, comprising of a curated selection of Jakarta EE specifications:
+
+* *Jakarta Annotations*: Enables developers to decorate their code with metadata to influence system configuration and behavior, making the code concise, readable, and maintainable.
+
+* *Jakarta Contexts and Dependency Injection Lite*: Facilitates the management of lifecycle contexts of stateful components and the injection of dependencies.
+
+* *Jakarta Interceptors*: Offers a means to intercept business method invocations and lifecycle events, ideal for implementing cross-cutting concerns such as logging.
+
+* *Jakarta JSON Processing and Jakarta JSON Binding*: Simplifies the parsing, generation, and binding of JSON data for Java objects, crucial for RESTful service communication.
+
+* *Jakarta REST*: Provides a framework for creating web services according to the REST architectural pattern, enhancing web API development.
+
+== Key Specifications in Jakarta EE 10 Core Profile
+
+Let's delve deeper into some of the specifications included in the Jakarta Core Profile to understand their importance and functionality:
+
+=== Jakarta Annotations
+
+This specification simplifies the code by reducing the need for external configuration files and making the intentions behind code clear. Annotations are extensively used across various Jakarta EE specifications. 
+
+==== Key Features
+* *Simplification of Configuration*: Annotations reduce the need for XML configuration files, making the setup more straightforward and less error-prone.
+* *Enhanced Readability and Maintenance*: Code decorated with annotations is easier to read and maintain, as the configuration is co-located with the code it configures.
+* *Wide Adoption*: Used across the Jakarta EE platform for a variety of purposes, including dependency injection, defining REST endpoints, and configuring beans.
+
+=== Jakarta Contexts and Dependency Injection (CDI) - CDI Lite
+
+CDI is the specification that unifies the Jakarta EE platform by providing a consistent way to manage the lifecycle of stateful components and their interactions. The CDI Lite section of the specification is tailored for environments where full CDI support may be too heavyweight, such as microservices and serverless deployments.
+
+==== Key Features of Contexts and Dependency Injection (CDI) - CDI Lite
+
+* *Type-safe Dependency Injection*: Enables the injection of beans in a type-safe manner, reducing runtime errors and improving developer productivity.
+
+* *Contextual Lifecycle Management*: Manages the lifecycle of beans according to well-defined contexts, simplifying state management across different scopes.
+
+* *Interceptors*: Supports the use of interceptors for adding behavior to beans or for altering their behavior in a non-invasive manner.
+
+NOTE: The link:https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/cdi/cdi-basic/cdi-basic.html[CDI Lite Tutorial] is an invaluable resource, if you are looking to gain a solid foundation in CDI Lite and its role within the Jakarta EE ecosystem, especially in the context of building lightweight microservices and cloud-native applications. It will take you through the basics, advanced features, and the practical application of CDI Lite, equipping you with the knowledge to make the most out of this powerful specification.
+
+=== Jakarta Interceptors
+
+Jakarta Interceptors allow developers to define methods that intercept business method invocations and lifecycle events on Jakarta EE components. This is particularly useful for implementing cross-cutting concerns such as logging, transactions, security, and more, without cluttering business logic.
+
+==== Key Features of Jakarta Interceptors
+
+* *Separation of Concerns*: Helps in separating cross-cutting concerns (like logging, transaction management, and security) from business logic.
+
+* *Reusability*: Interceptors can be defined once and applied to multiple beans, promoting code reuse.
+
+* *Configurability*: Interceptors can be enabled, disabled, or reordered through configuration, offering flexibility in their application.
+
+NOTE: For an in-depth understanding of Jakarta Interceptors, We highly recommend you to read the link:https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/supporttechs/interceptors/interceptors.html[Jakarta Interceptors Tutorial]. This tutorial  covers everything from basic concepts to advanced usage scenarios, providing a solid foundation for effectively utilizing interceptors in your projects.
+
+=== Jakarta JSON Processing 
+
+Jakarta JSON Processing (JSON-P) is a specification in the Jakarta EE platform that provides a portable API to parse, generate, transform, and query JSON data in a Java application. It is part of the larger ecosystem of Jakarta EE specifications designed to facilitate the development of enterprise applications with support for modern data formats and protocols, including JSON, which is widely used in web services and RESTful APIs.
+
+==== Key Features of Jakarta JSON Processing
+
+* *Parsing and Generation*: JSON-P allows for both the parsing of JSON data into a Java representation and the generation of JSON data from Java objects. This can be done using either a streaming API for efficiency with large data sets or a more intuitive object model API for ease of use.
+
+* *Object Model API*: This API provides a way to build or manipulate JSON data using a DOM-like tree structure. It enables developers to create, access, and modify JSON data in a flexible manner.
+
+* *Streaming API*: The streaming API (JsonParser and JsonGenerator) offers a lower-level, event-based approach to parsing and generating JSON. It is highly efficient, making it suitable for processing large volumes of JSON data with minimal memory overhead.
+
+* *Data Binding*: While JSON-P itself does not directly support data binding (converting between JSON and Java POJOs), it lays the groundwork for such functionality, which is further extended by Jakarta JSON Binding (JSON-B).
+
+NOTE: For an in-depth exploration of Jakarta JSON Processing, including understanding JSON's syntax, its applications in web services, and the programming models for manipulating JSON data, readers are encouraged to visit the Jakarta EE tutorial. This tutorial offers comprehensive guidance on both the object and streaming models for JSON data handling, suitable for beginners and advanced users alike. Learn more at the link:https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/web/jsonp/jsonp.html[Jakarta EE 
+Documentation on JSON Processing].
+
+=== Jakarta JSON Binding
+
+Jakarta JSON Binding (JSON-B) is a specification within the Jakarta EE platform that provides a high-level API for converting (binding) Java objects to and from JSON documents. It sits on top of Jakarta JSON Processing (JSON-P) and offers a more convenient way to work with JSON data than manually parsing and generating JSON using JSON-P's lower-level APIs. JSON-B is designed to simplify the task of serializing Java objects into JSON and deserializing JSON into Java objects, making it an essential tool for developing modern Java enterprise applications that interact with web services, RESTful APIs, and microservices.
+
+==== Key Features of Jakarta JSON Binding
+
+* *Automatic Binding*: JSON-B can automatically bind Java objects to JSON and vice versa without requiring manual parsing, significantly simplifying code and reducing boilerplate.
+
+* *Customization*: It provides annotations that allow developers to customize the serialization and deserialization process, such as changing property names in JSON, including or excluding specific fields, and handling custom data types.
+
+* *Support for Java Generics*: JSON-B can handle complex objects, including those that use Java Generics, ensuring type safety during the binding process.
+Integration with JSON-P: JSON-B is built on top of JSON-P and can seamlessly integrate with it, allowing developers to mix high-level object binding with low-level JSON processing as needed.
+
+NOTE: If you are interested in diving deeper into the specifics of JSON Binding, We highly recommend you to visit the Jakarta EE tutorial. It provides detailed insights into how JSON Binding works, including the processes for converting Java objects to JSON and vice versa. This knowledge is crucial for effectively managing JSON data in Java-based enterprise applications. Learn more at the link:https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/web/jsonb/jsonb.html[Jakarta EE Documentation on JSON Binding].
+
+=== Jakarta RESTful Web Services
+
+Jakarta RESTful Web Services(Jakarta REST) is a specification for creating web services according to the Representational State Transfer (REST) architectural pattern. It provides annotations to define resources and operations, making it straightforward to develop APIs for web applications.
+
+==== Key Features of Jakarta RESTful Web Services
+
+* *Annotation-driven Development*: Simplifies the creation of web services by using annotations to define resources, HTTP methods, and response types.
+
+* *Flexible Data Format Support*: While JSON is commonly used, JAX-RS supports a variety of data formats, providing flexibility in API design.
+
+* *Client API*: Includes a client API for creating HTTP requests to RESTful services, facilitating communication between microservices.
+
+The Jakarta EE 10 Core Profile's focus on these specifications underscores its aim to provide a lightweight, yet comprehensive platform for developing modern Java applications suited for microservices architectures and cloud-native environments.
+
+NOTE: For those looking to master developing RESTful Web Services, we strongly encourage you to explore link:https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/websvcs/jaxrs/jaxrs.html[Jakarta RESTful Web Services Tutorial]. This comprehensive tutorial offers a deep dive into the Jakarta RESTful Web Services specification, demonstrating how to create, deploy, and manage RESTful services efficiently. 
+
+== Managing Component Dependencies
+
+Jakarta Annotations and CDI plays a central role in integrating different Jakarta EE specifications, such as Jakarta Persistence API (formerly JPA) for database operations and Jakarta RESTful Web Services (formerly JAX-RS) for web services. Let's now enhance the product microservices we developed previously.
+
+Jakarta Annotations is used for defining RESTful services and injecting dependencies. For instance, in our product microservices, we can update the `Product` and `ProductRepository` class to include annotations that facilitate entity management and dependency injection:
+
+=== Entity class
+
+[source, java]
+----
+package io.microprofile.tutorial.store.product.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.validation.constraints.NotNull;
+
+@Entity
+@Table(name = "Product")
+@NamedQuery(name = "Product.findAllProducts", query = "SELECT p FROM Product p")
+@NamedQuery(name = "Product.findProductById", query = "SELECT p FROM Product p WHERE p.id = :id")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Product {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @NotNull
+    private String name;
+
+    @NotNull
+    private String description;
+
+    @NotNull
+    private Double price;
+}
+----
+
+Explanation: 
+
+* `@Entity` and `@Table(name = "Product")`: These annotations declare the class as a Jakarta Persistence entity and map it to a database table named "Product".
+
+* `@Id` and `@GeneratedValue`: These annotations denote the `id` field as the primary key of the entity and indicate that its value should be generated automatically.
+
+* `@NotNull`: This annotation from Jakarta Bean Validation ensures that the `name`, `description`, and `price` fields cannot be `null`, enforcing data integrity at the application level.
+
+* `@NamedQuery`: These annotations define Jakarta Persistence API named queries for common operations, such as retrieving all products or finding a product by its ids. These can be used throughout the application to interact with the database in a consistent manner.
+
+* `@Data`, `@AllArgsConstructor`, and `@NoArgsConstructor`: These annotations from Project Lombok automatically generate boilerplate code such as getters, setters, a no-arguments constructor, and an all-arguments constructor. This keeps the entity class concise and focused on its fields and annotations related to Jakarta Persistence.
+
+=== Repository class
+
+The `ProductRepository` class serves as a bridge between the application's business logic layer and the database, performing CRUD (Create, Read, Update, Delete) operations on `Product` entities. It exemplifies the separation of concerns, a fundamental principle in enterprise Java applications, by cleanly segregating the data access logic from the business logic.
+
+[source, java]
+----
+package io.microprofile.tutorial.store.product.repository;
+
+import java.util.List;
+
+import io.microprofile.tutorial.store.product.entity.Product;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
+@RequestScoped
+public class ProductRepository {
+
+   @PersistenceContext(unitName = "product-unit")
+   private EntityManager em;
+
+   private List<Product> products = new ArrayList<>();
+
+   public ProductRepository() {
+        // Initialize the list with some sample products
+        products.add(new Product(1L, "iPhone", "Apple iPhone 15", 999.99));
+        products.add(new Product(2L, "MacBook", "Apple MacBook Air", 1299.0));
+   }
+
+   public void createProduct(Product product) {
+       em.persist(product);
+   }
+
+   public Product updateProduct(Product product) {
+       return em.merge(product);
+   }
+
+   public void deleteProduct(Product product) {
+       em.remove(product);
+   }
+
+   public List<Product> findAllProducts() {
+       return em.createNamedQuery("Product.findAllProducts",
+       Product.class).getResultList();
+   }
+
+   public Product findProductById(Long id) {
+       return em.find(Product.class, id);
+   }
+
+   public List<Product> findProduct(String name, String description, Double price) {
+       return em.createNamedQuery("Event.findProduct", Product.class)
+           .setParameter("name", name)
+           .setParameter("description", description)
+           .setParameter("price", price).getResultList();
+   }
+
+}
+----
+
+Explanation:
+
+* `ProductRepository`: This class utilizes Jakarta Persistence API (JPA) for database operations, encapsulating the CRUD (Create, Read, Update, Delete) operations along with methods to find products by various criteria. 
+
+* `@RequestScoped`: This CDI annotation for ProductRepository class indicates that an instance of this class is created for each HTTP request to ensure that database operations are handled within the context of a single request.
+
+* `@PersistenceContext`: This annotation injects an entity manager instance, em, specifying the persistence unit product-unit. The entity manager is 
+the primary JPA interface for database interactions.
+
+* The methods createProduct(), updateProduct(), deleteProduct(), findAllProducts(), and findProductById() methods define CRUD operations that might be performed by the repository. These methods utilize the EntityManager instance to persist, merge, remove, and query for product entities.
+
+* The EntityManager is responsible for managing the persistence context and performing CRUD operations on the entities. 
+
+The `ProductRepository` serves as a foundational example for developers to understand how to construct a data access layer in a MicroProfile application, emphasizing the significance of CDI in managing component lifecycles and dependencies, as well as showcasing the application of Jakarta Persistence for Object Relational Mapping(ORM) based data access.
+
+=== Lifecycle Management of Beans in Jakarta EE
+
+CDI defines several built-in scopes to manage the lifecycle of beans, each corresponding to a specific context within the application. When a bean is needed, the CDI container automatically creates it within its defined scope, manages its lifecycle, and destroys it when the context ends. This process is largely transparent to the developer, simplifying development.
+
+NOTE: To learn more about using built-in scopes in CDI for the lifecycle management of beans, We highly recommend visiting the link:https://jakartaee.github.io/jakartaee-documentation/jakartaee-tutorial/current/cdi/cdi-basic/cdi-basic.html#_using_scopes[Using Scopes] section of the Jakarta EE Tutorial. This resource provides valuable insights into each scope and how to use them effectively in your applications.
+
+== Handling HTTP Methods and Resources 
+
+Jakarta RESTful Web Services annotations are utilized to define endpoints for the web services, facilitating the creation and management of RESTful APIs. The `ProductResource` class demonstrates this:
+
+[source, java]
+----
+package io.microprofile.tutorial.store.product.resource;
+
+
+import java.util.List;
+
+
+import io.microprofile.tutorial.store.product.entity.Product;
+import io.microprofile.tutorial.store.product.repository.ProductRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/products")
+@ApplicationScoped
+public class ProductResource {
+
+    private static final Logger LOGGER = Logger.getLogger(ProductResource.class.getName());
+    
+    // ... 
+
+    @Inject
+    private ProductRepository productRepository;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllProducts() {
+        LOGGER.info("Fetching all products");
+        return Response.ok(products).build();
+    }
+
+    // Additional endpoint methods
+}
+----
+
+The `@ApplicaitonScoped` is an CDI annotation that specifies that the bean is application-scoped, meaning there will be a single instance of `ProductResource` for the entire application, which promotes better resource utilization and performance.
+
+The `@Inject` annotation is commonly used in CDI to inject instances into the application classes without needing to do manual lookups or new instance creations. For example, When `ProductResource` needed a repository to fetch products from a database, we used `@Inject` to incorporate that repository seamlessly.
+
+`@Path` and `@GET`: Defines the URI path and HTTP method for accessing the `getProducts` endpoint.
+
+== Defining RESTful APIs
+
+When creating a REST API, you typically start by defining the resources that your API will expose. A unique URI identifies each resource. You then define the operations that can be performed on each resource. These operations are typically CRUD operations: create, read, update, and delete.
+Let us now create a RESTful API to manage a list of products for a store. This RESTful API allows client applications to access the product stored as resources on the server.
+
+The API is implemented using Jakarta EE and REST architectural style. The API has the following methods:
+
+* `GET /api/products`: Retrieves a list of products
+
+* `POST /api/products`: Creates a new product, the product details are provided as JSON in the request body
+
+* `PUT /api/products`: Updates an existing product, the updated product details are provided as JSON in the request body
+
+* `DELETE /api/products/{id}`: Deletes a product, the product id is provided in the request URL path
+
+Multiple annotations can be used together in a single method to support multiple media types. For example, When both `@Consumes(MediaType.APPLICATION_JSON)` and `@Produces(MediaType.APPLICATION_XML)` are used together in a single method, then the method can consume JSON and produce XML.
+
+Table 3-1 shows a list of some of the popular Media types along with their constant fields in `jakarta.ws.rs.core.MediaType` class and corresponding HTTP ContentType:
+
+[options="header"]
+|===
+|Media Type |Constant Field |Description
+
+|`application/json`
+|`MediaType.APPLICATION_JSON`
+|JSON format, used for representing structured data.
+
+|`application/xml`
+|`MediaType.APPLICATION_XML`
+|XML format, used for representing structured data in XML format.
+
+|`text/xml`
+|`MediaType.TEXT_XML`
+|XML format, primarily used for XML data that is human-readable.
+
+|`text/plain`
+|`MediaType.TEXT_PLAIN`
+|Plain text format, used for unstructured text data.
+
+|`text/html`
+|`MediaType.TEXT_HTML`
+|HTML format, used for markup data that can be rendered by web browsers.
+
+|`application/octet-stream`
+|`MediaType.APPLICATION_OCTET_STREAM`
+|Binary data stream, used for transmitting files or streaming.
+
+|`application/x-www-form-urlencoded`
+|`MediaType.APPLICATION_FORM_URLENCODED`
+|Web form format, used for submitting form data in HTTP requests.
+
+|`multipart/form-data`
+|`MediaType.MULTIPART_FORM_DATA`
+|Multipart format, used for uploading files through web forms.
+
+|`application/vnd.api+json`
+|Custom
+|JSON API format, a specification for how clients should request and modify resources.
+
+|`application/hal+json`
+|Custom
+|Hypertext Application Language (HAL) JSON format, used for linking between resources in APIs.
+|===
+
+=== Implementing REST APIs for Managing Products Data
+
+After having successfully performed the development and testing of the GET method of `ProductResource` to fetch the list of product resources. Let’s now call the create, update and delete methods for our Products REST API. For this you only need to add additional methods of our `ProductResource` class.
+
+==== Creating a Product
+
+[source,java]
+----
+@POST
+@Consumes(MediaType.APPLICATION_JSON)
+@Transactional
+public Response createProduct(Product product) {
+   System.out.println("Creating product");
+   productRepository.createProduct(product);
+   return Response.status(Response.Status.CREATED)
+         .entity("New product created").build();
+}
+----
+
+Explanation:
+
+The `createProduct()` method is annotated with `@POST`, which means it can be invoked via an HTTP POST request. The `@Consumes(MediaType.APPLICATION_JSON)` annotation says it will consume JSON data. This method takes a single parameter, which is of type `Product``. This parameter will be populated with the data sent in the HTTP POST request. The method creates a new Product object and adds it to the list of products. Finally, the method returns a `Response` object with a status code of 201 (Created) and a message indicating that a new product has been created.
+
+===== Verifying the POST request
+
+You can use a REST client such as link:https://www.postman.com/[Postman] or the cURL command line utility to test the HTTP methods (including PUT, POST, DELETE). To verify the POST request, you can use the following cURL command. This sends  a JSON object representing a new product to your microservice.
+
+Command:
+
+[source, bash]
+----
+$ curl -H 'Content-Type: application/json' -d '{ "id": "3", "name":"iPhone 14", "description":"Apple iPhone 14", "price":"799.99"}' -X POST http://localhost:9080/mp-ecomm-store/api/products
+----
+
+Output:
+
+----
+New product created
+----
+
+This command specifies the content type as JSON and sends a data payload representing a product with an ID of 3, the name "iPhone 14", a description of "Apple iPhone 14", and a price of 799.99. The `-X POST` parameter indicates that this is a POST request. Upon successful execution, your service should process this data and add the new product to the database.
+
+Next you can verify the addition of the new product, by calling the GET method using cURL or browser as described previously to list all products. This request should now return an updated list of products, including the newly added product.
+
+----
+$ curl http://localhost:9080/mp-ecomm-store/api/products
+----
+
+=== Updating a Product 
+
+Updating existing product information is a common operation for RESTful services managing a catalog of items. The `PUT` request method is designed for these scenarios, allowing you to modify an existing product's details. The code snippet below demonstrates updating the product: 
+
+[source, java]
+----
+@PUT
+@Consumes(MediaType.APPLICATION_JSON)
+@Transactional
+public Response updateProduct(Product product) {
+   // Update an existing product
+   Response response;
+   System.out.println("Updating product");
+   Product updatedProduct = productRepository.updateProduct(product);
+   
+   if (updatedProduct != null) {
+       response = Response.status(Response.Status.OK)
+                .entity("Product updated").build();
+   } else {
+       response = Response.status(Response.Status.NOT_FOUND)
+               .entity("Product not found").build();
+   }
+   return response;
+}
+----
+
+Explanation: 
+
+* The `@PUT` annotation defines that the method `updateProduct()` can be invoked via an HTTP PUT request.
+
+* As in the POST method, the `@Consumes(MediaType.APPLICATION_JSON)` annotation specifies the method will consume JSON data. This method takes a single parameter, which is of type `Product`. This parameter will be populated with the data sent in the HTTP PUT request. The method updates the product with the same id as the one sent in the request.
+
+* If a product with the same id is not found, the method returns a 404 (Not Found) error. Finally, the method returns a `Response` object with a status code of 204 (No Content) and a message indicating that an existing product has been updated.
+
+==== Verifying the PUT request
+
+To test the PUT request, you can use the following cURL command. 
+
+----
+$ curl -H 'Content-Type: application/json' -d '{ "id": "3","name":"iPhone14", "description":"Apple iPhone 14", "price":"749"}' -X PUT  http://localhost:5050/mp-ecomm-store/api/products
+----
+
+Next you can verify the updation of the new product, by calling the GET method using cURL or browser as described previously to list all products. 
+
+----
+$ curl http://localhost:9080/mp-ecomm-store/api/products
+----
+
+=== Deleting a Product
+
+[source, java]
+----
+@DELETE
+@Path("products/{id}")
+public Response deleteProduct(@PathParam("id") Long id) {
+     // Delete a product
+     Response response;
+     System.out.println("Deleting product with id: " + id);
+     Product product = productRepository.findProductById(id);
+     if (product != null) {
+         productRepository.deleteProduct(product);
+         response = Response.status(Response.Status.OK)
+                 .entity("Product deleted").build();
+     } else {
+        response = Response.status(Response.Status.NOT_FOUND)
+                .entity("Product not found").build();
+     }
+     return response;
+}
+----
+
+Explanation: 
+
+* The `@DELETE` annotation defines that the method `deleteProduct()` can be invoked via an HTTP DELETE request. 
+
+* The @Path annotation specifies the id path parameter that will be used to identify which product to delete. This method takes a single parameter of type `Long` and is annotated with the `@PathParam` annotation. This parameter will be populated with the `id` path parameter from the HTTP DELETE request. 
+
+* The method deletes the product with the same `id` as the one sent in the request. If a product with the same id is not found, the method returns a 404 (Not Found) error. Finally, the method returns a Response object with a status code of 204 (No Content) and a message indicating that an existing product has been deleted.
+
+IMPORTANT: The code demonstrated in this chapter is not production quality. It was highly simplified to explain to you the fundamental principles of the REST API. In the upcoming chapters, you will be further building upon this code. By implementing many features from the latest MicroProfile and Jakarta EE standards, you would be making it more a robust microservice that is also cloud-ready. You would also learn to containerize, scale, deploy and manage this application.
+
+== Summary
+
+This chapter has laid a solid foundation on the Jakarta EE 10 Core Profile, emphasizing its crucial role in the development of microservices using MicroProfile. By delving into key specifications and through practical implementation examples, you have been equipped with the necessary knowledge to utilize the Jakarta EE 10 Core Profile's features for creating scalable, resilient, and portable cloud-native applications.
+
+Additionally, this chapter guided you through the creation of RESTful web services using Jakarta EE Restful Web Services APIs, providing an overview of REST (Representational State Transfer), it aimed to familiarize you with the basics of REST, enabling you to create and deploy a RESTful web service independently. 
+
+As we move forward, the next chapter will delve deeper into the REST architectural pattern, exploring standard conventions, design considerations, and best practices. It will cover many advanced concepts essential for building RESTful web services tailored for cloud-native and microservices-based applications, preparing you for more sophisticated aspects of modern application development.

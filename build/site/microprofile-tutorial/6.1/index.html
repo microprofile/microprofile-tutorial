@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MicroProfile API Tutorial :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/microprofile-tutorial/6.1/index.html">
+    <link rel="next" href="chapter01/chapter01.html">
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" />      <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5WLCZXC');</script>
+    <!-- End Google Tag Manager -->  
+    <script>var uiRootPath = '../../_'</script>
+    <script>!function (theme) {
+        if (theme === 'dark') document.documentElement.classList.add('theme-dark')
+      }(localStorage && localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)') && 'dark'))
+    </script>
+    <!-- Add Eclipse Foundation cookie consent to site for GA -->
+    <script src="//www.eclipse.org/eclipse.org-common/themes/solstice/public/javascript/vendor/cookieconsent/default.min.js"></script>
+      </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a id="site-title" class="navbar-item" href="https://microprofile.io">MicroProfile Tutorial</a>
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs" autofocus>
+        </div>
+      </div>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="../../microprofile-tutorial/6.1/microprofile-tutorial.pdf">Download</a>
+          </span>
+        </div>
+      </div>
+      <div class="navbar-theme-switcher">
+        <span class="switch" title="Switch between Light and Dark Theme">
+          <input id="theme-switcher-checkbox" type="checkbox" />
+          <label for="theme-switcher-checkbox">Dark Theme</label>
+        </span>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="6.1">
+  <div class="toolbar"></div>
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="index.html">Preface</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter01/chapter01.html">Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter02/chapter02-00.html">Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter03/chapter03.html">Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter04/chapter04.html">MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter05/chapter05.html">MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter06/chapter06.html">MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter07/chapter07.html">MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter08/chapter08.html">MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter09/index.html">MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter10/chapter10.html">MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter11/chapter11.html">MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">6.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">MicroProfile Tutorial</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">6.1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link is-current"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">MicroProfile Tutorial</a></li>
+    <li><a href="index.html">Preface</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///workspaces/microprofile-tutorial/./modules/ROOT/pages/index.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">MicroProfile API Tutorial</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">MicroProfile API Tutorial
+
+Version: 6.1
+
+Status: Draft</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="legal"><a class="anchor" href="#legal"></a>Legal</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Copyright (c) 2024 Contributors to the Eclipse Foundation</p>
+</div>
+<div class="paragraph">
+<p>See the NOTICE file(s) distributed with this work for additional
+information regarding copyright ownership.</p>
+</div>
+<div class="paragraph">
+<p>Licensed under the Apache License, Version 2.0 (the "License");
+You may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">     http://www.apache.org/licenses/LICENSE-2.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+</div>
+<div class="paragraph">
+<p>Oracle and Java are registered trademarks of Oracle and/or its affiliates. Other names may be trademarks of their respective owners.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="preface"><a class="anchor" href="#preface"></a>Preface</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="about-this-tutorial"><a class="anchor" href="#about-this-tutorial"></a>About this Tutorial</h3>
+<div class="paragraph">
+<p>In this tutorial, you will learn how to use the features of the MicroProfile Platform by building a microservices-based e-commerce application named "MicroProfile e-Commerce". The tutorial will cover using MicroProfile APIs such as Config, REST Client, JWT, Fault Tolerance, and Metrics to build efficient, scalable, and resilient microservices for cloud-native applications. We aim to provide a comprehensive overview and hands-on knowledge about using MicroProfile APIs.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="who-is-this-tutorial-for"><a class="anchor" href="#who-is-this-tutorial-for"></a>Who is this Tutorial for</h3>
+<div class="paragraph">
+<p>This tutorial caters to software professionals, from beginners to senior developers, engineering managers, and architects, to adeptly utilize MicroProfile in real-world projects.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="what-will-be-covered"><a class="anchor" href="#what-will-be-covered"></a>What will be Covered</h3>
+<div class="paragraph">
+<p>First, an overview of the MicroProfile project is presented, followed by detailed sections on each specification, complete with thoroughly tested and updated code samples.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="project"><a class="anchor" href="#project"></a>Project</h3>
+<div class="paragraph">
+<p>In this tutorial, you will learn to build a microservices-based e-commerce application called "MicroProfile e-Commerce". The app will demonstrate the use of MicroProfile APIs for developing an application based on microservices and cloud-native architecture.</p>
+</div>
+<div class="paragraph">
+<p>It would include multiple microservices, each serving a different purpose and highlighting different aspects of MicroProfile. Java developers can use this adaptation as a practical case study to implement MicroProfile APIs in real-world applications.</p>
+</div>
+<div class="paragraph">
+<p>The MicroProfile e-Commerce application compirses of multiple microservices, among the key ones are as below:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Product Catalog</strong>: This service acts as the central repository for all product-related information, including detailed descriptions, pricing, and inventory levels. It provides APIs for fetching product details efficiently for the other microservices, such as the Shopping Cart. This microservice is vital for updating product data, ensuring data consistency and accuracy across the e-Commerce platform.</p>
+</li>
+<li>
+<p><strong>The Shopping Cart</strong>: This service allows users to add or remove products from their shopping cart. It communicates with the Product Catalog Microservice to access up-to-date product information. It handles the storage and management of cart items for each user, including the calculation of cart totals with applicable discounts or promotions. This microservice plays interfaces with the Checkout microservice to initiate the order processing.</p>
+</li>
+<li>
+<p><strong>User Management</strong>: This service is responsible for user account management, handles registration, login, and account updates securely using JWT tokens. It is essential for personalizing the user experience and safeguarding user information.</p>
+</li>
+<li>
+<p><strong>Order Processing</strong>: This service manages the entire order process, from collecting shipping information and confirming order details to initiating payment processing. This microservice ensures a seamless transition from shopping to order completion.</p>
+</li>
+<li>
+<p><strong>Payment</strong>: Dedicated to processing payments, this microservice interacts with external payment gateways to securely handle transactions. It receives payment instructions from the Checkout microservice, executes the payment process, and confirms transaction outcomes. This microservice is crucial for ensuring financial transactions are conducted securely and efficiently, maintaining the integrity of the payment process.</p>
+</li>
+<li>
+<p><strong>Inventory</strong>: This service is dedicated to monitoring and managing inventory levels. It tracks product availability, updates inventory in real-time as sales occu, and provides restocking alerts. By integrating with the Product Catalog and Checkout microservices, it ensures that product availability is accurately reflected on the platform and that orders are only placed for in-stock items. This microservice is crucial for maintaining optimal inventory levels and preventing stockouts, thereby enhancing the customer shopping experience.</p>
+</li>
+<li>
+<p><strong>Shipping</strong>: This microservice is responsible for managing the logistics of order delivery. It receives order details and shipping information from the Order Processing Microservice, ensuring that orders are shipped to customers in a timely and efficient manner. The Shipping Microservice plays a critical role in the post-purchase customer experience, managing expectations and communication regarding order delivery.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/figureFM-1.png" alt="MicroProfile e-Commerce Application">
+</div>
+<div class="title">Figure 1. MicroProfile e-Commerce Application</div>
+</div>
+<div class="paragraph">
+<p>As you can see in the above figure, together these microservices form a robust and flexible e-Commerce application architecture, enabling scalable, efficient, and secure online shopping experiences.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="downloading-the-code"><a class="anchor" href="#downloading-the-code"></a>Downloading the Code</h3>
+<div class="paragraph">
+<p>The code examples in this tutorial are available at this <a href="https://www.github.com/ttelang/microprofile-examples">repo</a> (TODO: to be changed).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="prerequisites"><a class="anchor" href="#prerequisites"></a>Prerequisites</h3>
+<div class="paragraph">
+<p>MicroProfile use the Java Platform, and are usually written in the Java programming language.
+All the examples in this tutorial are written in Java.
+If you&#8217;re new to Java, spend some time getting up to speed on the language and platform;
+a good place to start is <a href="https://dev.java/learn/">dev.java/learn</a>.</p>
+</div>
+<div class="paragraph">
+<p>Each topic in this tutorial provides some background information,
+but in general,
+we assume you have a basic understanding of RESTful Web Services.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="learning-objectives"><a class="anchor" href="#learning-objectives"></a>Learning Objectives</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Understanding MicroProfile and Its Ecosystem:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Gain a solid understanding of what MicroProfile is and its role in modern cloud-native application development.</p>
+</li>
+<li>
+<p>Learn about the evolution of MicroProfile and its relationship with Jakarta EE.</p>
+</li>
+<li>
+<p>Understand how MicroProfile facilitates building microservices.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Hands-On Experience with Key MicroProfile APIs:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Learn to implement Config, Health, Metrics, JWT Authentication, Fault Tolerance, Rest Client, and other MicroProfile APIs.</p>
+</li>
+<li>
+<p>Understand how to apply these APIs in practical scenarios through the Duke&#8217;s Forest application case study.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Building Resilient and Scalable Services:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Master techniques for developing resilient services using fault tolerance and health checks.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Securing Microservices:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Learn the intricacies of securing microservices using MicroProfile JWT and Security API.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Effective Data Management in Microservices:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Understand the role of JPA and JSON-B in MicroProfile for handling data operations in microservices.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Monitoring and Tracing:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Implement monitoring strategies using MicroProfile Metrics.</p>
+</li>
+<li>
+<p>Learn to trace microservice interactions with OpenTracing for enhanced observability.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Collaborative Learning and Community Engagement:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Participate in Q&amp;A sessions, forums, and interactive discussions.</p>
+</li>
+<li>
+<p>Engage with the MicroProfile community for continuous learning and staying updated with the latest trends.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>By the end of this tutorial readers will gain the knowledge and skills necessary to design, develop, and deploy robust microservices using MicroProfile, preparing them for advanced roles in software development and architecture in cloud-native environments.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conventions"><a class="anchor" href="#conventions"></a>Conventions</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all" style="width: 99%;">
+<colgroup>
+<col style="width: 21.0526%;">
+<col style="width: 40%;">
+<col style="width: 38.9474%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Convention</th>
+<th class="tableblock halign-left valign-top">Meaning</th>
+<th class="tableblock halign-left valign-top">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Boldface</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Boldface type indicates a term defined in text or graphical user interface elements associated with an action.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A <strong>cache</strong> is a copy stored locally.</p>
+<p class="tableblock">From the <strong>File</strong> menu, choose <strong>Open Project</strong>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Monospace</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Monospace type indicates the names of files and directories, commands within a paragraph, URLs, code in examples, text that appears on the screen, or text that you enter.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Edit your <code>.login</code> file.</p>
+<p class="tableblock">Use <code>ls -a</code> to list all files.</p>
+<p class="tableblock"><code><em>machine_name</em>% you have mail.</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>Italic</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Italic type indicates book titles, emphasis, or placeholder variables for which you supply particular values.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read Chapter 6 in the <em>User&#8217;s Guide</em>.</p>
+<p class="tableblock">Do <em>not</em> save the file.</p>
+<p class="tableblock">The command to remove a file is <code>rm <em>filename</em></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<nav class="pagination">
+  <span class="next"><a href="chapter01/chapter01.html">Introduction to MicroProfile</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../_/js/site.js" data-ui-root-path="../../_"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+<script src="../../_/js/vendor/lunr.js"></script>
+<script src="../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../.." data-snippet-length="100" data-stylesheet="../../_/css/search.css"></script>
+<script async src="../../search-index.js"></script>
+  </body>
+</html>

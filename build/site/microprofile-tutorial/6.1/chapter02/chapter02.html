@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chapter 2: Getting Started with MicroProfile :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/microprofile-tutorial/6.1/chapter02/chapter02.html">
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" />      <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5WLCZXC');</script>
+    <!-- End Google Tag Manager -->  
+    <script>var uiRootPath = '../../../_'</script>
+    <script>!function (theme) {
+        if (theme === 'dark') document.documentElement.classList.add('theme-dark')
+      }(localStorage && localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)') && 'dark'))
+    </script>
+    <!-- Add Eclipse Foundation cookie consent to site for GA -->
+    <script src="//www.eclipse.org/eclipse.org-common/themes/solstice/public/javascript/vendor/cookieconsent/default.min.js"></script>
+      </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a id="site-title" class="navbar-item" href="https://microprofile.io">MicroProfile Tutorial</a>
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="../../../microprofile-tutorial/6.1/microprofile-tutorial.pdf">Download</a>
+          </span>
+        </div>
+      </div>
+      <div class="navbar-theme-switcher">
+        <span class="switch" title="Switch between Light and Dark Theme">
+          <input id="theme-switcher-checkbox" type="checkbox" />
+          <label for="theme-switcher-checkbox">Dark Theme</label>
+        </span>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="6.1">
+  <div class="toolbar"></div>
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Preface</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter02-00.html">Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">6.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">MicroProfile Tutorial</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">6.1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">MicroProfile Tutorial</a></li>
+    <li><a href="chapter02.html">Chapter 2: Getting Started with MicroProfile</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///workspaces/microprofile-tutorial/./modules/ROOT/pages/chapter02/chapter02.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Chapter 2: Getting Started with MicroProfile</h1>
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a>Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this chapter, you&#8217;ll embark on your MicroProfile journey! We will guide you through creating your first microservice, equipping you with the essential understanding to leverage this robust framework for building modern, cloud-native applications. This journey begins with setting up your development environment, then diving into creating a microservice.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="topics-covered"><a class="anchor" href="#topics-covered"></a>Topics Covered</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Development Environment Setup</p>
+</li>
+<li>
+<p>Configuring Build Tools</p>
+</li>
+<li>
+<p>Initializing a New MicroProfile Project</p>
+</li>
+<li>
+<p>Choosing Right Modules for your Application</p>
+</li>
+<li>
+<p>Building a RESTful service</p>
+</li>
+<li>
+<p>Deployment</p>
+</li>
+<li>
+<p>Testing your microservices</p>
+</li>
+<li>
+<p>Exploring Further with MicroProfile</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="development-environment-setup"><a class="anchor" href="#development-environment-setup"></a>Development Environment Setup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s begin by preparing your workspace for MicroProfile development:</p>
+</div>
+<div class="sect2">
+<h3 id="java-development-kit-jdk"><a class="anchor" href="#java-development-kit-jdk"></a>Java Development Kit (JDK)</h3>
+<div class="paragraph">
+<p>MicroProfile, a Java framework, runs on the Java Virtual Machine (JVM), making the Java Development Kit (JDK) an essential component of your development environment.</p>
+</div>
+<div class="paragraph">
+<p>To install JDK, follow the steps below:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Download</strong>: Visit the official <a href="https://openjdk.org/">OpenJDK</a> website and download the JDK version compatible with your operating system.</p>
+</li>
+<li>
+<p><strong>Install</strong>: Follow the installation instructions provided on this official <a href="https://openjdk.org/install/">OpenJDK Installation</a> guide.</p>
+</li>
+<li>
+<p><strong>Verify</strong>: After Installation, run the following command in your command line or terminal to verify the Installation:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -version</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should an output similar to the one below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">openjdk 17.0.10 2024-01-16 LTS
+OpenJDK Runtime Environment Microsoft-8902769 (build 17.0.10+7-LTS)
+OpenJDK 64-Bit Server VM Microsoft-8902769 (build 17.0.10+7-LTS, mixed mode,
+sharing)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This confirms that JDK 17 has been successfully installed on your system.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For most MicroProfile implementations, JDK 11 or later is recommended. In
+this tutorial, we will be using JDK 17. While OpenJDK is used here, other JDK
+providers such as Oracle JDK, Amazon Corretto, Azul Zulu, OpenJ9 also offer
+compatible JDK distributions.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="build-tools-maven-or-gradle"><a class="anchor" href="#build-tools-maven-or-gradle"></a>Build Tools (Maven or Gradle)</h3>
+<div class="paragraph">
+<p>Build tools like <a href="https://maven.apache.org/">Apache Maven</a> or <a href="https://gradle.org/">Gradle</a> are commonly used for managing project dependencies and building Java applications. You can install the one that best fits your project needs. Here&#8217;s a brief overview to help you decide:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Apache Maven</strong>: Known for its convention-over-configuration approach, Maven is a popular choice due to its simple project setup and extensive plugin repository.</p>
+</li>
+<li>
+<p><strong>Gradle</strong>: Offers a flexible, script-based build configuration, allowing for highly customized build processes. Gradle is renowned for its superior performance, due to its incremental builds  and caching mechanisms. It&#8217;s a great choice for complex projects requiring customization.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+If your existing project&#8217;s build uses Maven wrapper (<code>mvnw</code>) or Gradle wrapper (<code>gradlew</code>), you don&#8217;t have to install any of these build tools. These wrappers help ensure a consistent build environment without requiring the build tools to be installed on your system.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="installing-apache-maven"><a class="anchor" href="#installing-apache-maven"></a>Installing Apache Maven</h4>
+<div class="paragraph">
+<p>To install Maven follow the steps below:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Visit the <a href="https://https://maven.apache.org/install.html">Installing Apache Maven</a> web page to download the latest version.</p>
+</li>
+<li>
+<p>Follow the installation instructions provided on the site.</p>
+</li>
+<li>
+<p>Verify the Maven installation by running this command in your terminal or command line.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">mvn -v</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see output similar to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">Apache Maven 3.9.6 (bc0240f3c744dd6b6ec2920b3cd08dcc295161ae)
+Maven home: /usr/local/sdkman/candidates/maven/current
+Java version: 17.0.10, vendor: Microsoft, runtime: /usr/lib/jvm/msopenjdk-current
+Default locale: en_US, platform encoding: UTF-8
+OS name: "linux", version: "6.2.0-1019-azure", arch: "amd64", family: "unix"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After Maven is installed, you can configure the <em>pom.xml</em> file in your project to include the MicroProfile dependencies.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="gradle"><a class="anchor" href="#gradle"></a>Gradle</h4>
+<div class="paragraph">
+<p>To install Gradle follow the step below:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Visit the <a href="https://gradle.org/install/">Gradle | Installation</a> web page to download the latest version.</p>
+</li>
+<li>
+<p>Follow the installation instructions provided on the site.</p>
+</li>
+<li>
+<p>Verify the installation by running this command in your terminal or command line.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">gradle -version</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see output similar to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">Welcome to Gradle 8.6!
+
+Here are the highlights of this release:
+ - Configurable encryption key for configuration cache
+ - Build init improvements
+ - Build authoring improvements
+
+For more details see https://docs.gradle.org/8.6/release-notes.html
+
+------------------------------------------------------------
+Gradle 8.6
+------------------------------------------------------------
+
+Build time:   2024-02-02 16:47:16 UTC
+Revision:     d55c486870a0dc6f6278f53d21381396d0741c6e
+
+Kotlin:       1.9.20
+Groovy:       3.0.17
+Ant:          Apache Ant(TM) version 1.10.13 compiled on January 4 2023
+JVM:          17.0.10 (Microsoft 17.0.10+7-LTS)
+OS:           Linux 6.2.0-1019-azure amd64</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After Gradle is installed, you can configure the <em>build.gradle</em> file in your project to include the MicroProfile dependencies.</p>
+</div>
+<div class="paragraph">
+<p>Whether you opt for Maven&#8217;s stability and convention or Gradle&#8217;s flexibility and performance, understanding how to configure and use your chosen build tool is important for MicroProfile development.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="integrated-development-environments"><a class="anchor" href="#integrated-development-environments"></a>Integrated Development Environments</h3>
+<div class="paragraph">
+<p>Integrated Development Environments (IDEs) enhance developer productivity by providing a rich set of features and extensions such as project boostraping, dependency management, intelligent code completion, configuration assistance, test runners, build, hot deployment and debugging tools. For MicroProfile development, the choice of IDE can significantly affect your development speed and efficiency. Below is a list of popular IDEs and their key features related to Java and MicroProfile development:</p>
+</div>
+<div class="sect3">
+<h4 id="eclipse-for-enterprise-java-and-web-developers"><a class="anchor" href="#eclipse-for-enterprise-java-and-web-developers"></a>Eclipse for Enterprise Java and Web Developers</h4>
+<div class="paragraph">
+<p><em>Overview</em>: <a href="https://www.eclipse.org/downloads/packages/release/2023-12/r/eclipse-ide-enterprise-java-and-web-developers">Eclipse for Enterprise Java and Web Developers</a> is a widely used IDE for Java development, offering extensive support for Java EE, Jakarta EE, and MicroProfile, among other technologies.</p>
+</div>
+<div class="paragraph">
+<p><em>Getting Started</em>: The official Eclipse documentation containing instructions about creating Java projects - <a href="https://help.eclipse.org/latest/topic/org.eclipse.jdt.doc.user/gettingStarted/qs-3.htm">Creating your first Java Project</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="intellij-idea"><a class="anchor" href="#intellij-idea"></a>IntelliJ IDEA</h4>
+<div class="paragraph">
+<p><em>Overview</em>:  <a href="https://www.jetbrains.com/idea/">IntelliJ IDEA</a> by JetBrains supports a wide range of programming languages and frameworks, including Java, Kotlin, and frameworks like Spring, Jakarta EE, and MicroProfile.</p>
+</div>
+<div class="paragraph">
+<p><em>Getting Started</em>: Refer to this IntelliJ IDEA guide on <a href="https://www.jetbrains.com/help/idea/2024.1/creating-and-running-your-first-java-application.html">Creating a Java Project Using IntelliJ IDEA 2024.1</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="apache-netbeans"><a class="anchor" href="#apache-netbeans"></a>Apache NetBeans</h4>
+<div class="paragraph">
+<p><em>Overview</em>: <a href="https://netbeans.apache.org/front/main/">NetBeans</a> is an open-source IDE that supports Java development, including Java SE, Java EE, JavaFX, and more.</p>
+</div>
+<div class="paragraph">
+<p><em>Getting Started</em>: Check out this <a href="https://netbeans.apache.org/tutorial/main/kb/docs/java/quickstart/">NetBeans Java Quick Start Tutorial</a> for a tutorial on creating a Java application.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="visual-studio-code"><a class="anchor" href="#visual-studio-code"></a>Visual Studio Code</h4>
+<div class="paragraph">
+<p><em>Overview</em>: <a href="https://code.visualstudio.com/">Visual Studio Code</a> is a lightweight, powerful source code editor that supports Java development through extensions.</p>
+</div>
+<div class="paragraph">
+<p><em>Getting Started</em>: To start with Java in VS Code, follow this <a href="https://code.visualstudio.com/docs/java/java-tutorial">Getting Started with Java in VS Code</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>Selecting an IDE should be based on personal preference, as the best choice varies depending on individual needs, familiarity, and the specific features that enhance your productivity. Each IDE offers unique advantages for MicroProfile development.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="setting-up-microprofile-runtime"><a class="anchor" href="#setting-up-microprofile-runtime"></a>Setting up MicroProfile Runtime</h3>
+<div class="paragraph">
+<p>MicroProfile applications need a runtime that supports MicroProfile specifications or a MicroProfile-compatible server to run your applications. Below are some popular options, each with unique features tailored to different needs:</p>
+</div>
+<div class="sect3">
+<h4 id="open-liberty"><a class="anchor" href="#open-liberty"></a>Open Liberty</h4>
+<div class="paragraph">
+<p><a href="https://openliberty.io/">Open Liberty</a> is a flexible server framework from IBM that supports MicroProfile, allowing developers to build microservices and cloud-native applications with ease. Open Liberty is known for its dynamic updates and lightweight design, which enhances developer productivity and application performance.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://openliberty.io/start/">Downloading Open Liberty</a> page provides access to its latest releases and documentation to help you set up your environment.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="quarkus"><a class="anchor" href="#quarkus"></a>Quarkus</h4>
+<div class="paragraph">
+<p><a href="https://quarkus.io/">Quarkus</a> is known for its container-first approach, offering fast startup times and low memory footprint. It aims to optimize Java for Kubernetes and cloud environments</p>
+</div>
+<div class="paragraph">
+<p>This <a href="https://quarkus.io/guides/getting-started">Getting Started with Quarkus</a> page will guide you through creating your first Quartus project and exploring its cloud-native capabilities.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="payara-micro"><a class="anchor" href="#payara-micro"></a>Payara Micro</h4>
+<div class="paragraph">
+<p><a href="https://www.payara.fish/products/payara-micro/">Payara Micro</a>  is a lightweight middleware platform suited for containerized Jakarta EE and MicroProfile applications.</p>
+</div>
+<div class="paragraph">
+<p>The <a href="https://www.payara.fish/downloads/payara-platform-community-edition/">Payara Platform Community Edition</a> enables easy packaging of applications into a single, runnable JAR file, simplifying deployment and scaling in cloud environments. This site about Payara Platform Community Edition offers downloads and documentation to get started.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="wildfly"><a class="anchor" href="#wildfly"></a>WildFly</h4>
+<div class="paragraph">
+<p><a href="https://www.wildfly.org/">WildFly</a> is a flexible, lightweight, managed application runtime that offers full Jakarta EE and MicroProfile support. WildFly is designed for scalability and flexibility in both traditional and cloud-native environments.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://www.wildfly.org/downloads/">WildFly Downloads</a> page offers the latest versions and documentation to get you started.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="helidon"><a class="anchor" href="#helidon"></a>Helidon</h4>
+<div class="paragraph">
+<p>Developed by Oracle, <a href="https://helidon.io/">Helidon</a> MP implements MicroProfile specifications. It provides a familiar programming model for Jakarta EE developers and enables efficient microservice development.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://helidon.io/docs/">Helidon Documentation</a> provides comprehensive resources to help developers get started with the framework, understand its core concepts, and develop microservices efficiently.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="apache-tomee"><a class="anchor" href="#apache-tomee"></a>Apache TomEE</h4>
+<div class="paragraph">
+<p><a href="https://tomee.apache.org/">Apache TomEE</a> integrates several Apache projects with Apache Tomcat to provide a Jakarta EE environment. It offers support for MicroProfile, allowing developers to build and deploy microservices using the well-known Jakarta EE technologies with additional MicroProfile capabilities.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://tomee.apache.org/download.html">TomEE Downloads</a> and <a href="https://tomee.apache.org/microprofile-6.0/javadoc/">TomEE MicroProfile Documentation</a> page provide the necessary resources to get started with TomEE for MicroProfile development.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="microprofile-starter"><a class="anchor" href="#microprofile-starter"></a>MicroProfile Starter</h3>
+<div class="paragraph">
+<p>To kickstart your MicroProfile project, use the MicroProfile Starter to generate a sample project with your chosen server and specifications. This tool provides a customizable project structure and generates necessary boilerplate code and configuration.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Visit the <a href="https://start.microprofile.io/">MicroProfile</a> Starter page - the official website for generating the MicroProfile project templates.</p>
+</li>
+<li>
+<p>Provide a <code>groupId</code> for your project, it&#8217;s an identifier for your project and should be unique to avoid conflicts with other libraries or projects.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Its recommended convention is to start your <code>groupId</code> with the reverse domain name of your organization (for example, <code>io.microprofile</code>).
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Enter the 'artifactID', which is the name of your project (e.g., 'mp-ecomm-store').</p>
+</li>
+<li>
+<p>Select the <strong>Java SE version</strong> your project will use.</p>
+</li>
+<li>
+<p>Select the <strong>MicroProfile version</strong> you want to use. Ideally, you should choose the latest version for the most up-to-date features but also consider the runtime’s support.</p>
+</li>
+<li>
+<p>Select the specifications you want to include in your project. These could be Config, Fault Tolerance, JWT Auth, Metrics, Health, Open API, Open Tracing, Rest Client. Choose what is relevant to your application.</p>
+</li>
+<li>
+<p>Click the <em>Download</em> button.</p>
+</li>
+<li>
+<p>Unzip the generated project and import it into your IDE.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This completes the development environment setup. Now we are all set to begin development using MicroProfile.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+At the time of writing this tutorial, the latest MicroProfile released version was 6.1. The MicroProfile Starter does not currently support this version. Hence, we will not be using MicroProfile Starter to generate the project structure.
+== Creating a Java Project for MicroProfile Development
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-your-ide"><a class="anchor" href="#using-your-ide"></a>Using Your IDE</h3>
+<div class="paragraph">
+<p>Most modern IDEs have built-in support for creating Java and Maven projects. Depending on your chosen IDE, look for options like "New Project", or "New Maven Project" to get started. These options typically guide you through the setup process, including specifying the project&#8217;s group Id, artifact Id, and dependencies.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-maven-from-command-line-terminal"><a class="anchor" href="#using-maven-from-command-line-terminal"></a>Using Maven from Command Line (Terminal)</h3>
+<div class="paragraph">
+<p>For developers who prefer using the command line or for those setting up projects in environments without an IDE, Maven can generate the base structure of a Java project through its archetype mechanism.
+To create a project using Maven, open your terminal or command line and run the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn archetype:generate -DgroupId=io.microprofile.tutorial -DartifactId=store
+-DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above command creates a new Maven project based on the <code>maven-archetype-quickstart archetype</code>, setting the <code>groupId</code> as <code>io.microprofile.tutorial</code> and the <code>artifactID</code> as <code>store</code>.</p>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>mvn archetype:generate</code> goal in this command initializes the project creation process and instructs Maven to generate a new project based on an archetype template.</p>
+</li>
+<li>
+<p><code>-DgroupId=io.microprofile.tutorial</code> Specifies the groupId for the project. The groupId is a unique identifier for your project and is usually based on the domain name of your organization in reverse. In this case, io.microprofile.tutorial represent a project related to MicroProfile tutorial.</p>
+</li>
+<li>
+<p><code>-DartifactId=store</code>: Sets the <code>artifactId</code> for the project. The <code>artifactId</code> is the name of the project and is used as the base name for the project&#8217;s artifacts (e.g., WAR files). Here, <code>store</code> is used as the project name to indicate this project is related an e-commerce store application.</p>
+</li>
+<li>
+<p><code>-DarchetypeArtifactId=maven-archetype-quickstart</code>: Indicates which archetype to use for generating the project. The maven-archetype-quickstart is a basic template for a Java application, providing a simple project structure that includes a sample application (App.java) and a unit test (AppTest.java).</p>
+</li>
+<li>
+<p><code>-DinteractiveMode=false</code>: This option disables interactive mode, meaning Maven will not prompt you for input during the project generation process. All necessary information is provided via the command-line options, allowing the command to execute without further user interaction.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Next, using your file explorer or command line, create the following folder structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-plain text hljs" data-lang="plain text">.
+├── pom.xml
+├── readme.md
+└── src
+    └── main
+    │   └── java
+    │       └── io
+    │           └── microprofile
+    │               └── tutorial
+    │                  └── store
+    │                      └── product
+    │                      │    ├── entity
+    │                      │    │   └── Product.java
+    │	                   │    └── service
+    │                      │       └── ProductService.java
+    │                      └── ProductRestApplication.java
+    └── test
+	└── java
+            └── io
+                └── microprofile
+                    └── tutorial
+                       └── store
+			   └── product
+                               └── ProductServiceTest.java</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The standard location for your Java source code is this folder:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">src/main/java</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And, the standard location for your test code is this folder:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">src/test/java</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can delete <code>App.java</code> and <code>AppTest.java</code> files from the poject as these are not required in MicroProfile development.</p>
+</div>
+<div class="paragraph">
+<p>The heart of your Maven project is <code>pom.xml</code> (Project Object Model) file. It defines project metadata, dependencies, build configurations and plugins.</p>
+</div>
+<div class="paragraph">
+<p>The content for the <em>pom.xml</em> file should look as below, ensure MicroProfile depencency is added:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+  &lt;groupId&gt;io.microprofile.tutorial&lt;/groupId&gt;
+  &lt;artifactId&gt;mp-ecomm&lt;/artifactId&gt;
+  &lt;packaging&gt;war&lt;/packaging&gt;
+  &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+
+  &lt;!-- Setting the source and target of the Java Compiler !&gt;
+  &lt;properties&gt;
+     &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+     &lt;project.reporting.outputEncoding&gt;UTF-8&lt;/project.reporting.outputEncoding&gt;
+     &lt;maven.compiler.source&gt;17&lt;/maven.compiler.source&gt;
+     &lt;maven.compiler.target&gt;17&lt;/maven.compiler.target&gt;
+  &lt;/properties&gt;
+...
+...
+   &lt;!-- Add Lombok dependency --&gt;
+   &lt;dependency&gt;
+     &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+     &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+     &lt;version&gt;1.18.26&lt;/version&gt;
+     &lt;scope&gt;provided&lt;/scope&gt;
+   &lt;/dependency&gt;
+
+
+   &lt;!-- Adding Jakarta EE dependencies --&gt;
+   &lt;dependency&gt;
+     &lt;groupId&gt;jakarta.platform&lt;/groupId&gt;
+     &lt;artifactId&gt;jakarta.jakartaee-api&lt;/artifactId&gt;
+     &lt;version&gt;10.0.0&lt;/version&gt;
+     &lt;scope&gt;provided&lt;/scope&gt;
+   &lt;/dependency&gt;
+
+
+   &lt;!-- Adding MicroProfie dependency --&gt;
+   &lt;dependency&gt;
+     &lt;groupId&gt;org.eclipse.microprofile&lt;/groupId&gt;
+     &lt;artifactId&gt;microprofile&lt;/artifactId&gt;
+     &lt;version&gt;6.1&lt;/version&gt;
+     &lt;type&gt;pom&lt;/type&gt;
+     &lt;scope&gt;provided&lt;/scope&gt;
+   &lt;/dependency&gt;
+
+
+   &lt;!-- JUnit Jupiter API for writing tests --&gt;
+   &lt;dependency&gt;
+       &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+       &lt;artifactId&gt;junit-jupiter-api&lt;/artifactId&gt;
+       &lt;version&gt;5.8.2&lt;/version&gt;
+       &lt;scope&gt;test&lt;/scope&gt;
+   &lt;/dependency&gt;
+
+   &lt;!-- JUnit Jupiter Engine for running tests --&gt;
+   &lt;dependency&gt;
+       &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+       &lt;artifactId&gt;junit-jupiter-engine&lt;/artifactId&gt;
+       &lt;version&gt;5.8.2&lt;/version&gt;
+       &lt;scope&gt;test&lt;/scope&gt;
+   &lt;/dependency&gt;
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Below is the list of essential dependencies you need to add to your Maven <em>pom.xml</em> for a MicroProfile project:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Lombok Dependency</strong> - Simplifies your model by auto-generating getters, setters, constructors, and other boilerplate code.</p>
+</li>
+<li>
+<p><strong>Jakarta EE API Dependency</strong> - Provides the APIs for Jakarta EE, which are often used alongside MicroProfile for enterprise Java applications.</p>
+</li>
+<li>
+<p><strong>MicroProfile Dependency</strong> - This is the core MicroProfile dependency that allows you to use MicroProfile specifications in your project.</p>
+</li>
+<li>
+<p><strong>JUnit Jupiter API for Writing Tests</strong> - Essential for writing unit tests for your MicroProfile services.</p>
+</li>
+<li>
+<p><strong>JUnit Jupiter Engine for Running Tests</strong> - Enables the execution of JUnit tests.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These dependencies provide a foundation for building MicroProfile applications, including aspects like model simplification with Lombok, the application of Jakarta EE APIs for building robust enterprise applications, and testing with JUnit. Remember to adjust the versions based on your project requirements and the compatibility with your MicroProfile runtime​​.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Execute the <code>$ mvn validate</code> command. This checks the <em>pom.xml</em> file for correctness, ensuring that all necessary configuration is present and valid.
+== Choosing Right Modules for Your MicroProfile Application
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Choosing the right modules for your MicroProfile application is crucial for ensuring that your application is lean, maintainable, and only includes the necessary functionalities to meet its requirements.</p>
+</div>
+<div class="paragraph">
+<p>Before diving into MicroProfile modules, it&#8217;s essential to have a clear understanding of your application&#8217;s requirements. Consider aspects such as configuration needs, security, health checks, data metrics, fault tolerance, and the need for distributed tracing. Mapping out these requirements will guide you in selecting the most relevant MicroProfile specifications. MicroProfile provides a selection of APIs that you can choose from based on the specific needs of your application. However, with the variety of specifications available, it&#8217;s important to understand which ones best fit your project&#8217;s needs.</p>
+</div>
+<div class="paragraph">
+<p>This section aims to help you make informed decisions about which MicroProfile modules to use.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-the-entire-microprofile-dependency"><a class="anchor" href="#use-the-entire-microprofile-dependency"></a>Use the Entire MicroProfile Dependency</h3>
+<div class="paragraph">
+<p>If you&#8217;re beginning a new MicroProfile-based project and are unsure which specifications you will need, starting with the entire MicroProfile dependency can give you immediate access to the full suite of MicroProfile APIs. This approach allows you to explore and experiment with different specifications without modifying your pom.xml to add or remove dependencies frequently.</p>
+</div>
+<div class="paragraph">
+<p>For projects that aim to leverage a wide range of MicroProfile specifications, including advanced features like telemetry, metrics, and fault tolerance, including the entire MicroProfile 6.1 dependency ensures that you have all the necessary APIs at your disposal. This approach simplifies dependency management, especially for complex applications.</p>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;!-- MicroProfile 6.1 API --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.eclipse.microprofile&lt;/groupId&gt;
+    &lt;artifactId&gt;microprofile&lt;/artifactId&gt;
+    &lt;version&gt;6.1&lt;/version&gt;
+    &lt;type&gt;pom&lt;/type&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Gradle</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">dependencies {
+ compileOnly 'org.eclipse.microprofile:microprofile:6.1'
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-individual-microprofile-specification-dependencies"><a class="anchor" href="#use-individual-microprofile-specification-dependencies"></a>Use Individual MicroProfile Specification Dependencies</h3>
+<div class="paragraph">
+<p>For applications where size and startup time are critical (e.g., serverless functions, microservices with stringent resource constraints), including only the necessary MicroProfile specifications can help minimize the application&#8217;s footprint. This selective approach ensures that your application includes only what it needs, potentially reducing memory usage and startup time.</p>
+</div>
+<div class="paragraph">
+<p>To prevent potential conflicts or security issues associated with unused dependencies, it&#8217;s prudent to include only the specifications your application directly uses. This practice follows the principle of minimalism in software design, reducing the surface area for bugs and vulnerabilities.</p>
+</div>
+<div class="paragraph">
+<p>The list below is provided to help you select the appropriate modules for your MicroProfile application:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Config</strong> provides a way to fetch configurations from various sources dynamically. You should use this dependency in your microservices if they require external configuration or need to be run in different environments without requiring repackaging.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.config&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-config-api&lt;/artifactId&gt;
+  &lt;version&gt;3.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Health</strong> allows you to define health endpoints easily. If you&#8217;re deploying your application in a environment where the service needs to report its health status.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.health&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-health-api&lt;/artifactId&gt;
+  &lt;version&gt;4.0.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Metrics</strong> offers a way to generate various metrics from your application, which can be consumed by monitoring tools. You should use this dependency in your microservices if you need to monitor the performance of your application.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.metrics&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-metrics-api&lt;/artifactId&gt;
+  &lt;version&gt;5.1.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Fault Tolerance</strong> helps applications in implementing patterns like timeout, retry, bulkhead, circuit breaker, and fallback. Applications requiring resilience and reliability, especially those facing network latency or failure in microservices environments, will benefit from it.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.fault-tolerance&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-fault-tolerance-api&lt;/artifactId&gt;
+  &lt;version&gt;4.0.2&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile JWT Authentication</strong> provides a method for using JWT tokens for securing your microservices, especially where propagation of identity and authentication information is needed across services.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.jwt&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-jwt-auth-api&lt;/artifactId&gt;
+  &lt;version&gt;2.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile OpenAPI</strong> offers tools for generating OpenAPI descriptions of your endpoints automatically for documenting your REST APIs.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.openapi&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-openapi-api&lt;/artifactId&gt;
+  &lt;version&gt;3.1.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Rest Client</strong> simplifies calling RESTful services over HTTP for type-safe invocations of HTTP services for type-safe invocations of HTTP services.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.rest.client&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-rest-client-api&lt;/artifactId&gt;
+  &lt;version&gt;3.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Telemetry</strong> integrates OpenTelemetry for distributed tracing For applications that need to trace requests across microservices to diagnose and monitor.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;project&gt;
+  &lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;io.opentelemetry&lt;/groupId&gt;
+        &lt;artifactId&gt;opentelemetry-bom&lt;/artifactId&gt;
+        &lt;version&gt;1.29.0&lt;/version&gt;
+        &lt;type&gt;pom&lt;/type&gt;
+        &lt;scope&gt;import&lt;/scope&gt;
+      &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+  &lt;/dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;io.opentelemetry&lt;/groupId&gt;
+      &lt;artifactId&gt;opentelemetry-api&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/project&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Jakarta EE Core Profile</strong> dependency provides the API set included in the Jakarta EE 10 Core Profile, which is optimized for developing microservices and cloud-native Java applications with a reduced set of specifications for a lighter runtime footprint.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependencies&gt;
+    &lt;!-- Jakarta EE 10 Core Profile --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;jakarta.platform&lt;/groupId&gt;
+        &lt;artifactId&gt;jakarta.jakartaee-api&lt;/artifactId&gt;
+        &lt;version&gt;10.0.0&lt;/version&gt;
+        &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For rapidly evolving projects or those in the exploratory phase, starting with the full MicroProfile dependency might be advantageous. However, for production applications with well-defined requirements, opting for individual specifications can lead to more efficient and maintainable solutions.</p>
+</div>
+<div class="paragraph">
+<p>When choosing MicroProfile modules, start with the minimal set that meets your application&#8217;s core requirements. You can always integrate additional specifications as your application evolves. This approach keeps your application lightweight and focused on its primary functionalities, improving maintainability and performance. Always consider the compatibility between different versions of MicroProfile and your runtime environment to ensure seamless integration and deployment.
+== Developing a RESTful Web Service</p>
+</div>
+<div class="paragraph">
+<p><strong>Web Services</strong> are very popular nowadays because they allow for building decoupled systems
+– services can communicate with each other without the knowledge of each other’s implementation details.
+There are many different ways to design and implement web services. One popular way is to use the Representational State Transfer (REST)
+architecture. A Jakarta RESTful Webservice is a web service that uses the <strong>Representational State Transfer (REST)</strong> architecture.
+This type of web service makes it easy to build modern, scalable web applications. The REST architecture is based on the principle that
+all data and functionality should be accessed through a uniform interface. This makes it easy to develop, test, and deploy web
+applications.</p>
+</div>
+<div class="paragraph">
+<p>To understand this better, let’s create a simple RESTful service to manage a list of products for our sample application,
+the MicroProfile ecommerce store. This RESTful API will allow client applications to access the product information stored as
+resources on the server. For example, let’s say you have a product catalog that you want to make available as a web service.
+With REST, you would create a URL that represents the resources (products) in your catalog. When a client (such as a web browser)
+requests this URL, the server would return a list of products in JSON format.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="creating-an-entity-class"><a class="anchor" href="#creating-an-entity-class"></a>Creating an Entity class</h3>
+<div class="paragraph">
+<p>An Entity class represents a specific object, in our case a product. It contains the product&#8217;s details id and name,
+and other properties like price, and quantity. To implement an entity class first, you need to create a <code>Product</code>  class, as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Product.java
+package io.microprofile.tutorial.store.product.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Product {
+   private Long id;
+   private String name;
+   private String description;
+   private Double price;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>Product</code> class is a Plain Old Java Object (POJO). It has an <code>id</code>, <code>name</code>, <code>description</code> and <code>price</code> property. The <code>id</code> property is of type <code>Long</code>, The <code>name</code> and <code>description</code> properties are of type <code>String</code>. The <code>price</code> property is of type <code>Double</code>.</p>
+</li>
+<li>
+<p><code>@Data</code> annotation will generate constructors, getters, and setters for all fields. By doing this,
+you enable the Jackson library to convert your Java objects to JSON and vice versa. All properties must be of <code>Object</code> type as well.
+Jackson cannot work with primitive types because they cannot be <code>null</code>.</p>
+</li>
+<li>
+<p><code>@AllArgsConstructor</code> generates a constructor with one argument for each field in the class.
+This is useful for instantiating objects with all their fields initialized.</p>
+</li>
+<li>
+<p><code>@NoArgsConstructor</code> generates a default constructor
+for the class.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="creating-a-resource-class"><a class="anchor" href="#creating-a-resource-class"></a>Creating a Resource class</h3>
+<div class="paragraph">
+<p>A resource class represents a collection of related resources. It includes methods for creating, updating, deleting, and retrieving
+(CRUD) operations on the resources. Let us now create a <code>ProductResource</code> class with a <code>getProducts()</code> method to return a list of
+<code>Product</code> objects.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// ProductResource.java
+package io.microprofile.tutorial.store.product.resource;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.microprofile.tutorial.store.product.entity.Product;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/products")
+@ApplicationScoped
+public class ProductResource {
+   private List&lt;Product&gt; products;
+
+   public ProductResource() {
+       products = new ArrayList&lt;&gt;();
+
+       products.add(new Product(Long.valueOf(1L), "iPhone", "Apple iPhone 15", Double.valueOf(999.99)));
+       products.add(new Product(Long.valueOf(2L), "MacBook", "Apple MacBook Air", Double.valueOf(1299.99)));
+   }
+
+   @GET
+   @Produces(MediaType.APPLICATION_JSON)
+   public List&lt;Product&gt; getProducts() {
+       // Return a list of products
+       return products;
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>ProductResource</code> is annotated with <code>@ApplicationScoped</code>. This will ensure that only one instance of this class available when the
+application is running.</p>
+</li>
+<li>
+<p>The <code>ProductResource</code> class has a <code>getProducts()</code> method, which returns a list of products. This method is annotated with the <code>@GET</code> annotation, which maps this method to the <code>GET</code> HTTP method.</p>
+</li>
+<li>
+<p>The <code>@Produces</code> annotation tells the server that this method produces JSON content. This will return the following JSON response when we make a <code>GET</code> request to the <code>/api/products</code> endpoint.</p>
+</li>
+<li>
+<p>RESTful web services can produce and consume many different media types, including JSON, XML, and HTML.</p>
+</li>
+<li>
+<p>Annotations specify the media type that a method can consume or produce. For example, if a method is annotated with
+<code>@Produces(MediaType.APPLICATION_JSON)</code> it can produce JSON.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="creating-a-resource-class-2"><a class="anchor" href="#creating-a-resource-class-2"></a>Creating a Resource class</h3>
+<div class="paragraph">
+<p>Create a class named <code>ProductRestApplication</code> as per the code below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// ProductRestApplication.java
+package io.microprofile.tutorial.store.product;
+
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
+
+@ApplicationPath("/api")
+public class ProductRestApplication extends Application{
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The annotation <code>@ApplicationPath("/api")</code> specifies that any RESTful resources registered within this application will be accessed
+under the base path <code>/api</code>. For example, if you have a resource class named <code>ProductResource</code> mapped to the path <code>/products</code>, it would be accessible at <code>/api/products</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="building-your-application"><a class="anchor" href="#building-your-application"></a>Building Your Application</h3>
+<div class="paragraph">
+<p>You may build the application using the following commands from your project’s root directory:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ mvn compile</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above command will compile your project’s source code.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ mvn test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above command will run the test using a unit testing framework. These test should not require the code to be packaged and deployed.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$mvn package</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above command will create a deployment package.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deploying-your-microservices"><a class="anchor" href="#deploying-your-microservices"></a>Deploying your microservices</h3>
+<div class="paragraph">
+<p>This section guides you through deploying your newly created product microservice to a runtime environment. Below are some of the general considerations:</p>
+</div>
+<div class="sect3">
+<h4 id="general-considerations"><a class="anchor" href="#general-considerations"></a>General Considerations:</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Runtime Compatibility: Ensure your chosen runtime supports the MicroProfile version used in your project.</p>
+</li>
+<li>
+<p>Packaging: Decide on a packaging format (e.g., WAR file, Docker image).</p>
+</li>
+<li>
+<p>Configuration: Review and adjust any runtime configuration necessary for your service.</p>
+</li>
+<li>
+<p>Deployment Tools: Leverage runtime-specific tools or commands for deployment.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="deployment-options"><a class="anchor" href="#deployment-options"></a>Deployment Options</h4>
+<div class="paragraph">
+<p>You can then deploy this application on a MicroProfile compatible server and access the web service at
+<code><a href="http://localhost:&lt;port&gt;/&lt;contextRoot&gt;/api/products" class="bare">http://localhost:&lt;port&gt;/&lt;contextRoot&gt;/api/products</a></code>. Replace <code>&lt;port&gt;</code> with the port number on which the web server or
+application server is listening. The <code>&lt;contextRoot&gt;</code> is a placeholder for the context root of the web application.
+The context root is part of the URL path that identifies the base path for the application on the web server.</p>
+</div>
+<div class="paragraph">
+<p>Below are the steps for popular options. Specific steps will depend on your chosen runtime.</p>
+</div>
+<div class="paragraph">
+<p><strong>Open Liberty</strong></p>
+</div>
+<div class="paragraph">
+<p>Package your application as a WAR file using Maven or Gradle by adding the packaging tag in <code>pom.xml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;groupId&gt;io.microprofile.tutorial&lt;/groupId&gt;
+&lt;artifactId&gt;mp-ecomm-store&lt;/artifactId&gt;
+&lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+&lt;packaging&gt;war&lt;/packaging&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add a server configuration file at the location /main/liberty/config/server.xml with the content as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;server description="MicroProfile Tutorial Liberty Server"&gt;
+    &lt;featureManager&gt;
+        &lt;feature&gt;restfulWS-3.1&lt;/feature&gt;
+        &lt;feature&gt;jsonb-3.0&lt;/feature&gt;
+    &lt;/featureManager&gt;
+
+    &lt;httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
+                  id="defaultHttpEndpoint" host="*" /&gt;
+    &lt;webApplication location="mp-ecomm-store.war" contextRoot="${app.context.root}"/&gt;
+&lt;/server&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add the Open Liberty configuration in the pom.xml as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;properties&gt;
+   &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+   &lt;project.reporting.outputEncoding&gt;UTF-8&lt;/project.reporting.outputEncoding&gt;
+   &lt;maven.compiler.source&gt;17&lt;/maven.compiler.source&gt;
+   &lt;maven.compiler.target&gt;17&lt;/maven.compiler.target&gt;
+   &lt;!-- Liberty configuration --&gt;
+   &lt;liberty.var.default.http.port&gt;9080&lt;/liberty.var.default.http.port&gt;
+   &lt;liberty.var.default.https.port&gt;9443&lt;/liberty.var.default.https.port&gt;
+   &lt;liberty.var.app.context.root&gt;mp-ecomm-store&lt;/liberty.var.app.context.root&gt;
+ &lt;/properties&gt;
+
+Add the Open Liberty build plugin in the pom.xml as below:
+&lt;build&gt;
+    &lt;finalName&gt;${project.artifactId}&lt;/finalName&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-war-plugin&lt;/artifactId&gt;
+            &lt;version&gt;3.3.2&lt;/version&gt;
+        &lt;/plugin&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;io.openliberty.tools&lt;/groupId&gt;
+            &lt;artifactId&gt;liberty-maven-plugin&lt;/artifactId&gt;
+            &lt;version&gt;3.8.2&lt;/version&gt;
+            &lt;configuration&gt;
+                &lt;serverName&gt;productServer&lt;/serverName&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt;
+            &lt;version&gt;3.0.0&lt;/version&gt;
+            &lt;configuration&gt;
+                &lt;systemPropertyVariables&gt;
+                    &lt;http.port&gt;${liberty.var.default.http.port}&lt;/http.port&gt;
+                    &lt;war.name&gt;${liberty.var.app.context.root}&lt;/war.name&gt;
+                &lt;/systemPropertyVariables&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+   &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running-your-application"><a class="anchor" href="#running-your-application"></a>Running Your Application</h3>
+<div class="paragraph">
+<p>Refer to your runtime’s documentation for instructions on running your MicroProfile application.
+For example, Consult the Open Liberty documentation for detailed instructions:
+<a href="https://openliberty.io/docs/latest/microprofile.html">MicroProfile - Open Liberty Docs</a>
+Finally, use the following command from the command line or terminal to run the application on Liberty server.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ mvn liberty:run</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also run the following command to start the liberty server in development mode.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ mvn liberty:dev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Assuming your server is running on <code><a href="http://localhost:9080/" class="bare">http://localhost:9080/</a></code>, you can access your service at:
+<code><a href="http://localhost:9080/mp-ecomm-store/api/products" class="bare">http://localhost:9080/mp-ecomm-store/api/products</a></code>.</p>
+</div>
+<div class="paragraph">
+<p>To call this RESTful web service, you can enter the URL in your browser. The response is an array of JSON objects.
+Each object has an id, name, description and price property. Please note only GET methods can be tested with browsers.
+The response should be</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[{"description":"Apple iPhone 15","id":1,"name":"iPhone","price":999.99},{"description":"Apple MacBook Air","id":2,"name":"MacBook","price":1299.99}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This uses an in-memory list; In the next chapter, in a real application you should integrate a database (via Jakarta Persistence API). We will be learning about this in the next chapter.</p>
+</div>
+<div class="paragraph">
+<p><strong>Quarkus</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Build your application as a native executable or Docker image.</p>
+</li>
+<li>
+<p>Run the generated executable or deploy the Docker image to a container platform.</p>
+</li>
+<li>
+<p>Refer to the Quarkus documentation for deployment guides: <a href="https://quarkus.io/guides/getting-started">Creating your first application - Quarkus</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Payara Micro</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Package your application as a WAR file.</p>
+</li>
+<li>
+<p>Deploy the WAR to a Payara Micro server instance.</p>
+</li>
+<li>
+<p>See the Payara Micro documentation for specific instructions: <a href="https://www.payara.fish/learn/getting-started-with-payara-micro/">Getting Started with Payara Micro</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>WildFly</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Package your application as a WAR file.</p>
+</li>
+<li>
+<p>Deploy the WAR to a WildFly server instance.</p>
+</li>
+<li>
+<p>Refer to the WildFly documentation for deployment details: <a href="https://docs.wildfly.org/31/Developer_Guide.html">WildFly Developer Guide</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Helidon</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Choose between Helidon SE (native packaging) or Helidon MP (WAR packaging).</p>
+</li>
+<li>
+<p>Build your application using Gradle.</p>
+</li>
+<li>
+<p>Follow the relevant Helidon documentation for deployment steps: <a href="https://helidon.io/docs/v4/about/prerequisites">Helidon - Getting Started</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>TomEE</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Package your application as a WAR file.</p>
+</li>
+<li>
+<p>Deploy the WAR file to the TomEE server instance.</p>
+</li>
+<li>
+<p>Refer to the TomEE documentation for instructions: <a href="https://tomee.apache.org/latest/examples/serverless-tomee-microprofile.html">Serverless TomEE MicroProfile</a></p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="additional-considerations"><a class="anchor" href="#additional-considerations"></a>Additional Considerations:</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Containerization: Consider using containerization technologies like Docker and Kubernetes for portability and scalability.</p>
+</li>
+<li>
+<p>Cloud Deployment: Explore cloud platforms like AWS, Azure, or GCP.
+== Testing your microservice</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Testing your microservice is critical for ensuring the reliability and robustness of your microservice. Maven, being a powerful project build management tool, simplifies this process by automating the test execution.
+To create tests for your microservice, start by creating a class called <code>ProductResourceTest</code>, which contains unit tests for the <code>ProductResource</code> class as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// ProductResourceTest.java
+package io.microprofile.tutorial.store.product.resource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import io.microprofile.tutorial.store.product.entity.Product;
+
+public class ProductResourceTest {
+  private ProductResource productResource;
+
+   @BeforeEach
+   void setUp() {
+       productResource = new ProductResource();
+   }
+
+   @AfterEach
+   void tearDown() {
+       productResource = null;
+   }
+
+   @Test
+   void testGetProducts() {
+       List&lt;Product&gt; products = productResource.getProducts();
+
+       assertNotNull(products);
+       assertEquals(2, products.size());
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="paragraph">
+<p>Below are the assertions to test the <code>getProducts()</code> method of <code>ProductService</code>:
+* The <code>assertNotNull(products)</code>; assertion checks that products are not <code>null</code>. It ensures the method returns a list, even if it’s empty.
+* The <code>assertEquals(2, products.size())</code>; assertion verifies that the list contains two products.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running-unit-tests-with-maven"><a class="anchor" href="#running-unit-tests-with-maven"></a>Running Unit Tests with Maven</h3>
+<div class="paragraph">
+<p>To run the unit tests defined in ProductResourceTest, follow these steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Open a Terminal or Command Prompt: Navigate to the root directory of your project where the pom.xml file is located. This file contains the Maven project definition, including dependencies and test configurations.</p>
+</li>
+<li>
+<p>Execute the Maven Test Command: Enter the following command to initiate the execution of the unit tests:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ mvn test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This command tells Maven to execute the test phase of the build lifecycle. Maven will compile the test source code, execute the test cases, and provide a summary of the test execution results.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Review Test Results: After running the tests, Maven displays the results in the terminal. Look for the Tests run:, Failures:, and Errors: summaries to assess the outcome. For the ProductResourceTest class, ensure that the test methods execute successfully and meet the expected assertions:</p>
+</li>
+<li>
+<p>Addressing Failures: If any tests fail, Maven will highlight these failures in the output. Use this information to identify and fix issues in your code. Review the failing tests' output for details on the assertion failures and adjust your microservice implementation accordingly.</p>
+</li>
+<li>
+<p>Rerun Tests: After making any necessary changes to your microservice code, rerun the tests using the mvn test command to verify that all issues have been resolved and that your microservice behaves as expected.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>By following these steps, you can leverage Maven to efficiently run and manage unit tests for your microservice, ensuring its functionality and reliability before deployment.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps"><a class="anchor" href="#next-steps"></a>Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that you have a basic MicroProfile service, consider exploring further:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Adding configuration with MicroProfile Config</p>
+</li>
+<li>
+<p>Implementing health checks using MicroProfile Health</p>
+</li>
+<li>
+<p>Enhancing your service with MicroProfile Fault Tolerance</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="resources"><a class="anchor" href="#resources"></a>Resources</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>MicroProfile Official Website: <a href="https://microprofile.io/" class="bare">https://microprofile.io/</a></p>
+</li>
+<li>
+<p>MicroProfile GitHub Repository: <a href="https://github.com/eclipse/microprofile" class="bare">https://github.com/eclipse/microprofile</a></p>
+</li>
+<li>
+<p>MicroProfile Documentation and Guides: <a href="https://microprofile.io/documentation/">MicroProfile Official documentation</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>After completing this chapter, you should have a basic understanding of MicroProfile and how to start building microservices with it. Continue exploring the specifications and capabilities of MicroProfile to fully leverage its power in your microservices architecture.
+== Package Structure</p>
+</div>
+<div class="paragraph">
+<p>The Table below provides an overview of the package structure and their purposes within a typical Java-based
+microservices architecture.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Package</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">dto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Data Transfer Objects (DTOs) are used to transfer data between processes, such as from your service to a REST endpoint. They often mirror entity classes but can be tailored to the needs of the client to avoid over-fetching or under-fetching data.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">entity</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Entity classes represent the domain model and are typically mapped to database tables. These are the core classes that represent the business data and are often used with ORM tools like JPA.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">repository</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interfaces in this package abstract the data layer, making it easier to perform CRUD operations without dealing with database intricacies directly. This follows the Repository pattern. Data access layer, interacting with databases or other storage mechanisms (e.g., ProductRepository, CustomerRepository).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Service classes contain the core business logic. They interact with repositories to fetch and persist data and perform operations specific to the business requirements. (e.g., ProductService, OrderService, InventoryService).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">resource</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">REST resource classes (sometimes called controllers in other frameworks) are the entry points for HTTP requests. They interact with service classes to process these requests. Interfaces defining endpoints for REST services (e.g., ProductResource, ShoppingCartResource).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">common</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This package contains classes and interfaces that are shared across different microservices, such as utility classes, common configuration, exception handling, and security-related classes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">client</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">For microservices to communicate with each other, they often use HTTP clients. This package contains interfaces or classes annotated for use with MicroProfile Rest Client or similar, facilitating easy communication between your services.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">config</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration classes for MicroProfile Config.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">exception</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Custom exceptions for error handling (e.g., ProductNotFoundException, PaymentFailedException).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">util</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Helper and utility classes.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Base Package</strong>: <code>io.microprofile.tutorial.store</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-plaintext hljs" data-lang="plaintext">io.microprofile.tutorial.store
+├── product
+│    ├── resource
+│    ├── config
+│    ├── exception
+│    ├── entity
+│    ├── repository
+│    ├── service
+│    └── util
+├── cart
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── client
+│    ├── exception
+│    └── util
+├── user
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+├── inventory
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+├── order
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+├── payment
+│    ├── resource
+│    ├── entity
+│    ├── service
+│    ├── repository
+│    ├── exception
+│    └── util
+└── shipment
+     ├── resource
+     ├── entity
+     ├── service
+     ├── repository
+     ├── exception
+     └── util
+----</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>TODO: Current package structure is just a proposal will update after completing the source code for all chapters</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="glossary"><a class="anchor" href="#glossary"></a>Glossary</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Java Development Kit (JDK)</dt>
+<dd>
+<p>A software development environment used for developing Java applications. It includes the Java Runtime Environment (JRE), an interpreter/loader (Java), a compiler (javac), an archiver (jar), a documentation generator (Javadoc), and other tools needed in Java development.</p>
+</dd>
+<dt class="hdlist1">Integrated Development Environment (IDE)</dt>
+<dd>
+<p>A software application that provides comprehensive facilities to computer programmers for software development. Examples include Eclipse, IntelliJ IDEA, NetBeans, and Visual Studio Code.</p>
+</dd>
+<dt class="hdlist1">RESTful Service</dt>
+<dd>
+<p>A web service implementing REST (Representational State Transfer) principles, providing interoperability between computer systems on the internet.</p>
+</dd>
+<dt class="hdlist1">Runtime Environment</dt>
+<dd>
+<p>The environment in which programs are executed. It includes everything your application needs to run in production, such as an operating system, a runtime (like JVM for Java applications), libraries, and environment variables.</p>
+</dd>
+<dt class="hdlist1">JUnit</dt>
+<dd>
+<p>A unit testing framework for Java, used to write and run repeatable tests.</p>
+</dd>
+<dt class="hdlist1">Containerization</dt>
+<dd>
+<p>A lightweight alternative to full machine virtualization that involves encapsulating an application in a container with its own operating environment.</p>
+</dd>
+<dt class="hdlist1">Cloud Deployment</dt>
+<dd>
+<p>Deploying applications in cloud environments, leveraging cloud resources like compute instances, storage, and networking capabilities.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
+  </body>
+</html>

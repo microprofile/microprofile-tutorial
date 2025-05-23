@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Chapter 9: MicroProfile Telemetry :: MicroProfile Tutorial</title>
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../..">MicroProfile Tutorial</a>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Chapter 1 - Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter02/chapter02-00.html">Chapter 2 - Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Chapter 3 - Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">Chapter 4 - MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">Chapter 5 - MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">Chapter 6 - MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">Chapter 7 - MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">Chapter 8 - MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="index.html">Chapter 9 - MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">Chapter 10 - MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">Chapter 11 - MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <div class="title"><a href="../index.html">MicroProfile Tutorial</a></div>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">MicroProfile Tutorial</a></li>
+    <li><a href="index.html">Chapter 9 - MicroProfile Telemetry</a></li>
+  </ul>
+</nav>
+<div class="edit-this-page"><a href="file:///workspaces/microprofile-tutorial/./modules/ROOT/pages/chapter09/index.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Chapter 9: MicroProfile Telemetry</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Microservices-based applications have better scalability, flexibility, and resilience, but they suffer from additional challenges regarding availability and performance monitoring. This makes observability critical to ensure these distributed systems operate reliably.</p>
+</div>
+<div class="paragraph">
+<p>MicroProfile Telemetry specification provides a set of vendor-neutral APIs for instrumenting, collecting, and exporting telemetry data such as traces, metrics, and logs. It is built on the foundation of <a href="https://opentelemetry.io/">OpenTelemetry</a> from the <a href="https://www.cncf.io/">Cloud Native Computing Foundation (CNCF)</a> project, an open-source observability framework.</p>
+</div>
+<div class="paragraph">
+<p>In this chapter, we will explore the fundamentals of MicroProfile Telemetry, covering topics such as tracing concepts, instrumenting Telemetry, setting up tracing providers, context propagation and correlation, analyzing traces, security considerations for tracing, and more. By the end of this chapter, you will learn how to effectively leverage distributed tracing for debugging, performance monitoring, and system optimization.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_topics_to_be_covered"><a class="anchor" href="#_topics_to_be_covered"></a>Topics to be covered</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Introduction to MicroProfile Telemetry</p>
+</li>
+<li>
+<p>Tracing Concepts</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Spans</p>
+</li>
+<li>
+<p>Traces</p>
+</li>
+<li>
+<p>Context Propagation</p>
+</li>
+<li>
+<p>Correlation</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Instrumenting OpenTelemetry</p>
+</li>
+<li>
+<p>Tools for Trace Analysis</p>
+</li>
+<li>
+<p>Exporting the Traces</p>
+</li>
+<li>
+<p>Types of Telemetry</p>
+</li>
+<li>
+<p>Agent Instrumentation</p>
+</li>
+<li>
+<p>Analyzing Traces</p>
+</li>
+<li>
+<p>Security Considerations for Tracing</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction_to_microprofile_telemetry"><a class="anchor" href="#_introduction_to_microprofile_telemetry"></a>Introduction to MicroProfile Telemetry</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile Telemetry addresses the operational challenges inherent in modern microservices architectures. Without proper observability, debugging, performance monitoring, and ensuring system reliability become complex and time-consuming.</p>
+</div>
+<div class="paragraph">
+<p>Some of the key challenges in microservices-based applications include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Complexity due to Distributed Architecture</strong>: Microservices are often deployed across multiple nodes, containers, or cloud environments, making it challenging to track requests as they move through the system. This lack of visibility increases debugging complexity, making it harder to identify bottlenecks and analyze system behavior.</p>
+</li>
+<li>
+<p><strong>Polyglot Architecture</strong>: Microservices are developed using multiple programming languages (e.g., Java, Python, and Go) and frameworks, resulting in inconsistent telemetry data and a lack of standardization in observability. This fragmentation makes correlating logs, traces, and metrics across services difficult.</p>
+</li>
+<li>
+<p><strong>Latency</strong>: Communication between Microservices involves latency, and all of this adds up as requests traverse several services. This makes it difficult to identify the root causes of issues.
+Ensuring High Availability: Failures in one microservice can affect the entire system, impacting multiple dependent microservices. This can lead to downtime or degraded performance, resulting in lost revenue and diminished user trust.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To address these challenges, MicroProfile Telemetry specification provides a standardized set of APIs for capturing telemetry data, including trace information and context propagation, to improve observability in distributed systems. By enabling seamless tracing, developers can analyze system behavior, troubleshoot service interactions, and ensure application reliability.</p>
+</div>
+<div class="paragraph">
+<p>MicroProfile Telemetry is vendor-neutral. It allows developers to switch between different OpenTelemetry implementations without modifying their application code. This flexibility ensures that MicroProfile applications can easily integrate with various observability platforms, making it easier to adopt, scale, and maintain Telemetry in modern cloud-native environments.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tracing_concepts"><a class="anchor" href="#_tracing_concepts"></a>Tracing Concepts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Tracing is critical for observability. It allows developers to inspect the flow of requests as they traverse through distributed systems. Tracing provides visibility into the interactions and dependencies within a system by breaking down a request into multiple spans, and connecting them into traces with context propagated across services.</p>
+</div>
+<div class="sect2">
+<h3 id="_spans"><a class="anchor" href="#_spans"></a>Spans</h3>
+<div class="paragraph">
+<p>A <strong>span</strong> is the basic unit of work in tracing. It represents a single operation or task a service performs, such as an HTTP request, a database query, or a computation. Each span contains metadata, including:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Operation Name</strong>: Describes the activity (e.g., HTTP GET /products).</p>
+</li>
+<li>
+<p><strong>Start Time and Duration</strong>: Captures when the operation started and how long it took.</p>
+</li>
+<li>
+<p><strong>Attributes</strong>: Key-value pairs providing context (e.g., user IDs, resource names, HTTP status codes).</p>
+</li>
+<li>
+<p><strong>Parent Span ID</strong>: Indicates the parent span, forming a relationship within a trace.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Spans may also include additional data like logs and events, which help provide a detailed view of the operation&#8217;s lifecycle. Spans are connected to form a trace, which helps identify bottlenecks and performance issues.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_traces"><a class="anchor" href="#_traces"></a>Traces</h3>
+<div class="paragraph">
+<p>A <strong>trace</strong> is a collection of related spans representing the end-to-end execution of a request or transaction. It provides a holistic view of how a single request flows through the system, including service interactions. Traces often form a tree structure, where the root span represents the entry point (e.g., a user request), and child spans represent subsequent operations.</p>
+</div>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">API Gateway (Root Span) +
+│
+├── Order Service (Child Span) +
+│   │
+│   ├── Database Query (Another Child Span) +
+│   │   ├── Fetch Order Details +
+│   │   ├── Process Order Data +
+│   │   └── Return Data to Order Service +
+│   │
+│   └── Return Response to API Gateway +
+│
+└── API Gateway Sends Final Response to User</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_context_propagation"><a class="anchor" href="#_context_propagation"></a>Context Propagation</h3>
+<div class="paragraph">
+<p><strong>Context propagation</strong> refers to the mechanism of carrying trace-related metadata, such as <strong>trace IDs</strong> and <strong>span IDs</strong>, across service and thread boundaries. This ensures that all spans created during a request can be linked together to form a complete trace.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_correlation"><a class="anchor" href="#_correlation"></a>Correlation</h3>
+<div class="paragraph">
+<p>Context propagation is vital for connecting distributed spans and understanding their relationship ensuring trace metadata remains correlated as it travels with requests across service boundaries.
+<strong>Correlation</strong> is the process of associating related spans and traces across multiple services and threads to form a cohesive view of a transaction. Correlation enables developers to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Identify the source of bottlenecks or errors in distributed systems.</p>
+</li>
+<li>
+<p>Understand the dependencies and interactions between services.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When viewing logs, the traceId and spanId allow you to link specific log entries to the corresponding spans in your tracing system.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Trace ID</strong>: A unique identifier shared across all spans in a single trace.</p>
+</li>
+<li>
+<p><strong>Span ID</strong>: A unique identifier for a single span. It is linked to a parent span, forming a hierarchy.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Together, these concepts form the foundation of distributed tracing, enabling developers to monitor, analyze, and optimize the performance of their microservices effectively.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_instrumenting_telemetry"><a class="anchor" href="#_instrumenting_telemetry"></a>Instrumenting Telemetry</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile Telemetry simplifies instrumentation by integrating OpenTelemetry for distributed tracing. The following steps outline how to instrument telemetry in a MicroProfile E-Commerce application.</p>
+</div>
+<div class="sect2">
+<h3 id="_step_1_add_the_microprofile_telemetry_dependency"><a class="anchor" href="#_step_1_add_the_microprofile_telemetry_dependency"></a><strong>Step 1: Add the MicroProfile Telemetry Dependency</strong></h3>
+<div class="paragraph">
+<p>To enable tracing and exporting of telemetry data, include the MicroProfile Telemetry API dependency in your <code>pom.xml</code> file.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;!-- Adding MicroProfile Telemetry dependency --&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.eclipse.microprofile.telemetry&lt;/groupId&gt;
+   &lt;artifactId&gt;microprofile-telemetry-api&lt;/artifactId&gt;
+   &lt;version&gt;1.1&lt;/version&gt;
+   &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_2_create_a_tracer"><a class="anchor" href="#_step_2_create_a_tracer"></a><strong>Step 2: Create a Tracer</strong></h3>
+<div class="paragraph">
+<p>MicroProfile automatically traces requests, but you can manually instrument your code using OpenTelementry APIs.</p>
+</div>
+<div class="paragraph">
+<p>A <strong>Tracer</strong> is a core component of OpenTelemetry, responsible for <strong>creating spans</strong> and <strong>managing trace data</strong> within the application. To use it, inject a Tracer instance into your MicroProfile service:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.api.trace.Span;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+@ApplicationScoped
+public class PaymentService {
+
+    @Inject
+    Tracer tracer;
+
+    public void processPayment(String orderId, double amount) {
+        // Create a custom span for tracing the payment process
+        Span span = tracer.spanBuilder("payment.process").startSpan();
+
+        try {
+            span.setAttribute("order.id", orderId);
+            span.setAttribute("payment.amount", amount);
+            span.setAttribute("payment.status", "IN_PROGRESS");
+
+            // Business logic for processing the payment
+            executePayment(orderId, amount);
+
+            span.setAttribute("payment.status", "SUCCESS");
+        } catch (Exception e) {
+            span.setAttribute("payment.status", "FAILED");
+            span.recordException(e);
+        } finally {
+            span.end();
+        }
+    }
+
+    private void executePayment(String orderId, double amount) {
+        System.out.println("Processing payment for Order ID: " + orderId + ", Amount: " + amount);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The implementation injects a <code>Tracer</code>, which enables manual span creation and precise trace management within the application. By creating a custom span (payment.process), it captures detailed telemetry data related to the payment process. Additionally, custom attributes such as <code>order.id</code>, <code>payment.amount</code>, and <code>payment.status</code> are attached to the span, providing valuable metadata for trace analysis. The implementation also includes exception handling, ensuring that any failures encountered during payment processing are properly recorded in the trace. Finally, the span is explicitly ended, marking the completion of tracing for this method.</p>
+</div>
+<div class="paragraph">
+<p>This setup ensures that each payment transaction is fully traceable, allowing developers to monitor execution flow, debug issues, and optimize application performance effectively.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_3_create_a_span"><a class="anchor" href="#_step_3_create_a_span"></a><strong>Step 3: Create a Span</strong></h3>
+<div class="paragraph">
+<p>Use the Tracer to create a span that represents a specific operation or activity in your application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Span span = tracer.spanBuilder("my-span").startSpan();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The method <code>spanBuilder("my-span")</code> creates a new named span, which represents a specific operation within the application&#8217;s execution flow. This helps in tracing and monitoring the operation as part of a distributed system. Calling <code>startSpan()</code> marks the beginning of the span lifecycle, ensuring that the span is actively recorded until it is explicitly ended. This allows telemetry data to be captured for performance analysis, debugging, and observability.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_4_add_attributes_to_the_span"><a class="anchor" href="#_step_4_add_attributes_to_the_span"></a><strong>Step 4: Add Attributes to the Span</strong></h3>
+<div class="paragraph">
+<p>Attributes enhance trace context by attaching key-value pairs to a span, providing additional metadata that helps filter and analyze traces in observability tools. This helps in contextualizing the trace data:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">span.setAttribute("http.method", "GET");
+span.setAttribute("http.url", "/products/12345");
+span.setAttribute("user.id", "98765");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above statements allow the tracing system to capture essential details about an HTTP request.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_5_end_the_span"><a class="anchor" href="#_step_5_end_the_span"></a><strong>Step 5: End the Span</strong></h3>
+<div class="paragraph">
+<p>When the operation completes, end the span to capture the telemetry data:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Span span = tracer.spanBuilder("payment.process").startSpan();
+
+try {
+    // Business logic execution
+} catch (Exception e) {
+    span.recordException(e);
+    span.setAttribute("error", true);
+} finally {
+    span.end();
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tools_for_trace_analysis"><a class="anchor" href="#_tools_for_trace_analysis"></a>Tools for Trace Analysis</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following tools are commonly used for trace collection, visualization, and analysis in MicroProfile applications:</p>
+</div>
+<div class="sect2">
+<h3 id="_opentelemetry_collector"><a class="anchor" href="#_opentelemetry_collector"></a>OpenTelemetry Collector</h3>
+<div class="paragraph">
+<p>The <a href="https://opentelemetry.io/docs/collector/">OpenTelemetry Collector</a> is an open-source telemetry processing system that acts as an intermediary between instrumented applications and observability backends such as Jaeger, Zipkin, and Prometheus. It is designed to receive, process, and export tracing data, making it a powerful tool for managing distributed traces in MicroProfile applications.</p>
+</div>
+<div class="paragraph">
+<p>It is vendor-agnostic, which allows for seamless integration with multiple tracing backends without requiring any changes to application instrumentation. It supports multiple data formats, enabling the ingestion of traces through several protocols, ensuring compatibility across different telemetry sources. Additionally, it offers processing pipelines that let developers filter, batch, and transform trace data before exporting it, optimizing observability workflows.</p>
+</div>
+<div class="paragraph">
+<p>Designed for scalability, the OpenTelemetry Collector can be deployed as a standalone instance or distributed across multiple nodes, making it suitable for both small-scale applications and large enterprise-grade distributed systems.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_jaeger"><a class="anchor" href="#_jaeger"></a>Jaeger</h3>
+<div class="paragraph">
+<p><a href="https://www.jaegertracing.io/">Jaeger</a> is an open-source distributed tracing system developed by Uber, widely used for monitoring microservices and visualizing request flows in cloud-native applications. It provides a powerful visualization interface that enables developers to inspect traces, analyze dependencies between services, and examine execution timelines, making it an essential tool for debugging performance bottlenecks.</p>
+</div>
+<div class="paragraph">
+<p>One of Jaeger’s key capabilities is service dependency analysis, which helps identify how microservices interact, providing insights into latency, failures, and request propagation. It also supports adaptive sampling strategies, allowing developers to control the volume of traces collected to optimize performance without overwhelming storage and processing resources. Additionally, Jaeger offers built-in storage options, allowing trace data to be stored in Elasticsearch, Cassandra, or Kafka, making it scalable and flexible for various deployment environments.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_zipkin"><a class="anchor" href="#_zipkin"></a>Zipkin</h3>
+<div class="paragraph">
+<p><a href="https://zipkin.io/">Zipkin</a> is a distributed tracing system designed to help developers visualize and diagnose latency issues in microservices-based applications. It provides a lightweight and fast tracing solution, making it ideal for quick deployment with minimal resource usage. Its simplicity and efficiency make it a popular choice for teams looking to implement tracing without significant infrastructure overhead.</p>
+</div>
+<div class="paragraph">
+<p>One of Zipkin’s core strengths is its tag-based searching, which allows developers to filter traces based on metadata such as service name, request ID, or other custom attributes, enabling quick identification of relevant traces. It also offers dependency graph visualization, helping to uncover bottlenecks and inefficiencies in microservices interactions. To accommodate different storage needs, Zipkin supports multiple storage backends, including Elasticsearch, MySQL, and Cassandra, providing flexibility for various deployment scenarios.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_grafana_tempo"><a class="anchor" href="#_grafana_tempo"></a>Grafana Tempo</h3>
+<div class="paragraph">
+<p><a href="https://grafana.com/oss/tempo/">Grafana Tempo</a> is a distributed tracing backend. Unlike Jaeger and Zipkin, Tempo does not require indexing as it only requires object storage, making it highly scalable and cost-efficient for handling large volumes of trace data. This unique approach allows Tempo to store traces efficiently without increasing storage and query overhead, making it an ideal choice for high-performance microservices environments.
+One of Tempo’s key advantages is its tight integration with Grafana dashboards, enabling developers to correlate logs, metrics, and traces within a unified observability platform. Additionally, Tempo offers multi-backend support, meaning it can ingest and process trace data from OpenTelemetry, Jaeger, and Zipkin sources, ensuring compatibility with existing tracing setups. Its scalability makes it well-suited for large-scale microservices architectures, where efficiently managing distributed tracing data is crucial.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_exporting_the_traces"><a class="anchor" href="#_exporting_the_traces"></a>Exporting the Traces</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To export the traces we need to configure the exporter type and endpoint in the <code>src/main/resources/META-INF/microprofile-config.properties</code>.
+For using OTLP (OpenTelemetry Protocol) export, you need to add the following configuration in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs"># Enable OpenTelemetry
+otel.traces.exporter=otlp
+
+# Set the OTLP exporter endpoint
+otel.exporter.otlp.endpoint=http://localhost:4317
+
+# Define the service name
+otel.service.name=payment-service
+
+# Sampling rate: (1.0 = always, 0.5 = 50%, 0.0 = never)
+otel.traces.sampler=parentbased_always_on</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This sends traces directly to a observability tool, enabling real-time distributed tracing and performance monitoring. To ensure proper tracing, your observability tool (for e.g. Jaeger) must be running to receive trace data.</p>
+</div>
+<div class="paragraph">
+<p>Using OTLP is advantageous because it is the native standard for OpenTelemetry, ensuring seamless integration with a wide range of observability tools. One of its key benefits is that it allows developers to use multiple observability platforms without changing instrumentation, providing a unified and vendor-neutral tracing solution.</p>
+</div>
+<div class="sect2">
+<h3 id="_verify_the_traces"><a class="anchor" href="#_verify_the_traces"></a>Verify the Traces</h3>
+<div class="paragraph">
+<p>Once tracing is enabled and the appropriate exporter is configured, the next step is to verify that traces are being captured and sent to the observability backend. This ensures that the MicroProfile Telemetry setup is functioning correctly and that distributed tracing data is available for monitoring and debugging.</p>
+</div>
+<div class="sect3">
+<h4 id="_run_jaeger"><a class="anchor" href="#_run_jaeger"></a>Run Jaeger</h4>
+<div class="paragraph">
+<p>The simplest way to run Jaeger is with Docker using the command as below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run -d --name jaeger \
+  -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
+  -p 5775:5775/udp \
+  -p 6831:6831/udp \
+  -p 6832:6832/udp \
+  -p 5778:5778 \
+  -p 16686:16686 \
+  -p 14268:14268 \
+  -p 14250:14250 \
+  -p 9411:9411 \
+  jaegertracing/all-in-one:latest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above command runs the <strong>all-in-one</strong> Jaeger container, which includes the agent, collector, query service, and UI.</p>
+</div>
+<div class="paragraph">
+<p>The Jaeger UI can be accessed at: <code><a href="https://&lt;hostname&gt;:16686" class="bare">https://&lt;hostname&gt;:16686</a></code>.</p>
+</div>
+<div class="paragraph">
+<p>Ensure all the services of our MicroProfile E-commerce applications are running.</p>
+</div>
+<div class="paragraph">
+<p>Search using parameters like operation name, time range, or service for the traces associated with different microservices and confirm that the telemetry data is visible.
+View a detailed breakdown of each span within the trace, including timing and attributes.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_types_of_telemetry"><a class="anchor" href="#_types_of_telemetry"></a>Types of Telemetry</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile Telemetry supports multiple approaches to instrumentation and tracing, ensuring flexibility for developers based on their observability needs. The three primary types of telemetry in MicroProfile Telemetry are:</p>
+</div>
+<div class="sect2">
+<h3 id="_automatic_instrumentation"><a class="anchor" href="#_automatic_instrumentation"></a>Automatic Instrumentation</h3>
+<div class="paragraph">
+<p>Automatic Instrumentation enables distributed tracing without requiring any modifications to the application code. This is particularly beneficial for Jakarta RESTful Web Services and MicroProfile REST Clients, as it enables seamless integration into distributed tracing systems following the semantic conventions of OpenTelemetry. This ensures compatibility across different tracing tools.</p>
+</div>
+<div class="paragraph">
+<p>For example, in the ProductService, which exposes a RESTful endpoint, automatic instrumentation ensures that incoming and outgoing HTTP requests are traced with minimal configuration, without requiring any additional code changes.</p>
+</div>
+<div class="paragraph">
+<p>By default, MicroProfile Telemetry tracing is disabled. To activate it, set the following property in <code>microprofile-config.properties</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">otel.sdk.disabled=false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This ensures that OpenTelemetry&#8217;s tracing capabilities are enabled for the application.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_manual_instrumentation"><a class="anchor" href="#_manual_instrumentation"></a>Manual Instrumentation</h3>
+<div class="paragraph">
+<p>Manual Instrumentation provides developers with fine-grained control over how telemetry data is collected and structured within a MicroProfile application. By explicitly defining spans, attributes, and trace propagation, developers can gain greater insight into application behavior beyond what automatic instrumentation provides.</p>
+</div>
+<div class="sect3">
+<h4 id="_using_the_withspan_annotation"><a class="anchor" href="#_using_the_withspan_annotation"></a>Using the @WithSpan Annotation</h4>
+<div class="paragraph">
+<p>The <code>@WithSpan</code> annotation provides a simple way to create custom spans within a trace. By annotating a method with <code>@WithSpan</code>, a new span is automatically generated whenever the method is invoked. This span is linked to the current trace context, allowing developers to track key operations without manually managing span lifecycle.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class PaymentService {
+
+    @WithSpan
+    public void processPayment(String orderId) {
+        // Business logic here
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Every time processPayment is called, a new span is created. The span is automatically linked to the current trace context. No need for explicit span creation or lifecycle management. You can use <code>@WithSpan</code> for tracing key business operations, such as order processing, payment handling, or API requests.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_spanbuilder_for_custom_spans"><a class="anchor" href="#_using_spanbuilder_for_custom_spans"></a>Using <code>SpanBuilder</code> for Custom Spans</h4>
+<div class="paragraph">
+<p>For greater flexibility, developers can manually create spans using the OpenTelemetry API. The <code>SpanBuilder</code> class provides the ability to define custom span names, making trace analysis more meaningful and structured. Additionally, developers can attach custom attributes to spans, enriching trace data with relevant metadata for deeper insights. This method also offers explicit control over the span lifecycle, allowing spans to be started and ended manually, ensuring they accurately represent specific business operations or execution flows within the application.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.api.trace.Span;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("/trace")
+public class TraceResource {
+
+    @Inject
+    Tracer tracer;
+
+    @GET
+    @Path("/custom")
+    public String customTrace() {
+        Span span = tracer.spanBuilder("custom-span").startSpan();
+        span.setAttribute("custom.key", "customValue");
+        span.end();
+        return "Trace recorded";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The method <code>tracer.spanBuilder("custom-span").startSpan()</code> creates a span with a specific name allowing developers to define meaningful trace segments for better observability. Using <code>span.setAttribute("custom.key", "customValue")</code>, custom metadata can be attached to the span, enriching trace data with relevant contextual information. Finally, calling <code>span.end()</code> explicitly marks the completion of the span, ensuring accurate tracking of execution duration. The <code>SpanBuilder</code> approach is particularly useful when developers require fine-grained control over when spans start and end, as well as the ability to include detailed metadata for enhanced trace analysis.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_manual_tracing_in_paymentservice"><a class="anchor" href="#_manual_tracing_in_paymentservice"></a>Manual Tracing in <code>PaymentService</code></h3>
+<div class="paragraph">
+<p>To manually instrument the processPayment method in the PaymentService, we use OpenTelemetry’s API to create a custom span, add attributes, and control the span lifecycle.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+@ApplicationScoped
+public class PaymentService {
+
+    @Inject
+    Tracer tracer;
+
+    public void processPayment(String orderId, double amount, String paymentMethod) {
+        // Create a custom span for tracing the payment process
+        Span span = tracer.spanBuilder("payment.process").startSpan();
+
+        try {
+            // Add attributes to enrich the trace
+            span.setAttribute("order.id", orderId);
+            span.setAttribute("payment.amount", amount);
+            span.setAttribute("payment.method", paymentMethod);
+            span.setAttribute("payment.status", "IN_PROGRESS");
+
+            // Business logic for processing the payment
+            System.out.println(“Processing Payment…);
+
+            // Update span attribute on successful completion
+            span.setAttribute("payment.status", "SUCCESS");
+        } catch (Exception e) {
+            // Capture error in tracing
+            span.setAttribute("payment.status", "FAILED");
+            span.recordException(e);
+        } finally {
+            // End the span to complete the tracing
+            span.end();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>payment.process</code> span is manually created using <code>tracer.spanBuilder()</code>, allowing explicit control over the tracing of the payment process. To enhance trace visibility, custom attributes such as the order ID, payment amount, and payment method are attached to the span, providing valuable context for analysis. Additionally, the payment status is recorded as <code>IN_PROGRESS</code> when processing starts and updated to <code>SUCCESS</code> or <code>FAILED</code> based on the outcome.</p>
+</div>
+<div class="paragraph">
+<p>In the event of an error, the span captures and records the exception, ensuring failure details are logged for debugging. The span lifecycle is carefully managed, starting before the business logic executes and ending only after the process is completed in the <code>finally</code> block. This structured approach guarantees accurate performance monitoring and trace completeness, improving visibility into how payments are processed in a distributed system.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_agent_instrumentation"><a class="anchor" href="#_agent_instrumentation"></a>Agent Instrumentation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Agent Instrumentation enables telemetry data collection without modifying application code by attaching a Java agent at runtime. This approach is particularly useful for legacy applications or scenarios where modifying source code is not feasible. The OpenTelemetry Java Agent dynamically instruments applications, automatically detecting and tracing interactions within commonly used frameworks such as Jakarta RESTful Web Services, database connections, and messaging systems.</p>
+</div>
+<div class="paragraph">
+<p>One of the key advantages of agent-based instrumentation is that it requires no changes to the application&#8217;s source code and eliminates the need for recompilation or redeployment. Instead, it can be activated by attaching the agent at application startup.</p>
+</div>
+<div class="paragraph">
+<p>Refer to the <a href="https://opentelemetry.io/docs/zero-code/java/agent/getting-started/">OpenTelemetry Java Agent Getting Started page</a> for step-by-step instructions on enabling it for your application.
+Once enabled, the agent automatically instruments the application, seamlessly integrating with distributed tracing systems without requiring developer intervention. This makes it an efficient and non-intrusive way to implement observability in MicroProfile applications.</p>
+</div>
+<div class="paragraph">
+<p>Once enabled, the agent automatically instruments the application, seamlessly integrating with distributed tracing systems without requiring developer intervention. This makes it an efficient and non-intrusive way to implement observability in MicroProfile applications.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_analyzing_traces"><a class="anchor" href="#_analyzing_traces"></a>Analyzing Traces</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once trace data is collected and exported to a backend system, analyzing these traces becomes a crucial step in understanding the behavior of your distributed microservices architecture. By examining traces, you can gain insights into system performance, identify bottlenecks, and detect failures or anomalies.</p>
+</div>
+<div class="sect2">
+<h3 id="_visualizing_traces"><a class="anchor" href="#_visualizing_traces"></a>Visualizing Traces</h3>
+<div class="paragraph">
+<p>Tracing backends like <strong>Jaeger</strong>, <strong>Zipkin</strong>, or <strong>Graphana Tempo</strong> provide visual interfaces to explore and analyze traces. These tools display traces as timelines or dependency graphs, making it easier to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Understand the sequence of operations.</p>
+</li>
+<li>
+<p>Identify the services and components involved in a request.</p>
+</li>
+<li>
+<p>Observe how requests propagate through the system.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_identifying_bottlenecks"><a class="anchor" href="#_identifying_bottlenecks"></a>Identifying Bottlenecks</h3>
+<div class="paragraph">
+<p>Traces highlight spans with long durations or repeated retries, which often point to bottlenecks or inefficiencies. Pay close attention to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Critical Path</strong>: The longest path in a trace that determines the total response time.</p>
+</li>
+<li>
+<p><strong>Service Dependencies</strong>: Examine how upstream and downstream services interact to find slow components.</p>
+</li>
+<li>
+<p><strong>Retries and Failures</strong>: Repeated spans or high failure rates indicate problematic dependencies or transient errors.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_diagnosing_failures"><a class="anchor" href="#_diagnosing_failures"></a>Diagnosing Failures</h3>
+<div class="paragraph">
+<p>Traces provide valuable information for diagnosing failures, including:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Error Codes</strong>: Look for spans with error attributes, such as <code>http.status_code=500</code>.</p>
+</li>
+<li>
+<p><strong>Exception Details</strong>: Many tracing systems capture stack traces or error messages in spans.</p>
+</li>
+<li>
+<p><strong>Service Impact</strong>: Identify which upstream and downstream services are affected by the failure.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_understanding_service_dependencies"><a class="anchor" href="#_understanding_service_dependencies"></a>Understanding Service Dependencies</h3>
+<div class="paragraph">
+<p>Dependency graphs generated from traces show the interactions between services. These graphs help:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Visualize which services depend on each other.</p>
+</li>
+<li>
+<p>Detects circular dependencies or excessive coupling.</p>
+</li>
+<li>
+<p>Plan optimizations by focusing on critical services.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_correlating_traces_with_logs_and_metrics"><a class="anchor" href="#_correlating_traces_with_logs_and_metrics"></a>Correlating Traces with Logs and Metrics</h3>
+<div class="paragraph">
+<p>Traces, when combined with logs and metrics, provide a comprehensive picture of the system:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Logs</strong>: Use trace IDs and span IDs in logs to correlate application logs with specific spans.</p>
+</li>
+<li>
+<p><strong>Metrics</strong>: Correlate trace performance data with system metrics like CPU usage, memory consumption, or request rates.
+Example: If a span indicates high latency, check corresponding logs and metrics to identify the underlying cause, such as a resource constraint or network delay.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_best_practices_for_analyzing_traces"><a class="anchor" href="#_best_practices_for_analyzing_traces"></a>Best Practices for Analyzing Traces</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Establish Baselines</strong>: Use traces to establish performance baselines for services.</p>
+</li>
+<li>
+<p><strong>Monitor Critical Paths</strong>: Focus on traces that traverse critical services or user-facing operations.</p>
+</li>
+<li>
+<p><strong>Use Sampling Strategically</strong>: Balance trace volume and storage costs by sampling traces intelligently.</p>
+</li>
+<li>
+<p><strong>Automate Alerts</strong>: Set up alerts for abnormal patterns in traces, such as increased latency or failure rates.</p>
+</li>
+<li>
+<p><strong>Collaborate Across Teams</strong>: Share trace insights with development, operations, and QA teams to improve system reliability.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>By analyzing traces effectively, you can identify opportunities to optimize your microservices, ensure smoother operations, and enhance the overall user experience. Tracing tools provide a powerful way to visualize and understand the intricate dynamics of distributed systems.<br>
+When analyzing traces, developers should look for the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Long spans:</strong> Spans that take a long time to complete may indicate a performance issue.</p>
+</li>
+<li>
+<p><strong>Missing spans:</strong> Missing spans can make it difficult to understand the flow of a request.</p>
+</li>
+<li>
+<p><strong>Errors:</strong> Errors can indicate problems with a service or a request.</p>
+</li>
+<li>
+<p><strong>High latency:</strong> High latency can indicate a problem with the network or a service.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>By analyzing traces, developers can identify and troubleshoot problems with their microservices applications. This can help developers improve the performance and reliability of their applications.</p>
+</div>
+<div class="paragraph">
+<p>Here are some tips for analyzing traces:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Use a trace viewer:</strong> A trace viewer is a tool that can help you visualize and analyze traces.</p>
+</li>
+<li>
+<p><strong>Look for patterns:</strong> Look for patterns in the traces that may indicate a problem.</p>
+</li>
+<li>
+<p><strong>Correlate traces with metrics:</strong> Correlate traces with metrics to get a better understanding of the performance of your application.</p>
+</li>
+<li>
+<p><strong>Use sampling:</strong> Use sampling to reduce the number of traces that are collected. This can improve the performance of your tracing system.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>By following these tips, developers can effectively analyze traces to improve the performance and reliability of their microservices applications.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_security_considerations_for_tracing"><a class="anchor" href="#_security_considerations_for_tracing"></a>Security Considerations for Tracing</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When implementing tracing in your applications, it is crucial to be mindful of security implications. Tracing involves collecting and storing data about application behavior, which can potentially expose sensitive information if not handled properly.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Data Sensitivity:</strong> Be cautious about the data included in traces. Avoid logging sensitive information such as passwords, API keys, or personally identifiable information (PII).</p>
+</li>
+<li>
+<p><strong>Access Control:</strong> Implement strict access controls to limit who can view and manage trace data.</p>
+</li>
+<li>
+<p><strong>Encryption:</strong> Consider encrypting trace data at rest and in transit to protect it from unauthorized access.</p>
+</li>
+<li>
+<p><strong>Storage:</strong> Carefully manage the storage of trace data. Avoid storing traces indefinitely and implement data retention policies.</p>
+</li>
+<li>
+<p><strong>Third-Party Services:</strong> If using third-party tracing services, ensure they have robust security measures in place to protect your data.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_avoid_capturing_sensitive_data"><a class="anchor" href="#_avoid_capturing_sensitive_data"></a>Avoid Capturing Sensitive Data</h3>
+<div class="paragraph">
+<p>Traces often include attributes and metadata that can contain sensitive information. Avoid storing or transmitting sensitive details, such as:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Personally Identifiable Information (PII) (e.g., names, addresses, social security numbers).</p>
+</li>
+<li>
+<p>Payment information (e.g., credit card numbers).</p>
+</li>
+<li>
+<p>Authentication credentials (e.g., passwords, API keys, tokens).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Best Practice:</strong></p>
+</div>
+<div class="paragraph">
+<p>Sanitize attributes before adding them to spans:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">span.setAttribute("user.id", "anonymized-user-id");
+span.setAttribute("credit.card.last4", "****1234");</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_encrypt_trace_data"><a class="anchor" href="#_encrypt_trace_data"></a>Encrypt Trace Data</h3>
+<div class="paragraph">
+<p>To prevent unauthorized access during transmission, ensure that telemetry data is encrypted. Use secure protocols such as HTTPS or TLS for exporting trace data to a backend.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>*Example:*</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Configure the tracing provider to use encrypted connections:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">otel.exporter.jaeger.endpoint=https://secure-jaeger-collector.example.com
+otel.exporter.otlp.endpoint=https://secure-collector.example.com</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_limit_trace_retention"><a class="anchor" href="#_limit_trace_retention"></a>Limit Trace Retention</h3>
+<div class="paragraph">
+<p>Trace data can grow rapidly in distributed systems. Retaining it indefinitely increases the risk of exposing sensitive information. Implement retention policies to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Retain traces only for the necessary duration for debugging or performance analysis.</p>
+</li>
+<li>
+<p>Periodically purge older traces from storage.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_access_control_and_auditing"><a class="anchor" href="#_access_control_and_auditing"></a>Access Control and Auditing</h3>
+<div class="paragraph">
+<p>Restrict access to trace data to authorized personnel only. Ensure that your tracing backend implements robust authentication and authorization mechanisms.</p>
+</div>
+<div class="paragraph">
+<p><strong>Best Practice:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Use role-based access control (RBAC) to define permissions for viewing and managing traces.</p>
+</li>
+<li>
+<p>Audit access to trace data regularly to identify potential misuse or breaches.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sampling_strategies_to_minimize_exposure"><a class="anchor" href="#_sampling_strategies_to_minimize_exposure"></a>Sampling Strategies to Minimize Exposure</h3>
+<div class="paragraph">
+<p>Sampling reduces the volume of traces collected and limits the exposure of sensitive data by capturing only a subset of requests. Common strategies include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Random Sampling: Captures a fixed percentage of traces.</p>
+</li>
+<li>
+<p>Rate-Limiting Sampling: Limits the number of traces per second.</p>
+</li>
+<li>
+<p>Key-Based Sampling: Samples traces based on specific attributes (e.g., user ID).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Example:</strong></p>
+</div>
+<div class="paragraph">
+<p>Random sampling to limiting the amount of trace data collected:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">otel.traces.sampler=traceidratio
+otel.traces.sampler.traceidratio=0.1</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_compliance_with_regulations"><a class="anchor" href="#_compliance_with_regulations"></a>Compliance with Regulations</h3>
+<div class="paragraph">
+<p>Ensure that your tracing practices comply with data protection and privacy regulations such as GDPR, CCPA, or HIPAA. Key considerations include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Anonymizing sensitive data before tracing.</p>
+</li>
+<li>
+<p>Informing users about telemetry collection in your privacy policy.</p>
+</li>
+<li>
+<p>Providing mechanisms to opt out of tracing where required.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isolate_tracing_infrastructure"><a class="anchor" href="#_isolate_tracing_infrastructure"></a>Isolate Tracing Infrastructure</h3>
+<div class="paragraph">
+<p>The tracing infrastructure, such as Jaeger or OpenTelemetry Collector, should be isolated from the public internet and accessible only within secure networks.</p>
+</div>
+<div class="paragraph">
+<p><strong>Best Practice:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Deploy tracing backends in private subnets or behind firewalls.</p>
+</li>
+<li>
+<p>Use VPNs or dedicated connections for remote access to tracing dashboards.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_monitor_and_alert_on_trace_anomalies"><a class="anchor" href="#_monitor_and_alert_on_trace_anomalies"></a>Monitor and Alert on Trace Anomalies</h3>
+<div class="paragraph">
+<p>Tracing can help detect potential security incidents. Monitor traces for unusual patterns, such as:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Unexpected spikes in requests.</p>
+</li>
+<li>
+<p>Requests from unknown or unauthorized sources.</p>
+</li>
+<li>
+<p>Abnormal response times indicating possible exploits.
+Set up alerts for these anomalies to investigate and mitigate potential issues.<br>
+By following these security considerations, you can leverage the benefits of distributed tracing without compromising the security of your system or the privacy of your users. Careful handling of trace data, coupled with robust encryption, access controls, and compliance practices, ensures that tracing remains a valuable yet secure component of your observability strategy.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusion"><a class="anchor" href="#_conclusion"></a>Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile Telemetry provides a robust foundation for observability in Java-based microservices, enabling developers to implement distributed tracing seamlessly. By leveraging this specification, you can gain deep insights into the flow of requests, identify bottlenecks, and enhance the reliability and performance of your applications. The integration of standardized tracing concepts like spans, traces, and context propagation ensures that developers can maintain a cohesive understanding of their system&#8217;s behavior across service boundaries.</p>
+</div>
+<div class="paragraph">
+<p>Through instrumentation, context propagation, and effective trace analysis, MicroProfile Telemetry simplifies the complexities of monitoring and debugging distributed systems. It empowers teams to proactively address issues, optimize performance, and improve the user experience. Moreover, by adhering to security best practices, developers can ensure that telemetry data is protected, compliant with regulations, and free of sensitive information.</p>
+</div>
+<div class="paragraph">
+<p>In this chapter, we explored the critical security considerations surrounding tracing within the MicroProfile Telemetry framework. We emphasized the importance of safeguarding sensitive data by avoiding the inclusion of Personally Identifiable Information (PII) in trace spans. Additionally, we discussed the potential security risks associated with tracing in production environments and the significance of carefully managing sampling rates and data retention policies. By adhering to these security best practices, developers can harness the power of tracing for observability while ensuring the confidentiality and integrity of their applications.</p>
+</div>
+<div class="paragraph">
+<p>As microservices architectures continue to evolve, the ability to observe and trace system interactions will remain a critical factor in maintaining resilient and efficient applications. MicroProfile Telemetry stands as a valuable tool in achieving these goals, providing developers with the observability they need to deliver reliable, high-performance microservices in modern cloud-native environments.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

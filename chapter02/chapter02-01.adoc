@@ -154,4 +154,4 @@ Below is the list of essential dependencies you need to add to your Maven _pom.x
 
 These dependencies provide a foundation for building MicroProfile applications, including aspects like model simplification with Lombok, the application of Jakarta EE APIs for building robust enterprise applications, and testing with JUnit. Remember to adjust the versions based on your project requirements and the compatibility with your MicroProfile runtime​​.
 
-TIP: Execute the `$ mvn validate` command. This checks the _pom.xml_ file for correctness, ensuring that all necessary configuration is present and valid. 
+TIP: Execute the `$ mvn validate command`. This checks the _pom.xml_ file for correctness, ensuring that all necessary configuration is present and valid. 
