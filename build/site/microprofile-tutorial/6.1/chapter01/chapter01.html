@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Introduction to MicroProfile :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/microprofile-tutorial/6.1/chapter01/chapter01.html">
+    <link rel="prev" href="../index.html">
+    <link rel="next" href="../chapter02/chapter02-00.html">
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" /><link rel="icon" href="../../../_/img/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="../../../_/img/favicon.png" type="image/png">
+<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png">
+      <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5WLCZXC');</script>
+    <!-- End Google Tag Manager -->  
+    <script>var uiRootPath = '../../../_'</script>
+    <script>!function (theme) {
+        if (theme === 'dark') document.documentElement.classList.add('theme-dark')
+      }(localStorage && localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)') && 'dark'))
+    </script>
+    <!-- Add Eclipse Foundation cookie consent to site for GA -->
+    <script src="//www.eclipse.org/eclipse.org-common/themes/solstice/public/javascript/vendor/cookieconsent/default.min.js"></script>
+      </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a id="site-title" class="navbar-item" href="https://microprofile.io">MicroProfile Tutorial</a>
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="../../../microprofile-tutorial/6.1/microprofile-tutorial.pdf">Download</a>
+          </span>
+        </div>
+      </div>
+      <div class="navbar-theme-switcher">
+        <span class="switch" title="Switch between Light and Dark Theme">
+          <input id="theme-switcher-checkbox" type="checkbox" />
+          <label for="theme-switcher-checkbox">Dark Theme</label>
+        </span>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="6.1">
+  <div class="toolbar"></div>
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Preface</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="chapter01.html">Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter02/chapter02-00.html">Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">6.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">MicroProfile Tutorial</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">6.1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">MicroProfile Tutorial</a></li>
+    <li><a href="chapter01.html">Introduction to MicroProfile</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/ttelang/microprofile-tutorial/edit/patch-15/modules/ROOT/pages/chapter01/chapter01.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Introduction to MicroProfile</h1>
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a>Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This introductory chapter provides a comprehensive overview of the MicroProfile platform, setting the stage for subsequent chapters in this tutorial. It aims to familiarize you with the fundamentals of the MicroProfile platform, its need, and benefits. Finally, we will discuss its place in the broader context of enterprise Java development.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="topics-to-be-covered"><a class="anchor" href="#topics-to-be-covered"></a>Topics to be covered:</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>What is MicroProfile</p>
+</li>
+<li>
+<p>Need for MicroProfile</p>
+</li>
+<li>
+<p>MicroProfile Specifications</p>
+</li>
+<li>
+<p>Current MicroProfile Implementations</p>
+</li>
+<li>
+<p>Architecture Philosophy</p>
+</li>
+<li>
+<p>Benefits of MicroProfile</p>
+</li>
+<li>
+<p>Relationship with Jakarta EE specification</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-is-microprofile"><a class="anchor" href="#what-is-microprofile"></a>What is MicroProfile</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://microprofile.io/">MicroProfile</a> is an open-source specification that enhances enterprise Java technologies for microservices development. It provides a set of APIs and specifications for building modern, scalable, resilient, and efficient microservices-based applications. The primary goal of MicroProfile is to simplify the development for Java developers, enabling them to create applications optimized for cloud-native-development.</p>
+</div>
+<div class="paragraph">
+<p>MicroProfile was initiated in June 2016 by a collaboration of industry leaders, Java community members, and individual contributors. In the following year, the project was transitioned to the <a href="https://www.eclipse.org/">Eclipse Foundation</a> to enhance the project&#8217;s openness and vendor-neutral stance. Now, MicroProfile has become a key framework for extending Java in the cloud-computing domain, offering a comprehensive suite of APIs tailored for developing microservices in a cloud-native ecosystem.</p>
+</div>
+<div class="paragraph">
+<p>The <strong>MicroProfile Working Group</strong> currently comprises of the following members:</p>
+</div>
+<div class="paragraph">
+<p>Committer Representative (Year 2024)</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Emerson Castañeda</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Java user groups</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Atlanta Java User Group (AJUG)</p>
+</li>
+<li>
+<p>Association of the German Java User Groups (iJUG)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Corporate Members</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>IBM</p>
+</li>
+<li>
+<p>Fujitsu</p>
+</li>
+<li>
+<p>Red Hat</p>
+</li>
+<li>
+<p>Primeton</p>
+</li>
+<li>
+<p>Payara</p>
+</li>
+<li>
+<p>Microsoft</p>
+</li>
+<li>
+<p>Tomitribe</p>
+</li>
+<li>
+<p>Oracle</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This collective effort demonstrates MicroProfile&#8217;s commitment to evolving Java enterprise development for the modern cloud environment, leveraging the expertise of its community.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="need-for-microprofile"><a class="anchor" href="#need-for-microprofile"></a>Need for MicroProfile</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The MicroProfile Specification was developed to address the following requirements:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Microservices Architecture Adoption</strong>: The industry shift towards microservices architecture has brought several advantages, including improved flexibility, scalability, and speed of deployment. However, it also introduced several new challenges for developers due to the added complexities. These include ensuring seamless integration between microservices, securing each microservice individually as well as interactions between them, managing performance and efficiency, designing microservices to be fault-tolerant and resilient to failures, ensuring data consistency across services, managing configurations across multiple environments and managing various independently deployable components. To address these challenges, MicroProfile provides a simplified and optimized set of APIs designed to build and deploy Java-based microservices applications.</p>
+</li>
+<li>
+<p><strong>Limitations of Traditional Enterprise Java</strong>: Traditional enterprise Java frameworks, like Java EE (now Jakarta EE), were often seen as too monolithic and heavyweight for microservices while evolving too slowly. It led to a demand for a more streamlined and microservices-focused framework. MicroProfile fills this gap by providing a lightweight alternative optimized for microservices development.</p>
+</li>
+<li>
+<p><strong>Cloud-Native Application Development</strong>: The rise of cloud-native applications necessitated new features such as external configuration, health checks, and fault tolerance, which existing Java standards did not adequately address. MicroProfile bridges these gaps left, making it easier for developers to create resilient, scalable, and manageable microservices for cloud-native application development using Java.</p>
+</li>
+<li>
+<p><strong>Community-Driven Innovation</strong>: The rapid pace of technological change in microservices necessitated a collaborative platform for innovation. MicroProfile, backed by community and vendor support, promotes rapid evolution to meet these demands.</p>
+</li>
+<li>
+<p><strong>Vendor Neutrality and Interoperability</strong>: There was a need for a framework that could provide standardization across different implementations and environments, ensuring compatibility and avoiding vendor lock-in.</p>
+</li>
+<li>
+<p><strong>Focus on Simplicity and Productivity</strong>: Developers needed a simple, easy-to-understand framework that increased productivity by reducing boilerplate code and focusing on essential microservice functionalities. Well-defined standards and patterns eliminate the need to reinvent the wheel, allowing developers to focus on microservices logic.</p>
+</li>
+<li>
+<p><strong>Support for familiar programming model</strong>: MicroProfile was founded with support for Jakarta JSON Processing, Jakarta JSON Binding, Jakarta RESTful Web Services, and Jakarta Contexts and Dependency Injection (CDI) to define the core programming model and accelerate adoption.</p>
+</li>
+<li>
+<p><strong>Lightweight and Resilient Services</strong>: With the microservices architecture, there&#8217;s a need for frameworks that support the development of lightweight, resilient, and independently deployable services, which are essential for microservices.</p>
+</li>
+<li>
+<p><strong>Rapid Adaptation to New Trends</strong>: The technology landscape, especially around microservices, is constantly evolving. A framework like MicroProfile, which is community-driven and rapidly evolving, can adapt quickly to these changes, continually incorporating new practices and technologies, including:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Streaming APIs and Reactive Programming Model</strong>: To facilitate non-blocking communication and data processing, enhancing system responsiveness and scalability.</p>
+</li>
+<li>
+<p><strong>API-First Development (Open API)</strong>: Emphasizing the design and documentation of microservices with an API-first approach, promoting interoperability and clear service contracts.</p>
+</li>
+<li>
+<p><strong>Eventual Consistency and Long Running Actions (LRA)</strong>: Addressing the challenges of data consistency in distributed systems without compromising system performance.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Enhanced Observability and Monitoring</strong>: Microservices architectures complicate application monitoring and observability. A framework with built-in support for these capabilities simplifies the management of distributed services.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="microprofile-specifications"><a class="anchor" href="#microprofile-specifications"></a>MicroProfile Specifications</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile specifications are divided into two main categories: Platform and Standalone.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://microprofile.io/wp-content/uploads/2023/10/microprofile_release_6.1.png" alt="MicroProfile 6.1">
+</div>
+<div class="title">Figure 1. MicroProfile Specifications</div>
+</div>
+<div class="sect2">
+<h3 id="microprofile-platform-component-specifications"><a class="anchor" href="#microprofile-platform-component-specifications"></a>MicroProfile Platform Component Specifications</h3>
+<div class="paragraph">
+<p>The MicroProfile Platform Specification is the core set of MicroProfile specifications designed to provide the foundational functionalities needed for microservices development. These specifications solve specific microservices challenges, including configuration, fault tolerance, health checks, metrics, and security. The table below provides a list of platform specifications of MicroProfile along with their descriptions:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Specification</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-config/">Config</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Provides an easy-to-use and flexible system for application configuration.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-fault-tolerance/">Fault Tolerance</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Implements patterns like Circuit Breaker, Bulkhead, Retry, Timeout, and Fallback for building resilient applications.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-jwt-auth/">JWT Authentication</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Defines a standard for using OpenID Connect (OIDC) based JSON Web Tokens(JWT) for role-based access control(RBAC) of microservices endpoints for secure communication.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-metrics/">Metrics</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Define custom application metrics and expose platform metrics on a standard endpoint using a standard format to external monitoring systems.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-health/">Health</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allows applications to expose their health and readiness to perform operations to the underlying platform, which is crucial for automated recovery in cloud environments.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-open-api/">Open API</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Facilitates the generation of OpenAPI documentation for RESTful services, making API discovery and understanding easier.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-telemetry/">Telemetry</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Provides a unified set of APIs, libraries, and tools for collecting, processing, and exporting telemetry data (metrics, traces, and logs) from cloud-native applications and services.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-rest-client">Rest Client</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Defines a type-safe approach to invoke RESTful services over HTTP(S), simplifying the development of Rest clients.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://jakarta.ee/specifications/coreprofile/10/">Jakarta EE Core Profile 10</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An optimized Jakarta EE platform designed specifically for developing microservices and cloud-native Java applications with a reduced set of specifications for a lighter runtime footprint.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="standalone-outside-umbrella-specifications"><a class="anchor" href="#standalone-outside-umbrella-specifications"></a>Standalone (Outside Umbrella) Specifications</h3>
+<div class="paragraph">
+<p>Standalone specifications address more advanced needs that every microservices application may not require. They allow for innovation and experimentation in areas that are evolving or where there’s a need to address niche concerns without burdening the core platform with additional complexity. The table below provides a list of standalone specifications of MicroProfile along with their descriptions:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Specification</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-context-propagation/">Context Propagation</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Defines a way to propagate context between threads and managed executor services. Ensure that the context is consistent during executing asynchronous tasks or across different services.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-graphql/">GraphQL</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Provides a layer on top of Jakarta EE that allows the creation of GraphQL services. This specification makes it easier to build APIs, enabling clients to request exactly the data they need and nothing more.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-lra/">Long Running Actions (LRA)</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Focuses on providing a model for developing services that participate in long-running processes, ensuring consistency and reliability without necessarily locking data.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-reactive-messaging/">Reactive Messaging</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Aims to facilitate building applications that communicate via reactive streams, enabling the development of event-driven, responsive, and resilient microservices.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-reactive-streams-operators/">Reactive Streams Operators</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Provides a way to process data streams in a reactive manner, allowing for non-blocking system design and improving the efficiency of data processing in microservices.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://microprofile.io/specifications/microprofile-opentracing/">Open Tracing</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integrates distributed tracing by defining a way for services to trace requests across service boundaries, improving observability.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="microprofile-implementations"><a class="anchor" href="#microprofile-implementations"></a>MicroProfile Implementations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Below is the list of MicroProfile Implementations, each offering a platform for building and running microservices-based applications:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.payara.fish/products/payara-micro/" target="_blank" rel="noopener">Payara Micro</a></p>
+</li>
+<li>
+<p><a href="https://tomee.apache.org/" target="_blank" rel="noopener">Apache TomEE</a></p>
+</li>
+<li>
+<p><a href="https://openliberty.io/" target="_blank" rel="noopener">Open Liberty</a></p>
+</li>
+<li>
+<p><a href="https://github.com/fujitsu/launcher" target="_blank" rel="noopener">Launcher</a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/" target="_blank" rel="noopener">Quarkus</a></p>
+</li>
+<li>
+<p><a href="https://www.wildfly.org/" target="_blank" rel="noopener">WildFly</a></p>
+</li>
+<li>
+<p><a href="https://helidon.io/" target="_blank" rel="noopener">Helidon</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architecture-philosophy"><a class="anchor" href="#architecture-philosophy"></a>Architecture Philosophy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The overall goal of MicroProfile architecture is to provide a lightweight enterprise-grade framework tailored for building cloud-native applications and enabling developers to build and deploy microservices with Java easily:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Simplicity</strong>: MicroProfile APIs are designed to be simple and easy to use. They avoid unnecessary complexity and focus on providing the essential functionality for building microservices.</p>
+</li>
+<li>
+<p><strong>Modularity</strong>: Its modular approach allows developers to use only what they need, reducing the overhead typically associated with enterprise frameworks.</p>
+</li>
+<li>
+<p><strong>Standards-based</strong>: MicroProfile is based on open standards and specifications, ensuring compatibility and consistency across different implementations.</p>
+</li>
+<li>
+<p><strong>Community-driven</strong>: It encourages active participation from the Java community for continuous evolution.</p>
+</li>
+<li>
+<p><strong>Vendor-Neutral</strong>: MicroProfile is vendor-neutral. It’s supported by several industry players, ensuring that no single company controls its direction.</p>
+</li>
+<li>
+<p><strong>Focus on Cloud-Native Applications</strong>: The architecture is specifically tailored for cloud environments. MicroProfile integrates with a number of cloud-native technologies, such as Kubernetes and Istio. This makes it easy to deploy and manage MicroProfile applications in cloud environments.</p>
+</li>
+<li>
+<p><strong>Reactive programming</strong>: MicroProfile supports reactive programming, which is a style of programming that is well-suited for building microservices. Reactive applications are responsive and scalable, and they can handle high volumes of concurrent requests.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../_images/figure1-2.png" alt="MicroProfile Architecture Philosophy">
+</div>
+<div class="title">Figure 2. Architecture Philosophy of MicroProfile</div>
+</div>
+<div class="sect2">
+<h3 id="benefits-of-microprofile"><a class="anchor" href="#benefits-of-microprofile"></a>Benefits of MicroProfile</h3>
+<div class="paragraph">
+<p>MicroProfile offers several benefits, making it a compelling choice for developing microservices, especially in Java-centric environments. These benefits include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Optimized for Microservices</strong>: MicroProfile is designed explicitly for creating microservices, offering APIs that cater to the unique challenges of this architectural style.</p>
+</li>
+<li>
+<p><strong>Cloud-Native Focus</strong>: The framework includes features such as externalized configuration, health checks, and metrics, which are essential for building and operating cloud-native applications effectively. MicroProfile is inherently designed for cloud-native applications.</p>
+</li>
+<li>
+<p><strong>Open Source and Standards-Based</strong>: As an open-source framework based on open standards, MicroProfile facilitates interoperability and reduces the risk of vendor lock-in.</p>
+</li>
+<li>
+<p><strong>Enhanced Productivity, Rapid Development and Deployment</strong>: MicroProfile simplifies microservices development with a set of standard APIs. With its focus on simplicity and productivity, MicroProfile helps speed up the development and deployment of microservices by providing essential functionalities and reducing boilerplate code.</p>
+</li>
+<li>
+<p><strong>Community-Driven Innovation</strong>: Being community-driven, MicroProfile evolves quickly, incorporating new trends and best practices in microservices development. MicroProfile is backed by a strong Java community, ensuring continuous improvement and support.</p>
+</li>
+<li>
+<p><strong>Vendor Neutrality</strong>: Being vendor-neutral, MicroProfile is supported by a wide range of industry players, which ensures a broad choice of tools and platforms for developers.</p>
+</li>
+<li>
+<p><strong>Compatibility with Jakarta EE</strong>: MicroProfile is complementary to Jakarta EE, whether using MicroProfile implementations that support a small subset of Jakarta EE (such as Core Profile) or implementations that extend the full Jakarta EE Platform implementations with MicroProfile.</p>
+</li>
+<li>
+<p><strong>Lightweight and Modular</strong>: It provides a lightweight model compared to traditional enterprise Java frameworks. Its modularity allows developers to use only the necessary components, reducing the application&#8217;s footprint and overhead.</p>
+</li>
+<li>
+<p><strong>Scalability</strong>: The framework supports the development of scalable applications, essential for microservices that handle varying loads efficiently.</p>
+</li>
+<li>
+<p><strong>Enhanced Resilience</strong>: MicroProfile includes specifications for fault tolerance patterns like retries, circuit breakers, timeouts, and bulkheads, which are crucial for building resilient services that can withstand network and service failures.</p>
+</li>
+<li>
+<p><strong>Security Features</strong>: MicroProfile&#8217;s JWT Authentication provides a standardized way to secure microservices, making it easier to implement authentication and authorization.</p>
+</li>
+<li>
+<p><strong>Ease of Testing</strong>: With its lightweight nature and support for advanced features like Rest Client, MicroProfile simplifies the testing of microservices, both in isolation and in integration scenarios.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="relationship-with-jakarta-ee-specification"><a class="anchor" href="#relationship-with-jakarta-ee-specification"></a>Relationship with Jakarta EE specification</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Jakarta EE is an open specification with more than 40 component specifications to address a wide array of needs of enterprise Java development. MicroProfile complements this by providing a baseline platform definition that optimizes enterprise Java for microservices architecture and delivers application portability across multiple compatible runtimes. Many Jakarta EE implementations that target a broad array of applications supplement Jakarta EE with MicroProfile to better support microservices. Their coexistence allows developers to harness the strength of both platforms, thereby facilitating a more versatile and adaptive approach to modern enterprise and cloud-native application development. MicroProfile strategically leverages Java EE developers' existing skill sets, enabling them to transition and adapt to microservices development with minimal learning curve. This ensures that developers can easily design and implement microservices architecture, enhancing productivity and facilitating the creation of cloud-native applications. Later in this tutorial, we will explore how MicroProfile API extends Jakarta EE’s capability to address microservices-specific challenges.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+MicroProfile and Jakarta EE are complementary technologies. Both platforms enable developers to stay at the forefront of cloud-native application development.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion"><a class="anchor" href="#conclusion"></a>Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this section, we explored the MicroProfile platform in detail, laying the foundation for understanding how it revolutionizes the development of microservices using Java. We started by defining MicroProfile, emphasizing its role as an open-source specification tailored for microservices development. Key contributions from industry leaders and community members have positioned MicroProfile as a pivotal technology in the Java ecosystem, especially for cloud-native application development. We delved into the essential specifications of MicroProfile, each playing a critical role in addressing specific challenges in microservices development, from configuration management to service resilience. As we move forward in this tutorial, we will delve deeper into each specification and discover how to implement MicroProfile in real-world Java applications effectively.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="glossary"><a class="anchor" href="#glossary"></a>Glossary</h2>
+<div class="sectionbody">
+<div id="microservices" class="dlist">
+<dl>
+<dt class="hdlist1">Microservices</dt>
+<dd>
+<p>An architectural style for building applications as a collection of small, independent services. Each service focuses on a specific business capability and communicates with other services through well-defined APIs.</p>
+</dd>
+</dl>
+</div>
+<div id="apis" class="dlist">
+<dl>
+<dt class="hdlist1">APIs (Application Programming Interfaces)</dt>
+<dd>
+<p>A set of definitions and protocols that specify how software components interact with each other.</p>
+</dd>
+</dl>
+</div>
+<div id="cloud-native-development" class="dlist">
+<dl>
+<dt class="hdlist1">Cloud-native development</dt>
+<dd>
+<p>An approach to building and running applications that are specifically designed for the cloud environment. It involves using technologies and practices that leverage the benefits of cloud platforms, such as scalability, elasticity, and pay-as-you-go pricing.</p>
+</dd>
+</dl>
+</div>
+<div id="eclipse-foundation-working-group" class="dlist">
+<dl>
+<dt class="hdlist1">Eclipse Foundation Working Group</dt>
+<dd>
+<p>A collaborative group of industry leaders and Java community members who actively contribute to the of development of Eclipse projects like MicroProfile within the Eclipse Foundation framework.</p>
+</dd>
+</dl>
+</div>
+<div id="jakarta-ee" class="dlist">
+<dl>
+<dt class="hdlist1">Jakarta EE</dt>
+<dd>
+<p>Jakarta EE (formerly Java Platform, Enterprise Edition, or Java EE) is a set of specifications, extending Java Platform, Standard Edition, or Java SE with specifications for enterprise features such as web services, database persistence, asynchronous messaging and more.</p>
+</dd>
+</dl>
+</div>
+<div id="external-configuration" class="dlist">
+<dl>
+<dt class="hdlist1">External Configuration</dt>
+<dd>
+<p>A technique in application development where configuration data is separated from the application code, allowing the application&#8217;s behavior to be adjusted without changing the code, especially useful in cloud-native and microservices architectures.</p>
+</dd>
+</dl>
+</div>
+<div id="health-checks" class="dlist">
+<dl>
+<dt class="hdlist1">Health Checks</dt>
+<dd>
+<p>Mechanisms used in microservices architectures to continuously check the status of an application or service to ensure it is functioning correctly and available to users.</p>
+</dd>
+</dl>
+</div>
+<div id="fault-tolerance" class="dlist">
+<dl>
+<dt class="hdlist1">Fault Tolerance</dt>
+<dd>
+<p>The ability of a system to continue operating in the event of the failure of some of its components. This feature is critical for maintaining high availability and reliability in microservices architectures.</p>
+</dd>
+</dl>
+</div>
+<div id="vendor-neutrality" class="dlist">
+<dl>
+<dt class="hdlist1">Vendor Neutrality</dt>
+<dd>
+<p>The principle of designing software products and standards not controlled by any single vendor, promoting user interoperability and choice.</p>
+</dd>
+</dl>
+</div>
+<div id="interoperability" class="dlist">
+<dl>
+<dt class="hdlist1">Interoperability</dt>
+<dd>
+<p>The ability of a software to exchange and make use of information across different platforms and services.</p>
+</dd>
+</dl>
+</div>
+<div id="json-p" class="dlist">
+<dl>
+<dt class="hdlist1">JSON-P (JSON Processing)</dt>
+<dd>
+<p>A Jakarta EE (formerly Java EE) API that enables parsing, generating, transforming, and querying JSON data. It facilitates the processing of JSON data within the Java programming environment. Currently it is known as Jakarta JSON Processing.</p>
+</dd>
+</dl>
+</div>
+<div id="json-b" class="dlist">
+<dl>
+<dt class="hdlist1">JSON-B (JSON Binding)</dt>
+<dd>
+<p>A Jakarta EE (formerly Java EE) API for binding Java objects to JSON messages and vice versa, streamlining the serialization and deserialization process. It allows custom mappings to handle complex conversion scenarios efficiently. Currently it is known as Jakarta JSON Binding.</p>
+</dd>
+</dl>
+</div>
+<div id="jax-rs" class="dlist">
+<dl>
+<dt class="hdlist1">JAX-RS (Java API for RESTful Web Services)</dt>
+<dd>
+<p>A Jakarta EE API for creating web services according to the REST architectural pattern in Java, using annotations to simplify development. It enables the easy creation and management of resources via standard HTTP methods. It is currently known as Jakarta RESTful Web Services.</p>
+</dd>
+</dl>
+</div>
+<div id="cdi" class="dlist">
+<dl>
+<dt class="hdlist1">CDI (Contexts and Dependency Injection)</dt>
+<dd>
+<p>A Jakarta EE API for enterprise-grade dependency injection, offering type-safe mechanisms, context lifecycle management, and a framework for decoupling application components. It enhances modularity and facilitates the development of loosely coupled, easily testable applications.</p>
+</dd>
+</dl>
+</div>
+<div id="boilerplate-code" class="dlist">
+<dl>
+<dt class="hdlist1">Boilerplate Code</dt>
+<dd>
+<p>A piece of code that must be included in many places with little or no alteration.</p>
+</dd>
+</dl>
+</div>
+<div id="lightweight-services" class="dlist">
+<dl>
+<dt class="hdlist1">Lightweight Services</dt>
+<dd>
+<p>Services designed to consume minimal computing resources, enhancing performance and efficiency, particularly relevant in a microservices architecture.</p>
+</dd>
+</dl>
+</div>
+<div id="resilient-services" class="dlist">
+<dl>
+<dt class="hdlist1">Resilient Services</dt>
+<dd>
+<p>Services built to recover quickly from failures and continue operating. It is critical for maintaining the reliability of microservices-based applications.</p>
+</dd>
+</dl>
+</div>
+<div id="observability" class="dlist">
+<dl>
+<dt class="hdlist1">Observability</dt>
+<dd>
+<p>The ability to measure the internal state of a system by examining its outputs, crucial for understanding the performance and behavior of microservices.</p>
+</dd>
+</dl>
+</div>
+<div id="monitoring" class="dlist">
+<dl>
+<dt class="hdlist1">Monitoring</dt>
+<dd>
+<p>The practice of tracking and logging the performance and status of applications and infrastructure, essential for maintaining system health in microservices environments.</p>
+</dd>
+</dl>
+</div>
+<div id="circuit-breaker" class="dlist">
+<dl>
+<dt class="hdlist1">Circuit Breaker</dt>
+<dd>
+<p>A fault tolerance mechanism that prevents a failure in one service from causing system-wide failure, by temporarily disabling failing services.</p>
+</dd>
+</dl>
+</div>
+<div id="bulkhead" class="dlist">
+<dl>
+<dt class="hdlist1">Bulkhead</dt>
+<dd>
+<p>A pattern that isolates failures in one part of a system from the others, ensuring that parts of an application can continue functioning despite issues elsewhere.</p>
+</dd>
+</dl>
+</div>
+<div id="retry" class="dlist">
+<dl>
+<dt class="hdlist1">Retry</dt>
+<dd>
+<p>A simple fault tolerance mechanism where an operation is attempted again if it fails initially, based on predefined criteria.</p>
+</dd>
+</dl>
+</div>
+<div id="timeout" class="dlist">
+<dl>
+<dt class="hdlist1">Timeout</dt>
+<dd>
+<p>A mechanism to limit the time waiting for a response from a service, helping to avoid resource deadlock situations in distributed systems.</p>
+</dd>
+</dl>
+</div>
+<div id="fallback" class="dlist">
+<dl>
+<dt class="hdlist1">Fallback</dt>
+<dd>
+<p>A fault tolerance mechanism that provides an alternative solution or response when a primary method fails.</p>
+</dd>
+</dl>
+</div>
+<div id="rbac" class="dlist">
+<dl>
+<dt class="hdlist1">Role-Based Access Control (RBAC)</dt>
+<dd>
+<p>A method of restricting system access to authorized users based on their roles within an organization.</p>
+</dd>
+</dl>
+</div>
+<div id="kubernetes" class="dlist">
+<dl>
+<dt class="hdlist1">Kubernetes</dt>
+<dd>
+<p>An open-source platform for automating deployment, scaling, and operations of application containers across clusters of hosts.</p>
+</dd>
+</dl>
+</div>
+<div id="istio" class="dlist">
+<dl>
+<dt class="hdlist1">Istio</dt>
+<dd>
+<p>An open platform to connect, manage, and secure microservices, providing an easy way to create a network of deployed services with load balancing, service-to-service authentication, and monitoring.</p>
+</dd>
+</dl>
+</div>
+<div id="reactive-programming" class="dlist">
+<dl>
+<dt class="hdlist1">Reactive Programming</dt>
+<dd>
+<p>A programming paradigm oriented around data flows and the propagation of change, enabling the development of responsive and resilient systems.</p>
+</dd>
+</dl>
+</div>
+<div id="distributed-tracing" class="dlist">
+<dl>
+<dt class="hdlist1">Distributed Tracing</dt>
+<dd>
+<p>A method for monitoring applications, especially those built using a microservices architecture, by tracking the flow of requests and responses across services.</p>
+</dd>
+</dl>
+</div>
+<div id="lra" class="dlist">
+<dl>
+<dt class="hdlist1">Long Running Actions (LRA)</dt>
+<dd>
+<p>A model for managing long-duration, distributed transactions across microservices without locking resources.</p>
+</dd>
+</dl>
+</div>
+<div id="reactive-streams" class="dlist">
+<dl>
+<dt class="hdlist1">Reactive Streams</dt>
+<dd>
+<p>An initiative to provide a standard for asynchronous stream processing with non-blocking back pressure.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="../index.html">Preface</a></span>
+  <span class="next"><a href="../chapter02/chapter02-00.html">Getting Started with MicroProfile</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
+  </body>
+</html>

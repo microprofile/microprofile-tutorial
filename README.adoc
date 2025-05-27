@@ -1,5 +1,745 @@
-image:https://badges.gitter.im/eclipse/microprofile-samples.svg[link="https://app.gitter.im/#/room/#eclipse/microprofile-tutorial"]
+= MicroProfile Tutorial Documentation
+:toc: macro
+:toc-title: Table of Contents
+:toclevels: 3
+:doctype: book
 
-# MicroProfile API Tutorial Content
+The MicroProfile Tutorial is a comprehensive guide for learning about Eclipse MicroProfile. This repository contains the documentation built with Antora.
 
-This repo contains the source files that are used to build the _MicroProfile Tutorial_. The source files are authored in link:https://asciidoc.org/[AsciiDoc]. AsciiDoc is similar to markdown but is particularly suited for user documentation. The source files are processed and integrated into the MicroProfile Tutorial site using link:https://antora.org/[Antora], which is a tool for building documentation sites.
+toc::[]
+
+# Getting Started with MicroProfile Tutorial
+
+This repository contains the documentation for the MicroProfile Tutorial, built with Antora. This README provides information on how to set up, build, and customize the documentation site.
+
+## Prerequisites
+
+### Install Antora 
+You need to install Antora using npm. If you don't have npm installed, you can install it by following the instructions at https://docs.npmjs.com/getting-started/installing-node.
+
+```
+npm install -g @antora/cli @antora/site-generator-default 
+```
+
+### Recommended VS Code Extensions
+
+For the best experience editing AsciiDoc files in Visual Studio Code, we recommend installing the following extensions:
+
+* AsciiDoc extension by Asciidoctor (`asciidoctor.asciidoctor-vscode`) - Provides rich language support for AsciiDoc
+* Auto Open Preview Panel (`matt-rudge.auto-open-preview-panel`) - Opens preview automatically when opening AsciiDoc files
+
+## Building the Documentation Site
+
+You can build the site by running the following commands in the root directory of the project:
+
+```
+./update-repo-url.sh
+antora antora-assembler.yml
+./fix-edit-links.sh
+```
+
+The first command ensures that the repository URLs are up-to-date. The second command will generate the site in the `build/site` directory. The third command fixes the "Edit this Page" links to properly point to GitHub instead of local file paths.
+
+Alternatively, you can use the following one-liner:
+
+```
+./update-repo-url.sh && antora antora-assembler.yml && ./fix-edit-links.sh
+```
+
+After building, you can open the `build/site/index.html` file in your web browser to view the site.
+
+## Running the Site Locally
+
+You can run the site locally using Python's built-in HTTP server. First, navigate to the `build/site` directory:
+```
+cd build/site
+```
+Then, run the following command:
+```
+python3 -m http.server 8080
+```
+This will start a local server on port 8080. You can then open your web browser and navigate to `http://<hostname>:8080` to view the site.
+
+[TIP]
+====
+If port 8080 is already in use, you can free it by finding and stopping the process using it. For example, on Linux or macOS:
++
+----
+lsof -i :8080
+kill <PID>
+----
+Replace `<PID>` with the process ID shown in the output.
+====
+
+## Development Workflow
+
+To streamline the development process, a development server script is included that can automatically rebuild the documentation when files change.
+
+### Using the Development Server
+
+The `dev-server.sh` script provides three commands:
+
+1. **Build only**:
++
+----
+./dev-server.sh build
+----
++
+This builds the documentation site once.
+
+2. **Build and serve**:
++
+----
+./dev-server.sh serve
+----
++
+This builds the documentation site and starts a local HTTP server on port 8080.
+
+3. **Build, serve, and watch for changes**:
++
+----
+./dev-server.sh watch
+----
++
+This builds the documentation site, starts a local HTTP server, and automatically rebuilds the site when files change.
+
+### Requirements
+
+The development server requires:
+
+- Python 3 (for the HTTP server)
+- inotify-tools (for file watching, will be automatically installed if missing)
+
+### Typical Development Workflow
+
+1. Start the development server in watch mode: `./dev-server.sh watch`
+2. Open your browser at http://localhost:8080
+3. Edit AsciiDoc files in the `modules/ROOT/pages/` directory
+4. Save your changes and see them automatically reflected in the browser
+
+## Understanding Antora Configuration
+
+Antora uses several configuration files to manage the documentation site. The main files are:
+
+- `antora-assembler.yml`: The primary configuration file that defines the site structure, UI bundle, and supplemental files.
+- `antora.yml`: Component configuration for the MicroProfile Tutorial, including metadata and edit URL configuration.
+- `supplemental-ui/`: Directory containing customizations like favicons and custom partials.
+
+### Site Structure Configuration
+
+The main configuration file for the site is `antora-assembler.yml`, which defines:
+
+- **Site metadata**: Title, URL, and starting page
+- **Content sources**: Where to find documentation content
+- **UI bundle**: The theme and UI components to use
+- **Output**: Where to generate the site
+- **Asciidoc attributes**: Global attributes for all pages
+
+Here's a breakdown of the key sections:
+
+#### Site Information
+[source,yaml]
+----
+site:
+  title: MicroProfile Tutorial
+  url: https://microprofile.io
+  start_page: microprofile-tutorial::index.adoc
+  keys:
+    show_edit_page_link: true
+----
+
+#### Content Sources
+[source,yaml]
+----
+content:
+  sources:
+    - url: .
+      start_path: .
+      branches: HEAD
+----
+
+#### UI Configuration
+[source,yaml]
+----
+ui:
+  bundle:
+    url: https://github.com/ttelang/microprofile-documentation-ui/releases/download/latest/ui-bundle.zip
+    snapshot: true
+  supplemental_files: ./supplemental-ui
+----
+
+### Component Configuration
+
+The `antora.yml` file defines the documentation component:
+
+[source,yaml]
+----
+name: microprofile-tutorial
+title: MicroProfile Tutorial
+version: 6.1
+edit_url: https://github.com/ttelang/microprofile-tutorial/edit/patch-15/modules/ROOT/pages/{path}
+asciidoc:
+  attributes:
+    source-language: asciidoc@
+    table-caption: false
+    xrefstyle: full
+nav:
+  - modules/ROOT/pages/nav.adoc
+start_page: index.adoc
+----
+
+Key properties:
+- **name**: The component name used in xrefs and URLs
+- **title**: The human-readable title
+- **version**: The component version (appears in URLs and version selector)
+- **edit_url**: The URL template for "Edit this Page" links
+- **nav**: The navigation file(s) for the component
+- **start_page**: The default page when accessing the component root
+
+### Navigation Configuration
+
+The navigation is defined in `modules/ROOT/pages/nav.adoc` and uses AsciiDoc with special Antora directives:
+
+[source,asciidoc]
+----
+* xref:index.adoc[Home]
+* xref:chapter01/chapter01.adoc[Chapter 1: Introduction]
+* Chapter 2: Getting Started
+** xref:chapter02/chapter02-01.adoc[Section 2.1: Environment Setup]
+----
+
+The navigation structure directly affects the sidebar menu in the generated site.
+
+## Navigation and Site Structure
+
+The navigation system in Antora is a critical component that determines how users find and access content. Understanding how navigation works can help you create a better user experience.
+
+### Navigation Components
+
+The MicroProfile Tutorial site navigation consists of:
+
+1. **Main Navigation**: Defined in `modules/ROOT/pages/nav.adoc`, controls the sidebar navigation.
+2. **Breadcrumbs**: Shows the current page's location in the content hierarchy.
+3. **Previous/Next Links**: Helps users navigate sequentially through content.
+4. **Table of Contents**: Generated from page headings, provides in-page navigation.
+
+### Customizing Navigation
+
+The navigation can be customized in several ways:
+
+#### Modifying the nav.adoc File
+
+The main navigation structure is defined in `modules/ROOT/pages/nav.adoc`:
+
+[source,asciidoc]
+----
+* xref:index.adoc[Home]
+* xref:chapter01/chapter01.adoc[Chapter 1: Introduction]
+* Chapter 2: Getting Started
+** xref:chapter02/chapter02-01.adoc[Section 2.1: Environment Setup]
+** xref:chapter02/chapter02-02.adoc[Section 2.2: First Steps]
+----
+
+Navigation entries can be:
+- Direct links to pages (with `xref:`)
+- Unlinked category headers (without `xref:`)
+- Nested to create hierarchical structures (using multiple `*` characters)
+
+#### Navigation UI Customization
+
+To customize the navigation appearance:
+
+1. **Style Overrides**: Add CSS for navigation elements in your supplemental UI files.
+2. **Template Customization**: Override the navigation templates in the UI bundle.
+3. **JavaScript Enhancements**: Add interactive features like search, filtering, or collapsible sections.
+
+Example CSS customization for navigation:
+
+[source,css]
+----
+/* Customizing the sidebar navigation */
+.nav-menu {
+  background-color: #f5f5f5;
+}
+
+.nav-item.is-current-page > .nav-link {
+  color: #0d5aa7;
+  font-weight: bold;
+}
+----
+
+### Navigation Best Practices
+
+1. **Logical Organization**: Group related content together in the navigation.
+2. **Consistent Naming**: Use consistent naming conventions for pages and sections.
+3. **Limited Nesting**: Avoid deep nesting (more than 3 levels) to prevent navigation complexity.
+4. **Descriptive Labels**: Use clear, descriptive labels for navigation items.
+5. **Progressive Disclosure**: Organize content from basic to advanced topics.
+
+### Advanced Navigation Features
+
+The UI bundle can be customized to include advanced navigation features:
+
+1. **Search Integration**: Add search functionality to help users find content quickly.
+2. **Version Selector**: Allow users to switch between different versions of the documentation.
+3. **Component Selector**: If you have multiple components, provide a way to navigate between them.
+4. **Tag-Based Navigation**: Group content by tags or categories for alternative navigation paths.
+
+## About the fix-edit-links.sh Script
+
+The `fix-edit-links.sh` script is a necessary post-processing step in the build process. Despite having `edit_url` properly configured in `antora.yml`, when building from a local repository (`url: .` in `antora-assembler.yml`), Antora generates edit links that point to local file paths instead of GitHub URLs.
+
+The script performs a simple text replacement in the generated HTML files, replacing local file paths with proper GitHub repository URLs. This ensures that the "Edit this Page" links work correctly for users viewing the documentation.
+
+If you update the repository URL or branch name, make sure to update the replacement URL in the `fix-edit-links.sh` script accordingly. The current implementation assumes the GitHub repository URL is `https://github.com/ttelang/microprofile-tutorial` and the branch is `patch-15`.
+
+## Automating Repository URL Configuration
+
+To simplify the management of repository URLs across configuration files, the `update-repo-url.sh` script is provided. This script:
+
+1. Automatically detects your Git repository URL and current branch
+2. Updates the `edit_url` in `antora.yml`
+3. Updates the repository information in `fix-edit-links.sh`
+
+### Using the URL Configuration Script
+
+Run the script before building the documentation:
+
+```
+./update-repo-url.sh
+```
+
+This ensures that both the Antora configuration and the fix-edit-links script use the same repository URL and branch, eliminating duplication and reducing the chance of errors.
+
+When you clone the repository or switch branches, run this script to update the configuration automatically.
+
+## Customizing the Documentation Site
+
+The MicroProfile Tutorial documentation site can be customized in various ways to enhance its appearance and functionality. Here are the key customization options:
+
+### Favicon Configuration
+
+Favicons are configured using the `supplemental-ui/partials/head-meta.hbs` file, which is included in the HTML `<head>` section of each page. The current setup includes:
+
+- An SVG favicon (primary)
+- A PNG favicon (fallback for browsers that don't support SVG)
+
+To change the favicons:
+
+1. Replace the files in `supplemental-ui/img/`:
+   - `favicon.svg` - Vector version of the favicon
+   - `favicon.png` - Bitmap version of the favicon
+2. Make sure the references in `head-meta.hbs` match your file names
+
+### UI Customization
+
+The UI bundle is defined in `antora-assembler.yml` under the `ui.bundle.url` key. The current configuration uses a custom UI bundle from the `microprofile-documentation-ui` repository.
+
+To apply additional customizations:
+
+1. Add or modify files in the `supplemental-ui/` directory:
+   - `partials/` - Override specific UI components
+   - `css/` - Add custom CSS styles
+   - `js/` - Add custom JavaScript
+
+Common customizations include:
+
+- Header and footer modifications
+- Custom CSS for branding
+- Additional JavaScript functionality
+
+### Edit Page Links
+
+Edit page links are configured in two places:
+
+1. `antora.yml` - The `edit_url` property defines the base URL for edit links
+2. `antora-assembler.yml` - The `site.keys.show_edit_page_link` property enables the display of edit links
+
+If you change the repository URL or branch, update both:
+- The `edit_url` in `antora.yml`
+- The replacement URL in `fix-edit-links.sh`
+
+### Redirection Configuration
+
+The project includes a `redirect.html` file that automatically redirects users from the root URL to the latest version of the documentation. This is particularly useful when hosting the documentation on GitHub Pages or other static hosting services.
+
+The redirect is configured to:
+- Use relative URLs for maximum compatibility
+- Fall back to JavaScript-based redirection if needed
+
+### Further Customization Resources
+
+For more advanced customization options, refer to the Antora documentation:
+
+- [Antora UI Documentation](https://docs.antora.org/antora-ui-default/)
+- [Customizing the UI](https://docs.antora.org/antora/latest/playbook/ui-supplemental-files/)
+- [Page Templates](https://docs.antora.org/antora/latest/templates/)
+
+## Contributing to the Documentation
+
+### Directory Structure
+
+The MicroProfile Tutorial follows the standard Antora directory structure:
+
+- `modules/ROOT/pages/` - Contains the main documentation content in AsciiDoc format
+- `modules/ROOT/assets/images/` - Contains images used in the documentation
+- `modules/ROOT/examples/` - Contains code examples (if applicable)
+
+### AsciiDoc Best Practices
+
+When contributing to the documentation, follow these AsciiDoc best practices:
+
+1. Use proper heading levels (start with `==` for top-level headings within a page)
+2. Use cross-references to link between pages (`xref:page-id.adoc[]`)
+3. Add proper metadata to each page:
++
+----
+= Page Title
+:page-id: unique-id
+----
++
+4. For code examples, use proper language specifiers:
++
+----
+[source,java]
+----
+// Java code here
+----
+----
+
+### Adding New Content
+
+To add new content to the documentation:
+
+1. Create a new `.adoc` file in the appropriate directory under `modules/ROOT/pages/`
+2. Add a reference to the new page in the navigation file (`modules/ROOT/pages/nav.adoc`)
+3. Build the site to verify your changes
+
+### Handling Images
+
+When adding images to the documentation:
+
+1. Place image files in the `modules/ROOT/images/` directory
+2. Reference images using the `image::` directive:
++
+----
+image::image-name.png[Alt text for the image, width=600]
+----
+
+## Troubleshooting
+
+### Common Build Issues
+
+1. **Missing dependencies**
+   ```
+   npm install -g @antora/cli @antora/site-generator-default
+   ```
+
+2. **Edit links not working**
+   - Make sure `fix-edit-links.sh` is executable: `chmod +x fix-edit-links.sh`
+   - Verify the GitHub repository URL and branch in both `antora.yml` and `fix-edit-links.sh`
+
+3. **Incorrect links in navigation**
+   - Check that page references in `nav.adoc` use proper xref syntax
+   - Verify that page IDs are unique across the documentation
+
+### Getting Help
+
+If you encounter issues not covered in this documentation, check the following resources:
+
+- [Antora Documentation](https://docs.antora.org/)
+- [AsciiDoc Syntax Quick Reference](https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/)
+- [MicroProfile Community](https://microprofile.io/community/)
+
+## Hosting and Deployment
+
+The MicroProfile Tutorial documentation site is designed to be deployed as static HTML, which can be hosted on various platforms. Here are some common hosting options and deployment methods:
+
+### GitHub Pages
+
+GitHub Pages is a simple and free hosting option for static sites:
+
+1. Build the site: `antora antora-assembler.yml && ./fix-edit-links.sh`
+2. Copy the contents of the `build/site` directory to your GitHub Pages branch (typically `gh-pages`)
+3. Configure GitHub repository settings to enable GitHub Pages
+
+The `redirect.html` file can be renamed to `index.html` at the repository root to automatically redirect visitors to the latest documentation version.
+
+### Static Web Hosting
+
+Any static web hosting service can host the documentation:
+
+1. Build the site: `antora antora-assembler.yml && ./fix-edit-links.sh`
+2. Upload the contents of the `build/site` directory to your web server
+3. Configure your web server to serve `index.html` as the default document
+
+### Continuous Integration
+
+To automate the build and deployment process, you can use GitHub Actions or another CI/CD system:
+
+1. Set up a workflow that triggers on pushes to the main branch
+2. Configure the workflow to:
+   - Install Node.js and required dependencies
+   - Run the Antora build
+   - Execute the fix-edit-links script
+   - Deploy the generated site to your hosting platform
+
+Example GitHub Actions workflow file (`.github/workflows/deploy.yml`):
+
+[source,yaml]
+----
+name: Deploy Documentation
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          
+      - name: Install dependencies
+        run: npm install -g @antora/cli @antora/site-generator-default
+        
+      - name: Build site
+        run: |
+          antora antora-assembler.yml
+          chmod +x ./fix-edit-links.sh
+          ./fix-edit-links.sh
+          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/site
+----
+
+### Custom Domain Configuration
+
+If you're hosting the documentation on a custom domain:
+
+1. Update the `site.url` property in `antora-assembler.yml` to match your domain
+2. Configure your domain's DNS settings to point to your hosting provider
+3. If using GitHub Pages, add a CNAME file to the `build/site` directory
+
+## Future Improvements
+
+Consider these potential improvements to the documentation site:
+
+1. **Multi-version documentation**: Configure Antora to build multiple versions of the documentation from different branches or tags
+2. **Search integration**: Add a custom search engine like Algolia DocSearch
+3. **Analytics**: Integrate web analytics to track usage patterns
+4. **PDF generation**: Enhance the PDF export capabilities with custom styling
+5. **Interactive examples**: Add interactive code examples using tools like Asciidoctor-Kroki for diagrams
+
+## Managing Dependencies and Updates
+
+### Node.js Dependencies
+
+The MicroProfile Tutorial documentation relies on Node.js packages, primarily Antora. These dependencies are listed in the `package.json` file. To update or manage these dependencies:
+
+1. **Update all dependencies**:
++
+----
+npm update
+----
+
+2. **Install a specific Antora version**:
++
+----
+npm install -g @antora/cli@3.1.0 @antora/site-generator-default@3.1.0
+----
+
+### Understanding the UI Bundle
+
+The UI bundle is a critical component of an Antora site that controls the overall appearance, layout, and functionality of the documentation. It's defined in `antora-assembler.yml` under the `ui.bundle` section.
+
+#### Current UI Bundle Configuration
+
+The MicroProfile Tutorial uses a customized UI bundle from the `microprofile-documentation-ui` repository:
+
+[source,yaml]
+----
+ui:
+  bundle:
+    url: https://github.com/ttelang/microprofile-documentation-ui/releases/download/latest/ui-bundle.zip
+    snapshot: true
+  supplemental_files: ./supplemental-ui
+----
+
+Key properties in this configuration:
+
+* `url`: Specifies the location of the UI bundle ZIP file
+* `snapshot: true`: Tells Antora to fetch the bundle every time you build, ignoring any cached version
+* `supplemental_files`: Points to a directory containing files that override or extend the UI bundle
+
+#### UI Bundle Components
+
+A standard Antora UI bundle includes:
+
+* **CSS styles**: Controls the visual appearance of the site
+* **JavaScript files**: Provides interactive functionality
+* **Handlebars templates**: Defines the HTML structure of pages
+* **Fonts and images**: Basic visual assets
+* **Layouts**: Page structure templates for different content types
+
+#### Customizing the UI Bundle
+
+There are three approaches to customizing the UI:
+
+1. **Using supplemental files** (current approach):
+   * Add files to the `supplemental-ui/` directory
+   * These files override or extend the UI bundle without modifying it
+   * Good for simple customizations like favicons, headers, footers, and CSS tweaks
+
+2. **Creating a custom UI bundle**:
+   * Fork the default Antora UI repository
+   * Make extensive customizations
+   * Build and host your custom bundle
+   * Reference your custom bundle URL in `antora-assembler.yml`
+
+3. **Using a community UI bundle**:
+   * Several alternative UI bundles are available in the Antora ecosystem
+   * Each offers different features, layouts, and styling options
+
+#### Updating the UI Bundle
+
+To update to a newer version of the UI bundle:
+
+1. Check for new releases of the UI bundle at the GitHub repository
+2. Update the URL in `antora-assembler.yml`:
++
+[source,yaml]
+----
+ui:
+  bundle:
+    url: https://github.com/ttelang/microprofile-documentation-ui/releases/download/latest/ui-bundle.zip
+    snapshot: true
+----
+
+#### Creating a Custom UI Bundle
+
+If you need extensive customization beyond what supplemental files allow:
+
+1. Fork the https://github.com/ttelang/microprofile-documentation-ui repository
+2. Make your customizations following the project's README
+3. Build the UI bundle using `gulp bundle`
+4. Host the resulting ZIP file (e.g., on GitHub Releases)
+5. Update the `url` in `antora-assembler.yml` to point to your custom bundle
+
+This approach provides the most flexibility but requires more maintenance.
+
+## Advanced UI Bundle Configuration
+
+The UI bundle configuration in Antora offers several advanced options that can enhance the documentation site's functionality and performance.
+
+### Bundle Cache Control
+
+You can control how Antora handles UI bundle caching:
+
+[source,yaml]
+----
+ui:
+  bundle:
+    url: https://github.com/ttelang/microprofile-documentation-ui/releases/download/latest/ui-bundle.zip
+    snapshot: true  # Always fetch the latest version
+    # snapshot: false  # Use cached version when available
+----
+
+Setting `snapshot: false` can improve build performance by using a cached version of the bundle.
+
+### Custom UI Bundle Features
+
+Modern UI bundles for Antora can include advanced features:
+
+1. **Search Integration**: Many UI bundles include built-in search functionality:
++
+[source,yaml]
+----
+ui:
+  bundle:
+    url: https://example.com/ui-bundle.zip
+  supplemental_files: ./supplemental-ui
+search:
+  engine: lunr  # Or another search engine
+  index_latest_only: true
+----
+
+2. **Multiple Output Formats**: Some UI bundles support different output formats:
++
+[source,yaml]
+----
+ui:
+  bundle:
+    url: https://example.com/ui-bundle.zip
+output:
+  dir: ./build/site
+  formats:
+    - html
+    - pdf
+----
+
+3. **SEO Optimizations**: Enhanced metadata for search engines:
++
+[source,yaml]
+----
+site:
+  title: MicroProfile Tutorial
+  url: https://microprofile.io
+  keys:
+    seo_description: Comprehensive tutorial for learning Eclipse MicroProfile
+    seo_keywords: microprofile, java, cloud-native, microservices
+----
+
+### Using a Local UI Bundle
+
+For development or customization, you can use a local UI bundle:
+
+[source,yaml]
+----
+ui:
+  bundle:
+    url: ./path/to/local/ui-bundle.zip
+    snapshot: true
+----
+
+This approach is useful when developing your own UI bundle or testing modifications.
+
+### UI Bundle Development
+
+If you decide to develop your own UI bundle:
+
+1. **Prerequisites**: Node.js and Gulp
+2. **Project Structure**:
+   - `src/`: Source files (CSS, JavaScript, Handlebars templates)
+   - `gulp.d/`: Gulp tasks for building the bundle
+   - `preview-src/`: Sample content for testing
+3. **Build Process**:
+   - Run `gulp bundle` to create the UI bundle
+   - Use `gulp preview` to test with sample content
+
+### Performance Optimization Tips
+
+To optimize the performance of your documentation site:
+
+1. **Minification**: Ensure CSS and JavaScript are minified
+2. **Image Optimization**: Use optimized images and consider lazy loading
+3. **Font Subsetting**: Only include the character sets you need
+4. **Resource Caching**: Configure proper caching headers
+5. **CDN Integration**: Consider hosting assets on a CDN
+
+### Debugging UI Issues
+
+When troubleshooting UI problems:
+
+1. Use browser developer tools to inspect elements and styles
+2. Check the browser console for JavaScript errors
+3. Verify that all required resources are loading correctly
+4. Test with different browsers to identify browser-specific issues

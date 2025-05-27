@@ -1,4 +1,5 @@
 = MicroProfile API Tutorial
+:id: index
 :doctype: book
 
 ----

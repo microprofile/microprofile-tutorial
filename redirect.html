@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="refresh" content="0; url='./microprofile-tutorial/latest/index.html'" />
+    <script>
+        // In case the relative URL doesn't work, try to build a URL based on the current location
+        window.onload = function() {
+            var baseUrl = window.location.protocol + "//" + window.location.host;
+            var redirectPath = "/microprofile-tutorial/latest/index.html";
+            document.getElementById("redirect-link").href = baseUrl + redirectPath;
+            document.getElementById("redirect-link").textContent = "MicroProfile Tutorial at " + baseUrl;
+        }
+    </script>
+</head>
+<body>
+    <p>Redirecting to <a id="redirect-link" href="./microprofile-tutorial/latest/index.html">MicroProfile Tutorial</a>...</p>
+</body>
+</html>

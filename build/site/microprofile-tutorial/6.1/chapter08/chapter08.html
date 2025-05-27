@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MicroProfile Fault Tolerance :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/microprofile-tutorial/6.1/chapter08/chapter08.html">
+    <link rel="prev" href="../chapter07/chapter07.html">
+    <link rel="next" href="../chapter09/index.html">
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" /><link rel="icon" href="../../../_/img/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="../../../_/img/favicon.png" type="image/png">
+<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png">
+      <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5WLCZXC');</script>
+    <!-- End Google Tag Manager -->  
+    <script>var uiRootPath = '../../../_'</script>
+    <script>!function (theme) {
+        if (theme === 'dark') document.documentElement.classList.add('theme-dark')
+      }(localStorage && localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)') && 'dark'))
+    </script>
+    <!-- Add Eclipse Foundation cookie consent to site for GA -->
+    <script src="//www.eclipse.org/eclipse.org-common/themes/solstice/public/javascript/vendor/cookieconsent/default.min.js"></script>
+      </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a id="site-title" class="navbar-item" href="https://microprofile.io">MicroProfile Tutorial</a>
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="../../../microprofile-tutorial/6.1/microprofile-tutorial.pdf">Download</a>
+          </span>
+        </div>
+      </div>
+      <div class="navbar-theme-switcher">
+        <span class="switch" title="Switch between Light and Dark Theme">
+          <input id="theme-switcher-checkbox" type="checkbox" />
+          <label for="theme-switcher-checkbox">Dark Theme</label>
+        </span>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="6.1">
+  <div class="toolbar"></div>
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Preface</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter02/chapter02-00.html">Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="chapter08.html">MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">6.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">MicroProfile Tutorial</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">6.1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">MicroProfile Tutorial</a></li>
+    <li><a href="chapter08.html">MicroProfile Fault Tolerance</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/ttelang/microprofile-tutorial/edit/patch-15/modules/ROOT/pages/chapter08/chapter08.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">MicroProfile Fault Tolerance</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In a Microservices architecture, an application consists of multiple smaller, autonomous services. This architecture enhances development flexibility, agility, and scalability but introduces new challenges, particularly in ensuring the application&#8217;s reliability and managing failures. Unlike monolithic applications, where defects are localized, a single failure in one microservice can propagate across the entire application, potentially causing widespread outages. Therefore, fault tolerance is critical in a microservices architecture to ensure that failures are seamlessly isolated, managed, and recovered.</p>
+</div>
+<div class="paragraph">
+<p><strong>MicroProfile Fault Tolerance</strong> offers strategies for building resilient and reliable microservices, ensuring service continuity and stability even during unexpected failures.</p>
+</div>
+<div class="paragraph">
+<p>This chapter explains how to enhance your microservices' resilience and reliability using MicroProfile Fault Tolerance capabilities and annotations. We will also demonstrate how to implement key strategies such as timeouts, retries, fallbacks, circuit breakers, and bulkheads to handle faults. By the end of the chapter, you will understand how to use these strategies to enhance the resilience of your microservices.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="topics-to-be-covered"><a class="anchor" href="#topics-to-be-covered"></a>Topics to be Covered</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>What is Fault Tolerance?</p>
+</li>
+<li>
+<p>Key Strategies for Enhancing Fault Tolerance</p>
+</li>
+<li>
+<p>Implementing Retry Policies and Configuration</p>
+</li>
+<li>
+<p>Avoiding and Managing Cascading Failures</p>
+</li>
+<li>
+<p>Configuring Circuit Breaker</p>
+</li>
+<li>
+<p>Using <code>@Asynchronous</code> Annotation</p>
+</li>
+<li>
+<p>Setting Timeouts</p>
+</li>
+<li>
+<p>Implementing Fallback Logic</p>
+</li>
+<li>
+<p>Isolating Resources for Fault Tolerance</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-is-fault-tolerance"><a class="anchor" href="#what-is-fault-tolerance"></a>What is Fault Tolerance?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Fault tolerance is a system&#8217;s ability to continue working correctly even in case of unexpected failures. A fault-tolerant system should be able to detect, isolate, and recover from errors without human intervention. It is critical in applications based on modern microservices architectures where individual component failures are inevitable due to network issues, resource limitations, or transient errors.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="key-strategies-for-enhancing-fault-tolerance"><a class="anchor" href="#key-strategies-for-enhancing-fault-tolerance"></a>Key Strategies for Enhancing Fault Tolerance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Some of the key strategies for enhancing the fault tolerance of a microservices-based application include:</p>
+</div>
+<div class="sect2">
+<h3 id="asynchronous-execution"><a class="anchor" href="#asynchronous-execution"></a>Asynchronous Execution</h3>
+<div class="paragraph">
+<p>Asynchronous execution allows operations to run in a separate thread. It means the caller does not have to wait for the operation to finish, making the application more responsive. For example, when a user searches for products in the product catalog service, the service can asynchronously fetch product recommendations from an external API while immediately returning the main search results to the user, ensuring a fast and responsive experience.</p>
+</div>
+<div class="paragraph">
+<p>When applied individually or in combination, these strategies form the foundation of a fault-tolerant microservices architecture. The following sections delve deeper into their implementation and best practices.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="timeout"><a class="anchor" href="#timeout"></a>Timeout</h3>
+<div class="paragraph">
+<p>A timeout sets a time limit for operations, preventing indefinite waits and freeing up system resources for other tasks. For instance, a timeout in payment service ensures that the application can recover gracefully if the payment processing is taking too long to respond.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="retry"><a class="anchor" href="#retry"></a>Retry</h3>
+<div class="paragraph">
+<p>A retry allows the system to automatically retry failed operations, particularly useful for handling transient errors like temporary network glitches. You can customize the retry policy with parameters such as the delay between retries and maximum retries. Adding jitter prevents synchronized retries across services.</p>
+</div>
+<div class="paragraph">
+<p>For example, a payment service can retry a failed payment authorization request with an external payment gateway to ensure successful transaction processing.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bulkhead"><a class="anchor" href="#bulkhead"></a>Bulkhead</h3>
+<div class="paragraph">
+<p>A bulkhead isolates failures in one part of a system from other parts by segregating resources, such as thread pools, connection pools, or memory, among different microservices interactions.</p>
+</div>
+<div class="paragraph">
+<p>For example, in an e-commerce application, the catalog service can implement bulkheads using separate thread pools or connection pools for different upstream dependencies, such as the product database and the pricing service. If the pricing service becomes slow or unresponsive, a bulkhead prevents it from consuming all the resources of the catalog service, ensuring that requests to fetch product details from the database continue to work unaffected.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fallback"><a class="anchor" href="#fallback"></a>Fallback</h3>
+<div class="paragraph">
+<p>A fallback provides a default response if an operation fails. It ensures the system continues providing a meaningful response instead of completely failing. For example, if the database fails or becomes slow in the product catalog service, the system can fetch cached product data to continue serving user requests for product listings.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="circuit-breaker"><a class="anchor" href="#circuit-breaker"></a>Circuit Breaker</h3>
+<div class="paragraph">
+<p>A circuit breaker stops an application from making too many unsuccessful requests to another system. If the number of failures exceeds a threshold, the circuit breaker will <code>open</code>, causing all subsequent requests to fail immediately. After a configured delay, the circuit breaker will <code>half-open</code> and allow limited requests. If those requests succeed, the circuit breaker will <code>close</code> and let all requests go through.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../_images/figure8-1.png" alt="MicroProfile Fault Tolerance">
+</div>
+<div class="title">MicroProfile Fault Tolerance 1. MicroProfile Fault Tolerance</div>
+</div>
+<div class="paragraph">
+<p>For example, a circuit breaker can be applied to calls to an external inventory service in the Product Catalog Microservice. If the inventory service starts failing or becomes unresponsive, the circuit breaker will <code>open</code>, preventing repeated requests and reducing load. After a configured delay, the circuit breaker will <code>half-open</code> to test the availability of the inventory service with a few requests. If those succeed, the circuit breaker will <code>close</code>, resuming normal operations.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="fault-tolerance-api"><a class="anchor" href="#fault-tolerance-api"></a>Fault Tolerance API</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Fault Tolerance API equips developers with annotations to enhance the resilience of microservices against failures. It integrates seamlessly with the MicroProfile Config API, enabling the dynamic configuration of fault tolerance behaviors without modifying the application code. This section will explore using the Fault Tolerance API to build a robust, fault-tolerant microservice.</p>
+</div>
+<div class="sect2">
+<h3 id="adding-dependency-for-fault-tolerance-api"><a class="anchor" href="#adding-dependency-for-fault-tolerance-api"></a>Adding Dependency for Fault Tolerance API</h3>
+<div class="paragraph">
+<p>To use the Fault Tolerance API in your project, include the following dependency in your <code>pom.xml</code> file. Ensure you specify the version (e.g., 4.1.1) compatible with your MicroProfile runtime.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.fault-tolerance&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-fault-tolerance-api&lt;/artifactId&gt;
+  &lt;version&gt;4.1.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Fault Tolerance API defines a contract for fault tolerance implementations.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="microprofile-fault-tolerance-annotations"><a class="anchor" href="#microprofile-fault-tolerance-annotations"></a>MicroProfile Fault Tolerance Annotations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The MicroProfile Fault Tolerance annotations provide a declarative way to implement fault-tolerant behavior in Java methods, allowing developers to handle failures gracefully with minimal code changes.</p>
+</div>
+<div class="sect2">
+<h3 id="list-of-annotations"><a class="anchor" href="#list-of-annotations"></a>List of Annotations</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Annotation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Asynchronous</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ensures that the annotated method executes in a separate thread, allowing non-blocking execution. This is useful for improving responsiveness and handling long-running tasks asynchronously.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Retry</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies that the annotated method should automatically retry on failure. Parameters such as <code>maxRetries</code>, <code>delay</code>, <code>maxDuration</code>, and <code>jitter</code> control retry behavior. Configurations can be externalized using MicroProfile Config.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Timeout</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the maximum duration (in milliseconds) the method can execute before being aborted. If the timeout is exceeded, a <code>FaultToleranceException</code> is thrown.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@CircuitBreaker</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Defines a circuit breaker mechanism to prevent repeated calls to a failing method. Includes parameters like <code>failureRatio</code>, <code>delay</code>, and <code>requestVolumeThreshold</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Fallback</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies alternative logic to execute when the primary method fails. This ensures meaningful responses and graceful degradation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Bulkhead</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Limits the number of concurrent method executions to isolate system resources and prevent cascading failures.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="implementing-retry-policies-and-configuration"><a class="anchor" href="#implementing-retry-policies-and-configuration"></a>Implementing Retry Policies and Configuration</h3>
+<div class="paragraph">
+<p>Retries are a fundamental fault tolerance strategy for managing transient failures such as temporary network outages or intermittent service unavailability. The <code>@Retry</code> annotation in the MicroProfile Fault Tolerance API provides a simple and effective way to implement retry policies. By customizing parameters such as the number of retries, delay between attempts, and conditions for retries, you can ensure your application responds to failures gracefully and minimizes downtime.</p>
+</div>
+<div class="sect3">
+<h4 id="applying-retry-in-paymentservice-class"><a class="anchor" href="#applying-retry-in-paymentservice-class"></a>Applying <code>@Retry</code> in <code>PaymentService</code> class</h4>
+<div class="paragraph">
+<p>Below is an example of applying the <code>@Retry</code> annotation in a <code>processPayment</code> method within a <code>PaymentService</code> class of the MicroProfile e-commerce project:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.service;
+
+import org.eclipse.microprofile.faulttolerance.Retry;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.MediaType;
+
+public class PaymentService {
+
+    @Retry(
+        maxRetries = 3,
+        delay = 2000,
+        jitter = 500,
+        retryOn = PaymentProcessingException.class,
+        abortOn = CriticalPaymentException.class
+    )
+    public Response processPayment(PaymentDetails paymentDetails) throws PaymentProcessingException {
+        System.out.println("Processing payment for amount: " + paymentDetails.getAmount());
+
+        // Simulating a transient failure
+        if (Math.random() &gt; 0.7) {
+            throw new PaymentProcessingException("Temporary payment processing failure");
+        }
+
+        return Response.ok("{\"status\":\"success\"}", MediaType.APPLICATION_JSON).build();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="defining-the-paymentdetails-class"><a class="anchor" href="#defining-the-paymentdetails-class"></a>Defining the PaymentDetails Class</h4>
+<div class="paragraph">
+<p>To store the necessary payment information, the following <code>PaymentDetails</code> class is used. This class acts as a simple data container for payment-related details.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class PaymentDetails {
+    private double amount;
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="creating-custom-exception-classes-for-handling-failures"><a class="anchor" href="#creating-custom-exception-classes-for-handling-failures"></a>Creating Custom Exception Classes for Handling Failures</h4>
+<div class="paragraph">
+<p>The <code>PaymentProcessingException</code> class represents a recoverable error, which triggers retries when thrown.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.exception;
+
+public class PaymentProcessingException extends Exception {
+   public PaymentProcessingException(String message) {
+       super(message);
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>CriticalPaymentException</code> is considered a non-recoverable failure. If this exception occurs, the retry process is aborted.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.exception;
+
+class CriticalPaymentException extends Exception {
+    public CriticalPaymentException(String message) {
+        super(message);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example, the <code>processPayment</code> method attempts to process a payment. If a transient failure occurs (e.g., <code>PaymentProcessingException</code>), the method retries up to three times (<code>maxRetries = 3</code>), and there is a delay of 2000 milliseconds between retries (<code>delay = 2000</code>), with a random variation of up to 500 milliseconds added to the delay (<code>jitter  = 500</code>) to avoid synchronized retries (e.g. thundering herd problem).
+The retries are attempted only for the exception <code>PaymentProcessingException</code> (<code>retryOn = PaymentProcessingException.class</code>) and are aborted if a <code>CriticalPaymentException</code> is encountered (<code>abortOn = CriticalPaymentException.class</code>).</p>
+</div>
+<div class="paragraph">
+<p>This approach helps maintain application resilience while preventing unnecessary retries that could worsen critical failures.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="understanding-the-retry-parameters"><a class="anchor" href="#understanding-the-retry-parameters"></a>Understanding the <code>@Retry</code> Parameters</h4>
+<div class="paragraph">
+<p>A retry policy specifies the conditions under which an operation should be retried. The key attributes of the <code>@Retry</code> annotation include:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>maxRetries</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the maximum number of retries.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sets the time (in milliseconds) to wait between retry attempts.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>jitter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Adds a random variation (in milliseconds) to the delay to avoid synchronized retries.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>retryOn</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Defines the exception(s) that should trigger a retry. Defaults to all exceptions if not specified.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>abortOn</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the exception(s) that should not trigger a retry, overriding the default retry behavior.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>maxDuration</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Limits the total time (in milliseconds) that retries can be attempted.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="externalizing-configuration-with-microprofile-config"><a class="anchor" href="#externalizing-configuration-with-microprofile-config"></a>Externalizing Configuration with MicroProfile Config</h4>
+<div class="paragraph">
+<p>Retry policies can be externalized using the MicroProfile Config API. This allows you to modify the retry behavior without changing the application code. Here’s how to externalize the configuration:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Add the <code>@Retry</code> annotation with minimal attributes:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.service;
+
+import org.eclipse.microprofile.faulttolerance.Retry;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.MediaType;
+
+public class PaymentService {
+
+    @Retry
+    public Response processPayment(PaymentDetails paymentDetails) throws PaymentProcessingException {
+        System.out.println("Processing payment for amount: " + paymentDetails.getAmount());
+
+        // Simulating a transient failure
+        if (Math.random() &gt; 0.7) {
+            throw new PaymentProcessingException("Temporary payment processing failure");
+        }
+
+        return Response.ok("{\"status\":\"success\"}", MediaType.APPLICATION_JSON).build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Define the retry policy in a configuration file (e.g., microprofile-config.properties):</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">io.microprofile.tutorial.store.payment.service.PaymentService/processPayment/Retry/maxRetries=3
+io.microprofile.tutorial.store.payment.service.PaymentService/processPayment/Retry/delay=2000
+io.microprofile.tutorial.store.payment.service.PaymentService/processPayment/Retry/jitter=500</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this approach, you gain flexibility to adapt retry policies based on the environment, such as increasing retry attempts in production or reducing delays during testing.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="best-practices-for-retry-policies"><a class="anchor" href="#best-practices-for-retry-policies"></a>Best Practices for Retry Policies</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Limit Retries:</strong> Avoid setting <code>maxRetries</code> too high, as excessive retries can overwhelm the system or cause cascading failures.</p>
+</li>
+<li>
+<p><strong>Use Jitter:</strong> Always configure jitter to reduce the risk of synchronized retry attempts by multiple services.</p>
+</li>
+<li>
+<p><strong>Abort Non-Recoverable Errors:</strong> Use the <code>abortOn</code> parameter to exclude critical exceptions that retries cannot resolve.</p>
+</li>
+<li>
+<p><strong>Monitor Metrics:</strong> Integrate with MicroProfile Metrics to track retry patterns and adjust configurations dynamically based on real-world performance.</p>
+</li>
+<li>
+<p><strong>Combine Strategies:</strong> For robust error handling, use retries alongside other fault tolerance mechanisms, such as timeouts and circuit breakers.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="avoiding-and-managing-cascading-failures"><a class="anchor" href="#avoiding-and-managing-cascading-failures"></a>Avoiding and Managing Cascading Failures</h3>
+<div class="paragraph">
+<p>In a distributed microservices architecture, cascading failures occur when the failure of one service propagates to others, potentially causing widespread system outages. Such failures often result from tightly coupled services, unbounded retries, or resource exhaustion.</p>
+</div>
+<div class="sect3">
+<h4 id="causes-of-cascading-failures"><a class="anchor" href="#causes-of-cascading-failures"></a>Causes of Cascading Failures</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Tight Coupling:</strong> Dependencies between services without sufficient isolation mechanisms.</p>
+</li>
+<li>
+<p><strong>Unbounded Retries:</strong> Excessive retries on failing services, overwhelming resources.</p>
+</li>
+<li>
+<p><strong>Resource Contention:</strong> Exhaustion of critical resources such as thread pools, memory, or database connections.</p>
+</li>
+<li>
+<p><strong>Lack of Fail-Safe Mechanisms:</strong> Missing circuit breakers, bulkheads, or fallback logic.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="strategies-to-prevent-cascading-failures"><a class="anchor" href="#strategies-to-prevent-cascading-failures"></a>Strategies to Prevent Cascading Failures</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Use <strong>circuit breakers</strong> to isolate failing services.</p>
+</li>
+<li>
+<p>Apply <strong>bulkheads</strong> to limit the scope of failures and resource usage.</p>
+</li>
+<li>
+<p>Set <strong>timeouts</strong> to prevent long-running operations from blocking resources.</p>
+</li>
+<li>
+<p>Design retries with care to avoid overwhelming the system.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuring-circuit-breaker"><a class="anchor" href="#configuring-circuit-breaker"></a>Configuring Circuit Breaker</h3>
+<div class="paragraph">
+<p>A circuit breaker is a critical fault tolerance mechanism that protects a system from repeated failures of a dependent service. It stops repeated calls to a failing service, allowing it to recover.</p>
+</div>
+<div class="sect3">
+<h4 id="circuit-breaker-parameters"><a class="anchor" href="#circuit-breaker-parameters"></a>Circuit Breaker Parameters</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>failureRatio</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the proportion of failed requests required to open the circuit breaker.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>requestVolumeThreshold</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The minimum number of requests made in a rolling time window before the failure ratio is evaluated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>delay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The time (in milliseconds) the circuit breaker remains open before transitioning to the "half-open" state.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>successThreshold</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of consecutive successful test requests required in the "half-open" state to close the circuit breaker.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>failOn</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the exception(s) considered failures contributing to the failure ratio.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Below is an example of configuring a circuit breaker for a service method using the <code>@CircuitBreaker</code> annotation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@CircuitBreaker(
+    requestVolumeThreshold = 10,
+    failureRatio = 0.5,
+    delay = 5000,
+    successThreshold = 2,
+    failOn = RuntimeException.class
+)
+public String getProduct(Long id) {
+    // Logic to call the product details service
+    if (Math.random() &gt; 0.7) {
+        throw new RuntimeException("Simulated service failure");
+    }
+    return productRepository.findProductById(id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the above code, the circuit breaker opens if 50% of requests fail (<code>failureRatio = 0.5</code>) after at least 10 requests (<code>requestVolumeThreshold = 10</code>). It remains open for 5 seconds (<code>delay = 5000</code>) and transitions to the "half-open" state to test recovery. Two consecutive successful requests (<code>successThreshold = 2</code>) in the "half-open" state close the circuit breaker.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="externalizing-circuit-breaker-configuration"><a class="anchor" href="#externalizing-circuit-breaker-configuration"></a>Externalizing Circuit Breaker Configuration</h4>
+<div class="paragraph">
+<p>Using MicroProfile Config, you can externalize circuit breaker parameters to make them adjustable without code changes as below:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Update the <code>@CircuitBreaker</code> annotation:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@CircuitBreaker (failOn = RuntimeException.class)
+public String getProduct(Long id) {
+    // Logic to call the product details service
+    if (Math.random() &gt; 0.7) {
+        throw new RuntimeException("Simulated service failure");
+    }
+    return productRepository.findProductById(id);
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Define the configuration in <strong>microprofile-config.properties</strong>:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">io.microprofile.tutorial.store.payment.service.ProductService/fetchProductDetails/CircuitBreaker/requestVolumeThreshold=10
+io.microprofile.tutorial.store.payment.service.ProductService/fetchProductDetails/CircuitBreaker/failureRatio=0.5
+io.microprofile.tutorial.store.payment.service.ProductService/fetchProductDetails/CircuitBreaker/delay=5000
+io.microprofile.tutorial.store.payment.service.ProductService/fetchProductDetails/CircuitBreaker/successThreshold=2</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="best-practices-for-circuit-breaker"><a class="anchor" href="#best-practices-for-circuit-breaker"></a>Best Practices for Circuit Breaker</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Set Realistic Failure Ratios and Thresholds:</strong> Tailor parameters to your services' expected load and failure behavior.</p>
+</li>
+<li>
+<p><strong>Monitor Metrics:</strong> Use MicroProfile Metrics to monitor circuit breaker state transitions.</p>
+</li>
+<li>
+<p><strong>Combine with Other Strategies:</strong> Use circuit breakers alongside retries and timeouts for a robust fault tolerance setup.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-asynchronous-annotation"><a class="anchor" href="#using-asynchronous-annotation"></a>Using <code>@Asynchronous</code> Annotation</h3>
+<div class="paragraph">
+<p>The <strong><code>@Asynchronous</code></strong> annotation in MicroProfile Fault Tolerance is used to enable asynchronous execution of methods. It allows operations to run in a separate thread, freeing up the main thread for other tasks. This approach enhances the application&#8217;s responsiveness and scalability, particularly in high-concurrency or latency-sensitive scenarios.</p>
+</div>
+<div class="sect3">
+<h4 id="why-use-asynchronous"><a class="anchor" href="#why-use-asynchronous"></a>Why Use <code>@Asynchronous</code>?</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Improved Responsiveness</strong>: The caller does not need to wait for the method execution to complete, allowing the application to remain interactive.</p>
+</li>
+<li>
+<p><strong>Non-Blocking Execution</strong>: Long-running operations are offloaded to a separate thread, preventing bottlenecks.</p>
+</li>
+<li>
+<p><strong>Scalability</strong>: By decoupling method execution from the calling thread, you can handle higher loads without increasing thread contention.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="implementation"><a class="anchor" href="#implementation"></a>Implementation</h4>
+<div class="paragraph">
+<p>Below is an example of using the <strong><code>@Asynchronous</code></strong> annotation with MicroProfile Fault Tolerance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.service;
+
+import org.eclipse.microprofile.faulttolerance.Bulkhead;
+import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.faulttolerance.Asynchronous;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+
+@ApplicationScoped
+public class PaymentService {
+
+    private static final int SIMULATED_DELAY_MS = 2000;
+
+    /**
+     * Processes payments asynchronously
+     *
+     * @return A CompletionStage with the result of the operation.
+     */
+    @Asynchronous
+    public CompletionStage&lt;String&gt; processPayment() {
+        simulateDelay();
+        return CompletableFuture.completedFuture("Payment processed asynchronously.");
+    }
+
+    /**
+     * Simulates a delay in processing
+     */
+    private void simulateDelay() {
+        try {
+            Thread.sleep(SIMULATED_DELAY_MS); // Simulating delay
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Error during simulated delay", e);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="externalizing-timeout-configuration"><a class="anchor" href="#externalizing-timeout-configuration"></a>Externalizing Timeout Configuration</h4>
+<div class="paragraph">
+<p>Timeout values can be externalized using the MicroProfile Config API, allowing flexibility to adjust values without modifying code. Here’s how:
+* Define the @Timeout annotation without specifying the value:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Timeout
+public String fetchData() {
+    // Logic
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Configure the timeout in <strong>microprofile-config.properties</strong>:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">io.microprofile.tutorial.store.payment.service.ProductService/fetchData/Timeout/value=1500</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="best-practices-for-using-asynchronous"><a class="anchor" href="#best-practices-for-using-asynchronous"></a>Best Practices for Using @Asynchronous</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Use <code>CompletableStage</code> or <code>Future</code></strong>: Return types like <code>CompletableStage</code> allow asynchronous methods to integrate seamlessly with other asynchronous workflows.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="asynchronous-execution-in-fault-tolerance-strategies"><a class="anchor" href="#asynchronous-execution-in-fault-tolerance-strategies"></a>Asynchronous Execution in Fault Tolerance Strategies</h4>
+<div class="paragraph">
+<p>When used with other fault tolerance strategies, <strong><code>@Asynchronous</code></strong> provides a powerful mechanism to handle faults without impacting the system&#8217;s responsiveness:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Asynchronous with Bulkhead</strong>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Isolates resources while maintaining non-blocking execution.</p>
+</li>
+<li>
+<p>Handles concurrent requests efficiently using thread pools.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Asynchronous with Circuit Breaker</strong>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Prevents system overload during failures by breaking the circuit for failing asynchronous methods.</p>
+</li>
+<li>
+<p>The circuit breaker&#8217;s delay allows recovery while new threads are available for other tasks.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="setting-timeouts"><a class="anchor" href="#setting-timeouts"></a>Setting Timeouts</h3>
+<div class="paragraph">
+<p>Timeouts are an essential fault tolerance strategy to prevent long-running operations from consuming resources indefinitely. Slow or unresponsive services can degrade overall system performance and reliability in a microservices architecture. The <code>@Timeout</code> annotation provided by MicroProfile Fault Tolerance allows you to define a maximum duration for a method to complete, ensuring that system resources remain available for other tasks.</p>
+</div>
+<div class="sect3">
+<h4 id="why-use-timeouts"><a class="anchor" href="#why-use-timeouts"></a>Why Use Timeouts?</h4>
+<div class="paragraph">
+<p>In distributed systems, slow responses from downstream services can cascade through the system, leading to resource contention and degraded performance. Timeouts allow you to:
+- Abort operations that exceed acceptable time limits.
+- Free system resources for other operations.
+- Trigger alternative strategies, such as fallbacks, to maintain functionality.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.service;
+
+import io.microprofile.tutorial.store.payment.entity.PaymentDetails;
+import io.microprofile.tutorial.store.payment.exception.PaymentProcessingException;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
+
+import org.eclipse.microprofile.faulttolerance.Asynchronous;
+import org.eclipse.microprofile.faulttolerance.Timeout;
+
+@ApplicationScoped
+public class PaymentService {
+
+    private static final int TIMEOUT_MS = 1000;
+    private static final double FAILURE_THRESHOLD = 0.7;
+
+    @Inject
+    private Logger logger;
+
+    /**
+     * Processes payments asynchronously with a timeout.
+     *
+     * @param paymentDetails the payment details
+     * @return a CompletionStage with the result of the operation
+     */
+    @Asynchronous
+    @Timeout(TIMEOUT_MS)
+    public CompletionStage&lt;String&gt; processPayment(PaymentDetails paymentDetails) {
+        return CompletableFuture.supplyAsync(() -&gt; {
+            simulateDelay();
+            logger.info("Processing payment for amount: " + paymentDetails.getAmount());
+
+            if (Math.random() &gt; FAILURE_THRESHOLD) {
+                throw new PaymentProcessingException("Temporary payment processing failure");
+            }
+
+            return "{\"status\":\"success\", \"message\":\"Payment processed successfully.\"}";
+        }).exceptionally(ex -&gt; {
+            logger.warning("Payment processing failed: " + ex.getMessage());
+            return "{\"status\":\"failure\", \"message\":\"Payment failed due to a temporary issue.\"}";
+        });
+    }
+
+    /**
+     * Simulates a delay in processing.
+     */
+    private void simulateDelay() {
+        try {
+            Thread.sleep(2000); // Simulating delay
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.severe("Error during simulated delay: " + e.getMessage());
+            throw new RuntimeException("Error during simulated delay", e);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example, the <code>@Timeout(1000)</code> annotation specifies that the <code>processPayment</code> method must complete within 1000 milliseconds (1 second). If the execution exceeds this time, a <code>TimeoutException</code> will be thrown, and the process will terminate. <code>@Asynchronous</code> ensures non-blocking execution by making the method run in a separate thread. To explore the benefits of asynchronous programming with MicroProfile Fault Tolerance, the following resources provide valuable insights and real-world examples:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://openliberty.io/blog/2020/06/04/asynchronous-programming-microprofile-fault-tolerance.html">Asynchronous Programming with MicroProfile Fault Tolerance (Part 1)</a></p>
+</li>
+<li>
+<p><a href="https://openliberty.io/blog/2020/06/05/asynchronous-programming-microprofile-fault-tolerance-part-2.html">Asynchronous Programming with MicroProfile Fault Tolerance (Part 2)</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These articles explain how asynchronous execution enhances system responsiveness, reduces blocking, and ensures better resource utilization in MicroProfile applications.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="best-practices-for-timeouts"><a class="anchor" href="#best-practices-for-timeouts"></a>Best Practices for Timeouts</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Align Timeouts with SLAs:</strong> Ensure timeout values align with service-level agreements and user expectations.</p>
+</li>
+<li>
+<p><strong>Monitor Performance:</strong> Use MicroProfile Metrics to monitor execution times and identify operations requiring optimized timeout values.</p>
+</li>
+<li>
+<p><strong>Combine with Fallbacks:</strong> Always pair timeouts with fallback logic to provide a reliable response in case of delays.</p>
+</li>
+<li>
+<p><strong>Avoid Overly Short Timeouts:</strong> Overly aggressive timeout settings may cause unnecessary failures, particularly in high-latency environments.</p>
+</li>
+<li>
+<p><strong>Combine Timeout with Asynchronous:</strong> Use timeout together with asynchronous to improve responsiveness and prevent blocking the calling thread. This approach ensures better resource utilization and system scalability during long-running operations.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="implementing-fallbacks"><a class="anchor" href="#implementing-fallbacks"></a>Implementing Fallbacks</h3>
+<div class="paragraph">
+<p>Fallbacks provide a default response when an operation fails. They ensure the system continues to function, even if the primary operation cannot complete successfully. The <code>@Fallback</code> annotation in MicroProfile Fault Tolerance allows developers to define fallback logic for a method, ensuring graceful degradation.</p>
+</div>
+<div class="sect3">
+<h4 id="why-use-fallbacks"><a class="anchor" href="#why-use-fallbacks"></a>Why Use Fallbacks?</h4>
+<div class="paragraph">
+<p>Fallbacks help to:
+- Maintain system availability during failures.
+- Provide a meaningful response to users instead of complete failure.
+- Improve user experience by minimizing disruptions.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.faulttolerance.Fallback;
+import jakarta.ws.rs.core.Response;
+
+public class PaymentService {
+
+    @Fallback(fallbackMethod = "fallbackProcessPayment")
+    public Response processPayment(PaymentDetails paymentDetails) {
+        // Simulate a failure
+        throw new RuntimeException("Service Unavailable");
+    }
+
+    public Response fallbackProcessPayment(PaymentDetails paymentDetails) {
+        return Response.ok("{\"status\":\"failed\", \"message\":\"Payment service is currently unavailable.\"}").build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example:
+- The <code>@Fallback</code> annotation specifies that if the <code>processPayment</code> method fails, the <code>fallbackProcessPayment</code> method will be executed.
+- The fallback method provides a meaningful response, ensuring the user is informed of the service unavailability.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-fallback-handlers"><a class="anchor" href="#using-fallback-handlers"></a>Using Fallback Handlers</h4>
+<div class="paragraph">
+<p>A fallback handler class can implement the <code>FallbackHandler&lt;T&gt;</code> interface, allowing for reusable fallback logic across multiple methods.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.FallbackHandler;
+import org.eclipse.microprofile.faulttolerance.ExecutionContext;
+
+
+public class ProductService {
+
+    @Fallback(FallbackHandlerImpl.class)
+    public Product getProduct(Long id) {
+        // Logic to call the product details service
+        if (Math.random() &gt; 0.7) {
+            throw new RuntimeException("Simulated service failure");
+        }
+
+        return productRepository.findProductById(id);
+    }
+}
+
+public class FallbackHandlerImpl implements FallbackHandler&lt;String&gt; {
+    @Override
+    public String handle(ExecutionContext context) {
+        return "Fallback response for product details.";
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="combining-fallbacks-with-other-fault-tolerance-strategies"><a class="anchor" href="#combining-fallbacks-with-other-fault-tolerance-strategies"></a>Combining Fallbacks with Other Fault Tolerance Strategies</h4>
+<div class="paragraph">
+<p>Fallback logic can be combined with other fault tolerance mechanisms to create a robust strategy:
+- <strong>Timeout with Fallback:</strong> Ensure operations terminate within a specific time and provide a fallback if they fail.</p>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Timeout;
+
+import jakarta.enterprise.context.RequestScoped;
+
+import io.microprofile.tutorial.store.product.cache.ProductCache;
+import io.microprofile.tutorial.store.product.entity.Product;
+
+@RequestScoped
+public class ProductService {
+
+    @Inject
+    private ProductRepository productRepository; // Access to the database
+
+    @Inject
+    private ProductCache productCache; // Cache mechanism
+
+    /**
+     * Retrieves a list of products. If the operation takes longer than 2 seconds,
+     * fallback to cached data.
+     */
+    @Timeout(2000) // Set timeout to 2 seconds
+    @Fallback(fallbackMethod = "getProductsFromCache") // Fallback method
+    public List&lt;Product&gt; getProducts() {
+        if (Math.random() &gt; 0.7) {
+            throw new RuntimeException("Simulated service failure");
+        }
+        // database call
+        return productRepository.findAllProducts();
+    }
+
+    /**
+     * Fallback method to retrieve products from the cache.
+     */
+    public List&lt;Product&gt; getProductsFromCache() {
+        System.out.println("Fetching products from cache...");
+        return productCache.getAll().stream()
+                .map(obj -&gt; (Product) obj)
+                .collect(Collectors.toList());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This example demonstrates the use of MicroProfile Fault Tolerance annotations <code>@Timeout</code> and <code>@Fallback</code> to enhance the resilience of the <code>ProductService</code>. When <code>getProducts()</code> method is invoked, the application tries to retrieve product data from the database using <code>productRepository.findAllProducts()</code>. The <code>@Timeout(2000)</code> annotation ensures that this operation completes within 2 seconds. If the query executes successfully within this time, the method returns the product list as expected. However, if the execution time exceeds the timeout limit, a <code>TimeoutException</code> is triggered. Additionally, if an exception occurs within the time limit, the method also fails. To handle such failures gracefully, the <code>@Fallback</code> annotation specifies <code>getProductsFromCache()</code> as an alternative method. When a timeout or exception occurs, the fallback method is invoked, fetching product data from the cache instead of the database. This approach guarantees service availability and ensures a seamless user experience, even in scenarios where the database is slow or temporarily unavailable. For improved scalability and performance, <code>@Asynchronous</code> can be combined with <code>@Timeout</code> and <code>@Fallback</code>. This allows the method to execute in a non-blocking manner, freeing up system resources and enabling parallel processing of multiple requests. By utilizing asynchronous execution, the application can handle high loads efficiently while maintaining fault tolerance.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="externalizing-timeout-configuration-using-microprofile-config"><a class="anchor" href="#externalizing-timeout-configuration-using-microprofile-config"></a>Externalizing <code>@Timeout</code> Configuration using MicroProfile Config</h4>
+<div class="paragraph">
+<p>To externalize the @Timeout configuration using MicroProfile Config, you can replace the hardcoded timeout value with a configurable property. This allows us to modify the timeout dynamically without changing the source code.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Define a Configurable Property: Use <code>@ConfigProperty</code> to inject the timeout value.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// ...
+@RequestScoped
+public class ProductService {
+
+    @Inject
+    private ProductRepository productRepository; // Access to the database
+
+    @Inject
+    private ProductCache productCache; // Cache mechanism
+
+    // Inject the timeout value from MicroProfile Config
+    @Inject
+    @ConfigProperty(name = "product.service.timeout", defaultValue = "2000")
+    private long timeoutValue;
+
+    // ...</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Use the Configured Value in @Timeout Annotation: Define a getter method and using it in the annotation.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    ...
+    /**
+     * Provide the timeout value dynamically using a method reference.
+     */
+    @Timeout(value = getTimeout()) // Use method reference to fetch dynamic value
+    public long getTimeout() {
+        return timeoutValue;
+    }</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Define the Configuration Property: Configure the timeout in <strong>microprofile-config.properties</strong>:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">io.microprofile.tutorial.store.product.service.ProductService.timeout=3000</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This sets the timeout to 3000 milliseconds (3 seconds) instead of the default 2000 making your application more configurable and adaptable without code changes.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="best-practices-for-fallbacks"><a class="anchor" href="#best-practices-for-fallbacks"></a>Best Practices for Fallbacks</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Keep Fallbacks Lightweight:</strong> Ensure fallback logic is simple and reliable, avoiding dependencies on other potentially failing services.</p>
+</li>
+<li>
+<p><strong>Provide Meaningful Responses:</strong> The fallback response should maintain a reasonable user experience, even if it cannot replicate full functionality.</p>
+</li>
+<li>
+<p><strong>Monitor Fallback Usage:</strong> Use metrics to track the frequency of fallback execution, which can indicate service health and the need for improvements.</p>
+</li>
+<li>
+<p><strong>Plan for Degraded Functionality:</strong> Ensure the fallback behavior aligns with business priorities and provides the most critical features.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="combining-fault-tolerance-strategies"><a class="anchor" href="#combining-fault-tolerance-strategies"></a>Combining Fault Tolerance Strategies</h3>
+<div class="paragraph">
+<p>Combining fault tolerance strategies, such as <code>@Timeout</code>, <code>@Fallback</code>, <code>@CircuitBreaker</code>, and <code>@Retry</code>, ensures resilience and efficient resource usage. Externalize configurations with MicroProfile Config for flexibility across environments.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="isolating-resources-for-fault-tolerance"><a class="anchor" href="#isolating-resources-for-fault-tolerance"></a>Isolating Resources for Fault Tolerance</h3>
+<div class="paragraph">
+<p>Resource isolation is a key principle in building resilient microservices. By isolating resources, you prevent failures in one part of the system from spreading and affecting others. MicroProfile Fault Tolerance provides features like bulkheads to achieve resource isolation and ensure critical components remain functional, even when others fail.</p>
+</div>
+<div class="sect3">
+<h4 id="why-resource-isolation-matters"><a class="anchor" href="#why-resource-isolation-matters"></a>Why Resource Isolation Matters</h4>
+<div class="paragraph">
+<p>In a distributed system, shared resources like thread pools, database connections, and network bandwidth can quickly become bottlenecks if not adequately managed. Resource isolation ensures:
+- Failures in one service do not deplete resources for other services.
+- Critical operations remain functional even under load or failure conditions.
+- Better predictability and control over system behavior.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-bulkheads-to-isolate-resources"><a class="anchor" href="#using-bulkheads-to-isolate-resources"></a>Using Bulkheads to Isolate Resources</h4>
+<div class="paragraph">
+<p>Bulkheads are a common pattern for isolating resources by dividing a system into separate pools or partitions. This ensures that a failure in one area does not impact others. The MicroProfile Fault Tolerance standard provides the <code>@Bulkhead</code> annotation to implement this pattern.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="bulkhead-types"><a class="anchor" href="#bulkhead-types"></a>Bulkhead Types</h4>
+<div class="paragraph">
+<p>MicroProfile supports two types of bulkheads:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Semaphore-Style Bulkhead:</strong> Limits the number of concurrent requests.</p>
+</li>
+<li>
+<p><strong>Thread Pool-Style Bulkhead:</strong> Runs a maximum number of requests on a thread pool to isolate operations.</p>
+</li>
+</ul>
+</div>
+<div class="sect4">
+<h5 id="semaphore-style-bulkhead"><a class="anchor" href="#semaphore-style-bulkhead"></a>Semaphore-Style Bulkhead</h5>
+<div class="paragraph">
+<p>The semaphore-style bulkhead pattern limits the number of concurrent requests that can be processed by a service or method at any given time. Any additional requests are immediately rejected when the specified concurrency limit is reached. This approach prevents resource contention and protects the system from being overwhelmed during high traffic or failure scenarios.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.service;
+
+import org.eclipse.microprofile.faulttolerance.Bulkhead;
+import org.eclipse.microprofile.faulttolerance.Asynchronous;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.logging.Logger;
+
+@ApplicationScoped
+public class PaymentService {
+
+    @Inject
+    private Logger logger;
+
+    @Inject
+    @ConfigProperty(name = "payment.simulatedDelay", defaultValue = "1000")
+    private int simulatedDelay;
+
+    @Inject
+    @ConfigProperty(name = "payment.bulkhead.value", defaultValue = "5")
+    private int bulkheadValue;
+
+    /**
+     * Processes payment transactions with limited concurrency to prevent
+     * system overload and ensure stability during high traffic.
+     *
+     * The @Bulkhead annotation ensures that only a limited number of
+     * concurrent requests can access this method.
+     * The @Asynchronous annotation enables the use of the thread pool
+     * style bulkhead for non-blocking execution.
+     *
+     * @return A success message indicating the processing status.
+     */
+    @Asynchronous
+    @Bulkhead(value = bulkheadValue)
+    public CompletionStage&lt;String&gt; processPayment() {
+        logger.info("Starting payment processing...");
+        simulateDelay();
+        logger.info("Payment processing completed.");
+        return CompletableFuture.completedFuture("Payment processed asynchronously.");
+    }
+
+    /**
+     * Simulates a delay in processing.
+     */
+    private void simulateDelay() {
+        try {
+            Thread.sleep(simulatedDelay); // Simulating delay
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.severe("Error during simulated delay: " + e.getMessage());
+            throw new RuntimeException("Error during simulated delay", e);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example:
+- The method allows up to 5 concurrent invocations (<code>value = 5</code>).
+- Any additional requests are rejected to prevent overload, ensuring system stability.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="thread-pool-style-bulkhead"><a class="anchor" href="#thread-pool-style-bulkhead"></a>Thread Pool-Style Bulkhead</h5>
+<div class="paragraph">
+<p>The thread-pool-style bulkhead pattern leverages a thread pool to achieve resource isolation. Incoming requests are placed into a queue when the maximum allowed number of threads are in use. Queued requests are executed as threads become available. This design helps manage resource contention effectively.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.service;
+
+import org.eclipse.microprofile.faulttolerance.Bulkhead;
+import jakarta.enterprise.context.ApplicationScoped;
+
+import org.eclipse.microprofile.faulttolerance.Asynchronous;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+
+@ApplicationScoped
+public class PaymentService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
+
+    /**
+     * Processes payment transactions with limited concurrency using a thread pool
+     * to prevent system overload and ensure stability during high traffic.
+     *
+     * The @Bulkhead annotation ensures that only a limited number of concurrent
+     * requests (5 in this case) can access this method, and the @Asynchronous
+     * annotation allows the use of the thread pool style bulkhead.
+     */
+    @Bulkhead(value = 5, waitingTaskQueue = 10)
+    @Asynchronous
+    public CompletionStage&lt;Void&gt; processPayment() {
+        return CompletableFuture.runAsync(() -&gt; {
+            simulateDelay();
+            System.out.println("Payment processed with limited concurrency.");
+        }).thenRun(() -&gt; logger.info("Payment processed with limited concurrency."));
+    }
+
+    private void simulateDelay() {
+        try {
+            Thread.sleep(1000); // Simulating a delay
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Error during payment processing simulation", e);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example, The method uses up to 5 concurrent threads (<code>value = 5</code>) from a thread pool and a queue of up to 10 tasks (<code>waitingTaskQueue = 10</code>).This configuration prevents failures in one operation from depleting shared resources.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="externalizing-bulkhead-configuration"><a class="anchor" href="#externalizing-bulkhead-configuration"></a>Externalizing Bulkhead Configuration</h4>
+<div class="paragraph">
+<p>Bulkhead resource limits can be externalized using MicroProfile Config to allow runtime adjustments. For example:</p>
+</div>
+<div class="paragraph">
+<p>Annotate the method without specific values:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @Asynchronous
+    @Bulkhead
+    public CompletionStage&lt;String&gt; processPayment() {
+    logger.info("Starting payment processing...");
+    simulatePaymentProcessing();
+    logger.info("Payment processing completed.");
+    return CompletableFuture.completedFuture("Payment processed successfully with an isolated thread pool.");
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Define bulkhead parameters in <code>microprofile-config.properties</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">com.example.Service/dynamicBulkheadOperation/Bulkhead/value=5
+com.example.Service/dynamicBulkheadOperation/Bulkhead/waitingTaskQueue=10</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="best-practices-for-resource-isolation"><a class="anchor" href="#best-practices-for-resource-isolation"></a>Best Practices for Resource Isolation</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Isolate Critical Resources:</strong> Use bulkheads for high-priority operations, such as authentication, to ensure they are not impacted by failures elsewhere.</p>
+</li>
+<li>
+<p><strong>Monitor Usage:</strong> Track bulkhead metrics using MicroProfile Metrics to identify bottlenecks and adjust limits.</p>
+</li>
+<li>
+<p><strong>Plan for Scaling:</strong> Test bulkhead configurations under various load conditions to ensure scalability.</p>
+</li>
+<li>
+<p><strong>Combine with Graceful Degradation:</strong> Pair bulkheads with fallbacks to handle rejected requests gracefully.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>By effectively isolating resources, you can ensure that your microservices remain reliable and resilient, even in the face of unexpected failures or high demand. This approach not only protects critical operations but also improves overall system stability.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary"><a class="anchor" href="#summary"></a>Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This chapter explored the MicroProfile Fault Tolerance API and essential fault tolerance strategies:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Retries:</strong> Automatically reattempt failed operations for transient errors.</p>
+</li>
+<li>
+<p><strong>Timeouts:</strong> Define maximum execution times for operations to avoid resource blocking.</p>
+</li>
+<li>
+<p><strong>Circuit Breakers:</strong> Prevent repeated calls to failing services and allow graceful recovery.</p>
+</li>
+<li>
+<p><strong>Bulkheads:</strong> Limit concurrent operations and isolate resource usage.</p>
+</li>
+<li>
+<p><strong>Fallbacks:</strong> Provide meaningful responses during failures.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>By leveraging these strategies and combining them effectively, you can design resilient microservices that gracefully handle failures, minimize disruptions, and ensure a seamless user experience.</p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="../chapter07/chapter07.html">MicroProfile Metrics</a></span>
+  <span class="next"><a href="../chapter09/index.html">MicroProfile Telemetry</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
+  </body>
+</html>

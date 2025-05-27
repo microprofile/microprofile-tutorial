@@ -1,0 +1,23 @@
+[glossary]
+== Glossary
+
+Java Development Kit (JDK):: 
+A software development environment used for developing Java applications. It includes the Java Runtime Environment (JRE), an interpreter/loader (Java), a compiler (javac), an archiver (jar), a documentation generator (Javadoc), and other tools needed in Java development.
+
+Integrated Development Environment (IDE):: 
+A software application that provides comprehensive facilities to computer programmers for software development. Examples include Eclipse, IntelliJ IDEA, NetBeans, and Visual Studio Code.
+
+RESTful Service:: 
+A web service implementing REST (Representational State Transfer) principles, providing interoperability between computer systems on the internet.
+
+Runtime Environment:: 
+The environment in which programs are executed. It includes everything your application needs to run in production, such as an operating system, a runtime (like JVM for Java applications), libraries, and environment variables.
+
+JUnit:: 
+A unit testing framework for Java, used to write and run repeatable tests.
+
+Containerization:: 
+A lightweight alternative to full machine virtualization that involves encapsulating an application in a container with its own operating environment.
+
+Cloud Deployment:: 
+Deploying applications in cloud environments, leveraging cloud resources like compute instances, storage, and networking capabilities.

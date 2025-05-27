@@ -1,0 +1,157 @@
+== Creating a Java Project for MicroProfile Development
+
+=== Using Your IDE
+
+Most modern IDEs have built-in support for creating Java and Maven projects. Depending on your chosen IDE, look for options like "New Project", or "New Maven Project" to get started. These options typically guide you through the setup process, including specifying the project's `groupId`, `artifactId`, and dependencies.
+
+=== Using Maven from Command Line (Terminal)
+
+For developers who prefer using the command line or for those setting up projects in environments without an IDE, Maven can generate the base structure of a Java project through its archetype mechanism.
+
+To create a project using Maven, open your terminal or command line and run the following command: 
+
+[source, bash]
+----
+mvn archetype:generate -DgroupId=io.microprofile.tutorial -DartifactId=store 
+-DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+----
+
+The above command creates a new Maven project based on the `maven-archetype-quickstart archetype`, setting the `groupId` as `io.microprofile.tutorial` and the `artifactID` as `store`. 
+
+Explanation:
+
+* `mvn archetype:generate` goal in this command initializes the project creation process and instructs Maven to generate a new project based on an archetype template.
+
+* `-DgroupId=io.microprofile.tutorial` Specifies the groupId for the project. The groupId is a unique identifier for your project and is usually based on the domain name of your organization in reverse. In this case, io.microprofile.tutorial represent a project related to MicroProfile tutorial.
+
+* `-DartifactId=store`: Sets the `artifactId` for the project. The `artifactId` is the name of the project and is used as the base name for the project's artifacts (e.g., WAR files). Here, `store` is used as the project name to indicate this project is related an e-commerce store application.
+
+* `-DarchetypeArtifactId=maven-archetype-quickstart`: Indicates which archetype to use for generating the project. The maven-archetype-quickstart is a basic template for a Java application, providing a simple project structure that includes a sample application (App.java) and a unit test (AppTest.java).
+
+* `-DinteractiveMode=false`: This option disables interactive mode, meaning Maven will not prompt you for input during the project generation process. All necessary information is provided via the command-line options, allowing the command to execute without further user interaction.
+
+Next, using your file explorer or command line, create the following folder structure: 
+
+[source, plain text]
+----
+.
+├── pom.xml
+├── README.adoc
+└── src
+    └── main
+    │   └── java
+    │       └── io
+    │           └── microprofile
+    │               └── tutorial
+    │                  └── store
+    │                      └── product
+    │                      │    ├── entity
+    │                      │    │   └── Product.java
+    │	                   │    └── resource
+    │                      │       └── ProductResource.java
+    │                      └── ProductRestApplication.java
+    └── test
+	└── java
+            └── io
+                └── microprofile
+                    └── tutorial
+                       └── store
+			   └── product
+                               └── ProductServiceTest.java
+----
+
+The standard location for your Java source code is this folder:
+----
+src/main/java
+----
+
+And, the standard location for your test code is this folder:
+----
+src/test/java
+----
+
+
+You can delete `App.java` and `AppTest.java` files from the poject as these are not required in MicroProfile development. 
+
+The heart of your Maven project is `pom.xml` (Project Object Model) file. It defines project metadata, dependencies, build configurations and plugins.
+
+The content for the _pom.xml_ file should look as below, ensure MicroProfile depencency is added: 
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>io.microprofile.tutorial</groupId>
+  <artifactId>mp-ecomm</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+
+  <!-- Setting the source and target of the Java Compiler !>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    
+    <!-- Setting the source and target of the Java Compiler -->
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+...
+...
+   <!-- Add Lombok dependency -->
+   <dependency>
+     <groupId>org.projectlombok</groupId>
+     <artifactId>lombok</artifactId>
+     <version>1.18.26</version>
+     <scope>provided</scope>
+   </dependency>
+
+   <!-- Adding Jakarta EE dependencies -->
+   <dependency>
+     <groupId>jakarta.platform</groupId>
+     <artifactId>jakarta.jakartaee-api</artifactId>
+     <version>10.0.0</version>
+     <scope>provided</scope>
+   </dependency>
+
+   <!-- Adding MicroProfie dependency -->
+   <dependency>
+     <groupId>org.eclipse.microprofile</groupId>
+     <artifactId>microprofile</artifactId>
+     <version>6.1</version>
+     <type>pom</type>
+     <scope>provided</scope>
+   </dependency>
+
+   <!-- JUnit Jupiter API for writing tests -->
+   <dependency>
+       <groupId>org.junit.jupiter</groupId>
+       <artifactId>junit-jupiter-api</artifactId>
+       <version>5.8.2</version>
+       <scope>test</scope>
+   </dependency>
+  
+   <!-- JUnit Jupiter Engine for running tests -->
+   <dependency>
+       <groupId>org.junit.jupiter</groupId>
+       <artifactId>junit-jupiter-engine</artifactId>
+       <version>5.8.2</version>
+       <scope>test</scope>
+   </dependency>
+...
+
+----
+
+Below is the list of essential dependencies you need to add to your Maven _pom.xml_ for a MicroProfile project: 
+
+* *Lombok Dependency* - Simplifies your model by auto-generating getters, setters, constructors, and other boilerplate code.
+* *Jakarta EE API Dependency* - Provides the APIs for Jakarta EE, which are often used alongside MicroProfile for enterprise Java applications.
+* *MicroProfile Dependency* - This is the core MicroProfile dependency that allows you to use MicroProfile specifications in your project.
+* *JUnit Jupiter API for Writing Tests* - Essential for writing unit tests for your MicroProfile services.
+* *JUnit Jupiter Engine for Running Tests* - Enables the execution of JUnit tests.
+
+These dependencies provide a foundation for building MicroProfile applications, including aspects like model simplification with Lombok, the application of Jakarta EE APIs for building robust enterprise applications, and testing with JUnit. Remember to adjust the versions based on your project requirements and the compatibility with your MicroProfile runtime​​.
+
+TIP: Execute the `$ mvn validate` command. This checks the _pom.xml_ file for correctness, ensuring that all necessary configuration is present and valid. 

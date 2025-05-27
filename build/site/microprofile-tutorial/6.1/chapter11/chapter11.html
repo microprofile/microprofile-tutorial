@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MicroProfile Rest Client :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/microprofile-tutorial/6.1/chapter11/chapter11.html">
+    <link rel="prev" href="../chapter10/chapter10.html">
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" /><link rel="icon" href="../../../_/img/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="../../../_/img/favicon.png" type="image/png">
+<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png">
+      <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5WLCZXC');</script>
+    <!-- End Google Tag Manager -->  
+    <script>var uiRootPath = '../../../_'</script>
+    <script>!function (theme) {
+        if (theme === 'dark') document.documentElement.classList.add('theme-dark')
+      }(localStorage && localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)') && 'dark'))
+    </script>
+    <!-- Add Eclipse Foundation cookie consent to site for GA -->
+    <script src="//www.eclipse.org/eclipse.org-common/themes/solstice/public/javascript/vendor/cookieconsent/default.min.js"></script>
+      </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a id="site-title" class="navbar-item" href="https://microprofile.io">MicroProfile Tutorial</a>
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="../../../microprofile-tutorial/6.1/microprofile-tutorial.pdf">Download</a>
+          </span>
+        </div>
+      </div>
+      <div class="navbar-theme-switcher">
+        <span class="switch" title="Switch between Light and Dark Theme">
+          <input id="theme-switcher-checkbox" type="checkbox" />
+          <label for="theme-switcher-checkbox">Dark Theme</label>
+        </span>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="6.1">
+  <div class="toolbar"></div>
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Preface</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter02/chapter02-00.html">Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">MicroProfile JWT</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="chapter11.html">MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">6.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">MicroProfile Tutorial</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">6.1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">MicroProfile Tutorial</a></li>
+    <li><a href="chapter11.html">MicroProfile Rest Client</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/ttelang/microprofile-tutorial/edit/patch-15/modules/ROOT/pages/chapter11/chapter11.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">MicroProfile Rest Client</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In microservices architecture, developers often face the cumbersome task of implementing boilerplate code to consume REST APIs - manually constructing HTTP requests, parsing responses, and handling errors. The MicroProfile Rest Client specification addresses this by leveraging Jakarta RESTful Web Services (formerly JAX-RS) annotations to create type-safe Rest client interfaces. Instead of writing low-level HTTP logic, developers define Java interfaces that mirror the target service’s endpoints. At runtime, MicroProfile Rest Client dynamically generates an implementation of these interfaces, automating HTTP communication while ensuring compile-time consistency between the client and server contracts.</p>
+</div>
+<div class="paragraph">
+<p>This chapter introduces the MicroProfile Rest Client, a type-safe framework for simplifying service-to-service communication. We will begin by defining REST client interfaces using Jakarta RESTful Web Services annotations (<code>@GET</code>, <code>@Path</code>), configuring endpoints via MicroProfile Config, and implementing HTTP invocation. Next, we will explore handling HTTP communication, processing responses, and error handling. By the end of this chapter, you will be able to replace hand-written HTTP boilerplate code with declarative, maintainable clients while adhering to Jakarta EE and MicroProfile standards.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="topics-to-be-covered"><a class="anchor" href="#topics-to-be-covered"></a>Topics to be covered:</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Introduction to MicroProfile Rest Client</p>
+</li>
+<li>
+<p>Setting up Dependencies</p>
+</li>
+<li>
+<p>Defining a Rest Client Interface</p>
+</li>
+<li>
+<p>Parameter Configuration</p>
+</li>
+<li>
+<p>Requests and Response Handling</p>
+</li>
+<li>
+<p>Working with JSON Data formats</p>
+</li>
+<li>
+<p>Error Handling Strategies</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="introduction-to-microprofile-rest-client"><a class="anchor" href="#introduction-to-microprofile-rest-client"></a>Introduction to MicroProfile Rest Client</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The MicroProfile Rest Client specification simplifies RESTful service consumption in Java microservices by replacing error-prone manual HTTP handling with a type-safe, annotation-driven approach. Instead of writing boilerplate code, developers define Java interfaces that mirror the target service’s API. Using Jakarta RESTful Web Services annotations like <code>@GET</code>, and <code>@Path</code>, these interfaces declaratively map methods to HTTP operations (e.g., <code>/users/{id}</code> to <code>getUser(id)</code>). The framework then generates an implementation at runtime, automating communication while ensuring compile-time consistency between client and server contracts. Tight integration with MicroProfile Config and CDI allows seamless configuration and injection, making it ideal for building resilient, maintainable clients that align with modern microservices practices.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="key-features-of-microprofile-rest-client"><a class="anchor" href="#key-features-of-microprofile-rest-client"></a>Key Features of MicroProfile Rest Client</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The MicroProfile Rest Client simplifies consuming RESTful services in Java microservices with the following key features:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Type-Safe and Declarative APIs</strong> - The MicroProfile Rest Client allows developers to define REST clients as Java interfaces using Jakarta RESTful Web Services annotations like <code>@GET</code>, <code>@POST</code>, <code>@PUT</code>, <code>@DELETE</code>, <code>@Path</code>, <code>@Consumes</code> and <code>@Produces</code>. This approach improves code clarity and ensures compile-time validation, reducing the possibility of runtime errors .</p>
+</li>
+<li>
+<p><strong>Integration with CDI (Context and Dependency Injection)</strong> - This specification allows developers to seamlessly inject MicroProfile Rest Client interfaces using <code>@Inject</code> and <code>@RestClient</code> into CDI-managed beans, promoting better dependency management and integration with other components. By leveraging CDI lifecycle management, the MicroProfile Rest Client can benefit from scope management (e.g., <code>@ApplicationScoped</code>), proxying, and automatic initialization.</p>
+</li>
+<li>
+<p><strong>Runtime Configurable with MicroProfile Config</strong> -  The behavior of MicroProfile Rest Client can be dynamically configured using MicroProfile Config. This allows properties like the base URL and other client settings to be adjusted without recompilation. The configuration can be provided through <em>microprofile-config.properties</em> or environment variables, making the client highly adaptable to different environments.</p>
+</li>
+<li>
+<p><strong>Support for Asynchronous Execution</strong> - For asynchronous execution, MicroProfile Rest Client can return <code>CompletionStage&lt;T&gt;</code>, allowing non-blocking requests. This significantly  improves performance &amp; scalability in high-concurrency environments.</p>
+</li>
+<li>
+<p><strong>Automatic Handling of Redirect Responses</strong> -  MicroProfile Rest Client can automatically follow HTTP redirects, simplifying client implementation when working with services that return <code>3xx</code> responses.</p>
+</li>
+<li>
+<p><strong>Secure Socket Layer (SSL) and Security Configuration</strong> - Supports SSL/TLS configuration, including certificates and trust stores, ensuring secure communication between microservices.</p>
+</li>
+<li>
+<p><strong>Propagation of Headers and Cookies</strong> - Enables automatic propagation of HTTP headers, cookies and context (e.g., authentication tokens), facilitating session management across service calls.</p>
+</li>
+<li>
+<p><strong>Exception Handling and Custom Providers</strong> - Allows custom exception mapping and response handling, giving developers control over error response based on specific conditions, improving fault tolerance and user experience.</p>
+</li>
+<li>
+<p><strong>Integration with MicroProfile Fault Tolerance</strong> - This specification Supports resilience patterns like retries (<code>@Retry</code>), circuit breakers (<code>@CircuitBreaker</code>), and Bulkheads (<code>@Bulkhead</code>), ensuring stability in service-to-service communications.</p>
+</li>
+<li>
+<p><strong>Integration with MicroProfile Long Running Actions (LRA)</strong> -  MicroProfile Rest Client can coordinate distributed transactions using LRA annotations (e.g., <code>@LRA</code>), enabling compensation logic for long-running processes. This ensures consistency across services in complex workflows.</p>
+</li>
+<li>
+<p><strong>Portability and Standards Compliance</strong>: This specification enables MicroProfile Rest Client to work across different MicroProfile-compatible runtimes,  leveraging Jakarta EE standards (CDI, Jakarta RESTful Web Services, JSON Binding, JSON Processing).</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setting-up-dependency-for-microprofile-rest-client"><a class="anchor" href="#setting-up-dependency-for-microprofile-rest-client"></a>Setting up Dependency for MicroProfile Rest Client</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To use MicroProfile Rest Client 3.1 in your project, you need to include the necessary dependencies in your build configuration. Below are configurations for Maven and Gradle:</p>
+</div>
+<div class="sect2">
+<h3 id="maven-configuration"><a class="anchor" href="#maven-configuration"></a>Maven Configuration</h3>
+<div class="paragraph">
+<p>For Maven-based projects, add the following dependency to your pom.xml file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.eclipse.microprofile.rest.client&lt;/groupId&gt;
+    &lt;artifactId&gt;microprofile-rest-client-api&lt;/artifactId&gt;
+    &lt;version&gt;3.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="gradle-configuration"><a class="anchor" href="#gradle-configuration"></a>Gradle Configuration</h3>
+<div class="paragraph">
+<p>For Gradle-based projects, add the following dependency to your build.gradle file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">dependencies {
+    Implementation 'org.eclipse.microprofile.rest.client:microprofile-rest-client-api:3.1'
+    compileOnly 'org.eclipse.microprofile:microprofile:6.1'
+}</code></pre>
+</div>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Tip: The MicroProfile Rest Client is an Eclipse Foundation project. For more details and updates on the project, visit the official repository: MicroProfile Rest Client on GitHub.</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-microprofile-rest-client-interface"><a class="anchor" href="#creating-microprofile-rest-client-interface"></a>Creating MicroProfile Rest Client Interface</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To create a MicroProfile Rest Client interface, you need to define a Java interface and annotate it with annotations to map it to a RESTful service.</p>
+</div>
+<div class="sect2">
+<h3 id="the-registerrestclient-annotation"><a class="anchor" href="#the-registerrestclient-annotation"></a>The <code>@RegisterRestClient</code> Annotation</h3>
+<div class="paragraph">
+<p>To use the MicroProfile Rest Client, annotate your client interface with <code>@RegisterRestClient</code>. This annotation registers the interface as a Rest client within MicroProfile runtime and enables it as a CDI bean, allowing it to be injected into other components.</p>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.inventory.client;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+
+import io.microprofile.tutorial.inventory.dto.Product;
+
+@RegisterRestClient(configKey = "product-service")
+@Path("/products")
+public interface ProductServiceClient {
+
+    @GET
+    @Path("/{id}")
+    Product getProductById(@PathParam("id") Long id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:
+In the above code, we define a <code>ProductServiceClient</code> within the package <code>io.microprofile.tutorial.inventory.client</code>. The interface serves as a Rest client for interaction with a remote product service.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>@RegisterRestClient</code> - declares the <code>ProductServiceClient</code> interface as a MicroProfile Rest Client, enabling it to be injected into other CDI-managed components.</p>
+</li>
+<li>
+<p><code>configKey = "product-service"</code> - associates the client with a configuration key, allowing dynamic configuration via MicroProfile Config (e.g., using <em>microprofile-config.properties</em> or environment variables).</p>
+</li>
+<li>
+<p><code>@Path(/products)</code> - specifies the base URI path segement for the RESTful service.</p>
+</li>
+<li>
+<p><code>@GET</code> - indicates that the <code>getProductById()</code> method handles HTTP GET requests.</p>
+</li>
+<li>
+<p><code>@Path("/{id}")</code> – define a dynamic URI path parameter <code>{id}</code>, which will be replaced at runtime with the actual value provided.</p>
+</li>
+<li>
+<p><code>@PathParam("id")</code> - binds the method parameter <code>id</code> to the <code>{id}</code> placeholder in the request URL.</p>
+</li>
+<li>
+<p>Return Type (<code>Product</code>) - specifies that the method returns a <code>Product</code> Data Transfer Object (DTO), representing the retrieved product data.</p>
+</li>
+</ol>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Note: In CDI environments, it is recommended not to extend AutoCloseable in REST client interfaces. The container manages the lifecycle of injected clients automatically, ensuring proper resource handling without requiring manual closure.</p>
+</div>
+</blockquote>
+</div>
+<div class="sect3">
+<h4 id="configuration-via-microprofile-config"><a class="anchor" href="#configuration-via-microprofile-config"></a>Configuration via MicroProfile Config:</h4>
+<div class="paragraph">
+<p>To configure the URI using MicroProfile Config, you need to add a config file named src/main/webapp/META-INF/microprofile-config.properties in your project. This file contains the configuration key and value pairs. In this example, we’re configuring the base URI to <a href="http://localhost:8080/api/products" class="bare">http://localhost:8080/api/products</a>. We can configure other client properties, such as followRedirects. The followRedirects property specifies whether the client should automatically follow HTTP redirects (3xx status codes) when making RESTful web service calls.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">product-service/mp-rest/url=http://localhost:8080/api/products
+product-service/mp-rest/followRedirects=true</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="parameter-configurations"><a class="anchor" href="#parameter-configurations"></a>Parameter Configurations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In MicroProfile Rest Client, you can dynamically configure headers, query parameters, and path parameters using Jakarta RESTful Web Services annotations. These annotations bind method parameters to different parts of the HTTP request, enabling flexible and dynamic RESTful client interfaces that can efficiently interact with various endpoints.</p>
+</div>
+<div class="paragraph">
+<p><strong>Supported Parameter Annotations</strong></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>@PathParam</code> – Binds a method parameter to a path variable in the URL.</p>
+</li>
+<li>
+<p><code>@QueryParam</code> – Maps a method parameter to a query string parameter in the request URL.</p>
+</li>
+<li>
+<p><code>@HeaderParam</code> – Attaches a method parameter to an HTTP request header.</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="using-path-parameters-pathparam"><a class="anchor" href="#using-path-parameters-pathparam"></a>Using Path Parameters (<code>@PathParam</code>)</h3>
+<div class="paragraph">
+<p>Path parameters are used to insert dynamic values directly into the URL path.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+
+@RegisterRestClient
+@Path("/products")
+public interface ProductServiceClient {
+
+    @GET
+    @Path("/{id}")
+    Product getProductById(@PathParam("id") Long id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Example</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">productServiceClient.getProductById(1L);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting HTTP Request</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /products/1</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-use-pathparam"><a class="anchor" href="#why-use-pathparam"></a>Why Use @PathParam?</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Ensures URL structure consistency by enforcing path variables</p>
+</li>
+<li>
+<p>Prevents hardcoding URLs, making the code cleaner and maintainable.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-query-parameters-queryparam"><a class="anchor" href="#using-query-parameters-queryparam"></a>Using Query Parameters (<code>@QueryParam</code>)</h3>
+<div class="paragraph">
+<p>Query parameters are typically used for filtering, pagination, or optional parameters in the request URL.</p>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+
+@RegisterRestClient
+@Path("/products")
+public interface ProductServiceClient {
+
+    @GET
+    List&lt;Product&gt; getProductsByCategory(@QueryParam("category") String category);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Example Call:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">productServiceClient.getProductsByCategory("electronics");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting HTTP Request:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /products?category=electronics</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-use-queryparam"><a class="anchor" href="#why-use-queryparam"></a>Why Use @QueryParam?</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Useful for filtering results (?category=electronics).</p>
+</li>
+<li>
+<p>Ideal for pagination (?page=2&amp;size=20).</p>
+</li>
+<li>
+<p>Allows sending optional parameters without modifying the URL structure.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-header-parameters-headerparam"><a class="anchor" href="#using-header-parameters-headerparam"></a>Using Header Parameters (@HeaderParam)</h3>
+<div class="paragraph">
+<p>Header parameters are typically used for authentication, authorization, and metadata transmission between client and server.</p>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.Path;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+
+@RegisterRestClient
+@Path("/orders")
+public interface OrderServiceClient {
+
+    @GET
+    List&lt;Order&gt; getOrders(@HeaderParam("Authorization") String authToken);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Example Call:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">orderServiceClient.getOrders("Bearer my-secret-token");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Resulting HTTP Request:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">GET /orders
+Authorization: Bearer my-secret-token</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-use-headerparam"><a class="anchor" href="#why-use-headerparam"></a>Why Use @HeaderParam?</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Used for passing authentication tokens (Authorization: Bearer token).</p>
+</li>
+<li>
+<p>Helps with custom metadata exchange (e.g., X-Correlation-ID: 12345).</p>
+</li>
+<li>
+<p>Avoids exposing sensitive data in URLs (e.g., API keys).</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="overview-of-additional-annotations"><a class="anchor" href="#overview-of-additional-annotations"></a>Overview of Additional Annotations</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>@CookieParam</code> - Binds a method parameter to the value of an HTTP cookie in the incoming request.</p>
+</li>
+<li>
+<p><code>@FormParam</code> — Maps a method parameter to a field in a submitted HTML form (<code>application/x-www-form-urlencoded</code> POST body).</p>
+</li>
+<li>
+<p><code>@MatrixParam</code> — Binds a method parameter to a matrix parameter embedded within the URL path segements (e.g., <code>/product;color=blue;size=large</code>).</p>
+</li>
+<li>
+<p><code>@BeanParam</code> — Aggregates multiple parameter annotations (path, query, header, etc.) into a single Java bean for cleaner method signature.</p>
+</li>
+</ol>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Tip: These annotations eliminate manual string concatenation, making REST client calls type-safe and maintainable.</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="handling-requests-and-responses"><a class="anchor" href="#handling-requests-and-responses"></a>Handling Requests and Responses</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In MicroProfile Rest Client, handling requests and responses involves defining methods in your interface that map to RESTful service endpoints. This ensures that:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>HTTP requests are automatically constructed based on method definitions.</p>
+</li>
+<li>
+<p>Responses are efficiently deserialized into Java objects (DTOs) or processed manually using <code>Response</code>.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Using Jakarta RESTful Web Services annotations, you can define standard HTTP operations such as @GET, @POST, @PUT, and @DELETE. The framework also supports additional methods like @HEAD, @OPTIONS, and @PATCH, providing complete control over HTTP communication when needed. Meanwhile, MicroProfile automatically handles serialization, deserialization, and request execution at runtime.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="handling-json-data-formats"><a class="anchor" href="#handling-json-data-formats"></a>Handling JSON Data formats</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default, MicroProfile Rest Client supports JSON format without requiring additional configurations. Serialization and deserialization of request and response bodies are automatically handled using JSON-B (Jakarta JSON Binding) or JSON-P (Jakarta JSON Processing).</p>
+</div>
+<div class="paragraph">
+<p>Developers can directly use Java objects as request bodies or response entities, eliminating the need for manual parsing.</p>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.Consumes;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+
+@RegisterRestClient
+@Path("/products")
+@Produces("application/json")
+@Consumes("application/json")
+public interface ProductServiceClient {
+
+    @GET
+    @Path("/{id}")
+    Product getProductById(@PathParam("id") Long id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Explanation</strong></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The <code>@Produces("application/json")</code> annotation specifies that the client expects JSON responses. This determines the value of the <code>Accept</code> header in HTTP requests.</p>
+</li>
+<li>
+<p>The <code>@Consumes("application/json")</code> annotation specifies that the client sends JSON requests. This determines the value of the <code>Content-Type</code> header of the request.</p>
+</li>
+<li>
+<p>By default the media type <code>"application/json"</code> is used if <code>@Produces</code> and <code>@Consumes</code> are not explicitly set.</p>
+</li>
+<li>
+<p>MicroProfile Rest Client automatically serializes Java objects to JSON and deserializes responses into Product DTO (Data Transfer Object) Java object.</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="error-handling"><a class="anchor" href="#error-handling"></a>Error Handling</h3>
+<div class="paragraph">
+<p>Effective error handling is crucial when consuming remote RESTful services. MicroProfile Rest Client provides a structured approach to error handling by mapping HTTP responses to exceptions using the <code>ResponseExceptionMapper</code> interface.</p>
+</div>
+<div class="paragraph">
+<p>This mechanism allows developers to:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Convert specific HTTP response codes into custom exceptions.</p>
+</li>
+<li>
+<p>Customize exception handling behavior at runtime.</p>
+</li>
+<li>
+<p>Automatically throw mapped exceptions in client invocations.</p>
+</li>
+</ol>
+</div>
+<div class="sect3">
+<h4 id="using-responseexceptionmapper-interface"><a class="anchor" href="#using-responseexceptionmapper-interface"></a>Using <code>ResponseExceptionMapper</code> interface</h4>
+<div class="paragraph">
+<p>The <code>ResponseExceptionMapper</code> interface allows mapping an HTTP Response object to a <code>Throwable</code> (custom exception). This improves error handling by ensuring meaningful exceptions are thrown instead of manually checking response codes.</p>
+</div>
+<div class="paragraph">
+<p><strong>How it Works</strong></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Scanning and Prioritizing Exception Mappers</strong>: When a client method is invoked, the runtime scans all registered <code>ResponseExceptionMapper</code> implementations. Mappers are then sorted in ascending order of priority, determined by the <code>@Priority</code> annotation. The mapper with the lowest numeric priority value is checked first.</p>
+</li>
+<li>
+<p><strong>Handling Responses</strong>: The <code>handles(int status, MultivaluedMap&lt;String,Object&gt; headers)</code> method determines whether a mapper should handle a given response. By default, it handles responses with status code 400 or higher, but we can override this behavior.</p>
+</li>
+<li>
+<p><strong>Converting the Response to an Exception</strong>: The <code>toThrowable(Response response)</code> method converts a response into a <code>Throwable</code> (exception). Checked exceptions are only thrown if the client method declares that it throws that type of exception of its superclass. Unchecked exceptions (<code>RuntimeException</code>) are always thrown.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.inventory.client;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
+
+@RegisterRestClient(configKey = "product-service")
+@RegisterProvider(ProductServiceResponseExceptionMapper.class)
+@Path("/products")
+public interface ProductServiceClient extends AutoCloseable {
+
+    @GET
+    @Path("/{id}")
+    Response getProductById(@PathParam("id") Long id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Explanation:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The REST client interface defines an endpoint for retrieving products.</p>
+</li>
+<li>
+<p>The <code>@RegisterProvider</code> annotation registers <code>ProductServiceResponseExceptionMapper</code>, ensuring custom exception handling.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>And below is the corresponding <code>ResponseExceptionMapper</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.inventory.client;
+
+import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
+import io.microprofile.tutorial.inventory.dto.ProductNotFoundException;
+
+public class ProductServiceResponseExceptionMapper implements ResponseExceptionMapper&lt;Throwable&gt; {
+
+    @Override
+    public Throwable toThrowable(Response response) {
+        if (response.getStatus() == 404) {
+            return new ProductNotFoundException("Product not found");
+        }
+        return new Exception("An unexpected error occurred");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Explanation:</strong></p>
+</div>
+<div class="paragraph">
+<p>If the response status code is <code>404</code>, a <code>ProductNotFoundException</code> is thrown. Otherwise, a generic exception is returned.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-the-restclientbuilder-class"><a class="anchor" href="#using-the-restclientbuilder-class"></a>Using the <code>RestClientBuilder</code> Class</h3>
+<div class="paragraph">
+<p>While <strong>CDI-based injection</strong> is commonly used for REST clients in MicroProfile, programmatic creation using the <code>RestClientBuilder</code> class is beneficial when CDI is unavailable or when dynamic client instantiation is required. This builder provides a <strong>fluent API</strong> for configuring and constructing REST client proxies without relying on constructors that require numerous arguments.</p>
+</div>
+<div class="paragraph">
+<p>Using <code>RestClientBuilder</code> simplifies object creation, improves code readability, and supports <strong>method chaining</strong>, where each configuration method returns the builder instance itself.</p>
+</div>
+<div class="sect3">
+<h4 id="example-inventory-service-calls-product-service"><a class="anchor" href="#example-inventory-service-calls-product-service"></a>Example: Inventory Service Calls Product Service</h4>
+<div class="paragraph">
+<p>In the MicroProfile Ecommerce Store, the <code>InventoryService</code> must verify whether a product exists before checking or updating inventory. This interaction can be handled by calling the <code>ProductService</code> using a REST client interface.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.inventory.service;
+
+import io.microprofile.tutorial.store.inventory.client.ProductServiceClient;
+import io.microprofile.tutorial.store.product.entity.Product;
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
+
+import java.net.URI;
+import java.util.concurrent.TimeUnit;
+
+public class InventoryService {
+
+    public boolean isProductAvailable(Long productId) {
+        URI productApiUri = URI.create("http://localhost:8080/api");
+
+        try (ProductServiceClient productClient = RestClientBuilder.newBuilder()
+                .baseUri(productApiUri)
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .build(ProductServiceClient.class)) {
+
+            Product product = productClient.getProductById(productId);
+            return product != null;
+
+        } catch (Exception e) {
+            // Log exception (omitted for brevity)
+            return false;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="explanation"><a class="anchor" href="#explanation"></a>Explanation</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>isProductAvailable()</code> method accepts a product ID and returns <code>true</code> if the product exists in the catalog.</p>
+</li>
+<li>
+<p>A <code>URI</code> object is created pointing to the base path of the ProductService API using <code>URI.create()</code>.</p>
+</li>
+<li>
+<p>A <code>ProductServiceClient</code> instance is created using the builder pattern inside a <code>try-with-resource</code> block:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>newBuilder()</code> initializes the client builder.</p>
+</li>
+<li>
+<p><code>baseUri()</code> sets the root endpoint of the target service.</p>
+</li>
+<li>
+<p><code>connectTimeout()</code> and <code>readTimeout()</code> define connection and read timeouts respectively.</p>
+</li>
+<li>
+<p><code>build()</code> finalizes and returns the configured client proxy.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Because <code>ProductServiceClient</code> extends <code>AutoCloseable</code>, the try-with-resources block ensures that the client is automatically closed after the operation, preventing resource leaks.</p>
+</li>
+<li>
+<p>If a <code>Product</code> object is successfully returned, <code>true</code> is returned.</p>
+</li>
+<li>
+<p>Any exceptions are caught and handled appropriately, returning <code>false</code> in case of failure.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This approach is especially useful for <strong>utility services</strong>, <strong>batch jobs</strong>, or environments where REST client configuration must be <strong>dynamic or conditional</strong>, and manual client lifecycle management is necessary.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Tip: When building MicroProfile REST clients programmatically (using <code>RestClientBuilder</code>), ensure that your client interface extends <code>AutoCloseable</code> and uses try-with-resources to release resources automatically.</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="conclusion"><a class="anchor" href="#conclusion"></a>Conclusion</h3>
+<div class="paragraph">
+<p>The MicroProfile Rest Client provides a declarative, type-safe, and efficient mechanism for interacting with RESTful services in Java microservices. It reduces boilerplate code and lets developers focus on core business logic while still offering fine-grained control through features like <code>RestClientBuilder</code>.</p>
+</div>
+<div class="paragraph">
+<p>By integrating seamlessly with other MicroProfile specifications—such as <strong>Config</strong>, <strong>Fault Tolerance</strong>, and <strong>JWT Authentication</strong>—the Rest Client helps enhance the <strong>security</strong>, <strong>resilience</strong>, and <strong>maintainability</strong> of cloud-native applications.</p>
+</div>
+<div class="sect3">
+<h4 id="key-takeaways"><a class="anchor" href="#key-takeaways"></a>Key Takeaways</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Removes boilerplate HTTP code, improving clarity and maintainability.</p>
+</li>
+<li>
+<p>Automatically handles JSON serialization and deserialization.</p>
+</li>
+<li>
+<p>Supports <strong>CDI injection</strong> for managed client lifecycles.</p>
+</li>
+<li>
+<p>Integrates with <strong>Fault Tolerance</strong> for retries, timeouts, and circuit breakers.</p>
+</li>
+<li>
+<p>Enhances <strong>security</strong> through header propagation and authentication mechanisms.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>With MicroProfile Rest Client, building robust and maintainable microservices that communicate over REST becomes <strong>simpler</strong>, <strong>more flexible</strong>, and <strong>more powerful</strong>. This concludes the MicroProfile tutorial. You are now equipped with the foundational knowledge to build robust, cloud-native microservices using the MicroProfile specification. Thank you for following along, and happy coding!</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="../chapter10/chapter10.html">MicroProfile JWT</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
+  </body>
+</html>

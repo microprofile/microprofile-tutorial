@@ -96,7 +96,7 @@ public class ProductResource {
   
 Explanation: 
 
-* The `ProductResource` is annotated with `@ApplicationScoped`. This will ensure that only one instance of this class available when the 
+* The `ProductResource` is annotated with `@ApplicationScoped`. This will ensure that this class is available as long as the 
 application is running. 
 
 * The `ProductResource` class has a `getProducts()` method, which returns a list of products. This method is annotated with the `@GET` annotation, which maps this method to the `GET` HTTP method. 
