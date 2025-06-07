@@ -1,0 +1,346 @@
+= MicroProfile E-Commerce Store
+:toc: left
+:icons: font
+:source-highlighter: highlightjs
+:imagesdir: images
+:experimental:
+
+== Overview
+
+This project demonstrates a microservices-based e-commerce application built with Jakarta EE and MicroProfile, running on Open Liberty runtime. The application is composed of multiple independent services that work together to provide a complete e-commerce solution.
+
+[.lead]
+A practical demonstration of MicroProfile capabilities for building cloud-native Java microservices.
+
+[IMPORTANT]
+====
+This project is part of the official MicroProfile 6.1 API Tutorial.
+====
+
+See link:service-interactions.adoc[Service Interactions] for details on how the services work together.
+
+== Services
+
+The application is split into the following microservices:
+
+[cols="1,4", options="header"]
+|===
+|Service |Description
+
+|User Service
+|Manages user accounts, authentication, and profile information
+
+|Inventory Service
+|Tracks product inventory and stock levels
+
+|Order Service
+|Manages customer orders, order items, and order status
+
+|Catalog Service  
+|Provides product information, categories, and search capabilities
+
+|Shopping Cart Service
+|Manages user shopping cart items and temporary product storage
+
+|Shipment Service
+|Handles shipping orders, tracking, and delivery status updates
+
+|Payment Service
+|Processes payments and manages payment methods and transactions
+|===
+
+== Technology Stack
+
+* *Jakarta EE 10.0*: For enterprise Java standardization
+* *MicroProfile 6.1*: For cloud-native APIs
+* *Open Liberty*: Lightweight, flexible runtime for Java microservices
+* *Maven*: For project management and builds
+
+== Quick Start
+
+=== Prerequisites
+
+* JDK 17 or later
+* Maven 3.6 or later
+* Docker (optional for containerized deployment)
+
+=== Running the Application
+
+1. Clone the repository:
++
+[source,bash]
+----
+git clone https://github.com/your-username/liberty-rest-app.git
+cd liberty-rest-app
+----
+
+2. Start each microservice individually:
+
+==== User Service
+[source,bash]
+----
+cd user
+mvn liberty:run
+----
+The service will be available at http://localhost:6050/user
+
+==== Inventory Service
+[source,bash]
+----
+cd inventory
+mvn liberty:run
+----
+The service will be available at http://localhost:7050/inventory
+
+==== Order Service
+[source,bash]
+----
+cd order
+mvn liberty:run
+----
+The service will be available at http://localhost:8050/order
+
+==== Catalog Service
+[source,bash]
+----
+cd catalog
+mvn liberty:run
+----
+The service will be available at http://localhost:9050/catalog
+
+=== Building the Application
+
+To build all services:
+
+[source,bash]
+----
+mvn clean package
+----
+
+=== Docker Deployment
+
+You can also run all services together using Docker Compose:
+
+[source,bash]
+----
+# Make the script executable (if needed)
+chmod +x run-all-services.sh
+
+# Run the script to build and start all services
+./run-all-services.sh
+----
+
+Or manually:
+
+[source,bash]
+----
+# Build all projects first
+cd user && mvn clean package && cd ..
+cd inventory && mvn clean package && cd ..
+cd order && mvn clean package && cd ..
+cd catalog && mvn clean package && cd ..
+
+# Start all services
+docker-compose up -d
+----
+
+This will start all services in Docker containers with the following endpoints:
+
+* User Service: http://localhost:6050/user
+* Inventory Service: http://localhost:7050/inventory
+* Order Service: http://localhost:8050/order
+* Catalog Service: http://localhost:9050/catalog
+
+== API Documentation
+
+Each microservice provides its own OpenAPI documentation, available at:
+
+* User Service: http://localhost:6050/user/openapi
+* Inventory Service: http://localhost:7050/inventory/openapi
+* Order Service: http://localhost:8050/order/openapi
+* Catalog Service: http://localhost:9050/catalog/openapi
+
+== Testing the Services
+
+=== User Service
+
+[source,bash]
+----
+# Get all users
+curl -X GET http://localhost:6050/user/api/users
+
+# Create a new user
+curl -X POST http://localhost:6050/user/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "passwordHash": "password123",
+    "address": "123 Main St",
+    "phoneNumber": "555-123-4567"
+  }'
+
+# Get a user by ID
+curl -X GET http://localhost:6050/user/api/users/1
+
+# Update a user
+curl -X PUT http://localhost:6050/user/api/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "passwordHash": "password123",
+    "address": "456 Oak Ave",
+    "phoneNumber": "555-123-4567"
+  }'
+
+# Delete a user
+curl -X DELETE http://localhost:6050/user/api/users/1
+----
+
+=== Inventory Service
+
+[source,bash]
+----
+# Get all inventory items
+curl -X GET http://localhost:7050/inventory/api/inventories
+
+# Create a new inventory item
+curl -X POST http://localhost:7050/inventory/api/inventories \
+  -H "Content-Type: application/json" \
+  -d '{
+    "productId": 101,
+    "quantity": 25
+  }'
+
+# Get inventory by ID
+curl -X GET http://localhost:7050/inventory/api/inventories/1
+
+# Get inventory by product ID
+curl -X GET http://localhost:7050/inventory/api/inventories/product/101
+
+# Update inventory
+curl -X PUT http://localhost:7050/inventory/api/inventories/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "productId": 101,
+    "quantity": 50
+  }'
+
+# Update product quantity
+curl -X PATCH http://localhost:7050/inventory/api/inventories/product/101/quantity/75
+
+# Delete inventory
+curl -X DELETE http://localhost:7050/inventory/api/inventories/1
+----
+
+=== Order Service
+
+[source,bash]
+----
+# Get all orders
+curl -X GET http://localhost:8050/order/api/orders
+
+# Create a new order
+curl -X POST http://localhost:8050/order/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "totalPrice": 149.98,
+    "status": "CREATED",
+    "orderItems": [
+      {
+        "productId": 101,
+        "quantity": 2,
+        "priceAtOrder": 49.99
+      },
+      {
+        "productId": 102,
+        "quantity": 1,
+        "priceAtOrder": 50.00
+      }
+    ]
+  }'
+
+# Get order by ID
+curl -X GET http://localhost:8050/order/api/orders/1
+
+# Update order status
+curl -X PATCH http://localhost:8050/order/api/orders/1/status/PAID
+
+# Get items for an order
+curl -X GET http://localhost:8050/order/api/orders/1/items
+
+# Delete order
+curl -X DELETE http://localhost:8050/order/api/orders/1
+----
+
+=== Catalog Service
+
+[source,bash]
+----
+# Get all products
+curl -X GET http://localhost:9050/catalog/api/products
+
+# Get a product by ID
+curl -X GET http://localhost:9050/catalog/api/products/1
+
+# Search products
+curl -X GET "http://localhost:9050/catalog/api/products/search?keyword=laptop"
+----
+
+== Project Structure
+
+[source]
+----
+liberty-rest-app/
+├── user/               # User management service
+├── inventory/          # Inventory management service
+├── order/              # Order management service
+└── catalog/            # Product catalog service
+----
+
+Each service follows a similar internal structure:
+
+[source]
+----
+service/
+├── src/
+│   ├── main/
+│   │   ├── java/      # Java source code
+│   │   ├── liberty/   # Liberty server configuration
+│   │   └── webapp/    # Web resources
+│   └── test/          # Test code
+└── pom.xml            # Maven configuration
+----
+
+== Key MicroProfile Features Demonstrated
+
+* *Config*: Externalized configuration
+* *Fault Tolerance*: Circuit breakers, retries, fallbacks
+* *Health Checks*: Application health monitoring
+* *Metrics*: Performance monitoring
+* *OpenAPI*: API documentation
+* *Rest Client*: Type-safe REST clients
+
+== Development
+
+=== Adding a New Service
+
+1. Create a new directory for your service
+2. Copy the basic structure from an existing service
+3. Update the `pom.xml` file with appropriate details
+4. Implement your service-specific functionality
+5. Configure the Liberty server in `src/main/liberty/config/`
+
+== Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b my-new-feature`
+3. Commit your changes: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request
+
+== License
+
+This project is licensed under the Apache License 2.0 - see the LICENSE file for details.

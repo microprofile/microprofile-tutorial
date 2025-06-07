@@ -1,0 +1,243 @@
+= MicroProfile Catalog Service
+:toc:
+:icons: font
+:source-highlighter: highlight.js
+:imagesdir: images
+:url-quickstart: https://openliberty.io/guides/
+
+== Overview
+
+The MicroProfile Catalog Service is a Jakarta EE 10 and MicroProfile 6.1 application that provides a RESTful API for managing product catalog information in an e-commerce platform. It demonstrates the use of modern Jakarta EE features including CDI, Jakarta Persistence, Jakarta RESTful Web Services, and Bean Validation.
+
+== Features
+
+* RESTful API using Jakarta RESTful Web Services
+* Persistence with Jakarta Persistence API and Derby embedded database
+* CDI (Contexts and Dependency Injection) for component management
+* Bean Validation for input validation
+
+== Project Structure
+
+[source]
+----
+catalog/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── io/microprofile/tutorial/store/product/
+│   │   │       ├── entity/      # Domain models (Product)
+│   │   │       ├── repository/  # Data access layer
+│   │   │       ├── resource/    # REST endpoints
+│   │   │       ├── service/     # Business logic
+│   │   │       └── ProductRestApplication.java
+│   │   ├── liberty/
+│   │   │   └── config/
+│   │   │       └── server.xml  # Liberty server configuration
+│   │   └── resources/
+│   │       └── META-INF/       # Persistence configuration
+│   └── test/
+│       └── java/               # Unit and integration tests
+└── pom.xml                     # Project build configuration
+----
+
+== Architecture
+
+This application follows a layered architecture:
+
+1. *REST Resources* (`/resource`) - Provides HTTP endpoints for clients
+2. *Services* (`/service`) - Implements business logic and transaction management
+3. *Repositories* (`/repository`) - Data access objects for database operations
+4. *Entities* (`/entity`) - Domain models with Jakarta Persistence annotations
+
+== Database Configuration
+
+The application uses an embedded Derby database that is automatically provisioned by Open Liberty server. The database configuration is defined in the `server.xml` file:
+
+[source,xml]
+----
+<dataSource id="productjpadatasource" jndiName="jdbc/productjpadatasource">
+    <jdbcDriver libraryRef="derbyJDBCLib" />
+    <properties.derby.embedded databaseName="ProductDB" createDatabase="create" />
+</dataSource>
+----
+
+== Liberty Server Configuration
+
+The Open Liberty server is configured in `src/main/liberty/config/server.xml`:
+
+[source,xml]
+----
+<server description="MicroProfile Tutorial Liberty Server">
+    <featureManager>
+        <platform>jakartaEE-10.0</platform>
+        <platform>microProfile-6.1</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>persistence</feature>
+    </featureManager>
+
+    <application location="catalog.war" contextRoot="catalog"/>
+
+    <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
+        id="defaultHttpEndpoint" host="*" />
+
+    <!-- Derby Library Configuration -->
+    <library id="derbyJDBCLib">
+        <fileset dir="${shared.resource.dir}/" includes="derby*.jar" />
+    </library>
+
+    <dataSource id="productjpadatasource" jndiName="jdbc/productjpadatasource">
+        <jdbcDriver libraryRef="derbyJDBCLib" />
+        <properties.derby.embedded databaseName="ProductDB" createDatabase="create" />
+    </dataSource>
+</server>
+----
+
+== Building and Running
+
+=== Prerequisites
+
+* JDK 17 or higher
+* Maven 3.8.x or higher
+
+=== Development Mode
+
+To run the application in development mode with hot reload:
+
+[source,bash]
+----
+mvn liberty:dev
+----
+
+This will start the server on port 5050 (configured in pom.xml).
+
+=== Building the Application
+
+To build the application:
+
+[source,bash]
+----
+mvn clean package
+----
+
+This will create a WAR file in the `target/` directory.
+
+=== Running the Tests
+
+To run the tests:
+
+[source,bash]
+----
+mvn test
+----
+
+=== Deployment
+
+The application can be deployed to any Jakarta EE 10 compliant server. With Liberty:
+
+[source,bash]
+----
+mvn liberty:run
+----
+
+== API Endpoints
+
+The API is accessible at the base path `/catalog/api`.
+
+=== Products API
+
+|===
+| Method | Path | Description | Status Codes
+
+| GET    | `/products`     | List all products | 200 OK
+| GET    | `/products/{id}` | Get product by ID | 200 OK, 404 Not Found
+| POST   | `/products`     | Create a product  | 201 Created
+| PUT    | `/products/{id}` | Update a product | 200 OK, 404 Not Found
+| DELETE | `/products/{id}` | Delete a product | 204 No Content, 404 Not Found
+|===
+
+== Request/Response Examples
+
+=== Get all products
+
+Request:
+[source]
+----
+GET /catalog/api/products
+Accept: application/json
+----
+
+Response:
+[source,json]
+----
+[
+  {
+    "id": 1,
+    "name": "Laptop",
+    "description": "High-performance laptop",
+    "price": 999.99
+  },
+  {
+    "id": 2,
+    "name": "Smartphone",
+    "description": "Latest model smartphone",
+    "price": 699.99
+  }
+]
+----
+
+=== Create a product
+
+Request:
+[source]
+----
+POST /catalog/api/products
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "name": "Tablet",
+  "description": "10-inch tablet with high resolution display",
+  "price": 499.99
+}
+----
+
+Response:
+[source]
+----
+HTTP/1.1 201 Created
+Location: /catalog/api/products/3
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "id": 3,
+  "name": "Tablet",
+  "description": "10-inch tablet with high resolution display",
+  "price": 499.99
+}
+----
+
+== Troubleshooting
+
+=== Common Issues
+
+* *404 Not Found*: Ensure you're using the correct context root (`/catalog`) and API base path (`/api`).
+* *500 Internal Server Error*: Check server logs for exceptions.
+* *Database issues*: Check if Derby is properly configured and the `productjpadatasource` is available.
+
+=== Logs
+
+Server logs are available at:
+
+[source]
+----
+target/liberty/wlp/usr/servers/mpServer/logs/
+----
+

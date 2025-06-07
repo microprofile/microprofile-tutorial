@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Service - MicroProfile Config Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #0066cc;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 0;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            padding: 20px;
+        }
+        .endpoints {
+            list-style-type: none;
+            padding: 0;
+        }
+        .endpoints li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 60px;
+            text-align: center;
+        }
+        .get { background-color: #61affe; color: white; }
+        .post { background-color: #49cc90; color: white; }
+        .put { background-color: #fca130; color: white; }
+        .delete { background-color: #f93e3e; color: white; }
+        .patch { background-color: #50e3c2; color: white; }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .links {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .links a {
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .links a:hover {
+            background-color: #004999;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Payment Service</h1>
+        <p>MicroProfile Config Demo with Custom ConfigSource</p>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2>About this Service</h2>
+            <p>The Payment Service demonstrates MicroProfile Config integration with custom ConfigSource implementation.</p>
+            <p>It provides endpoints for managing payment configuration and processing payments using dynamic configuration.</p>
+            <p><strong>Key Features:</strong></p>
+            <ul>
+                <li>Custom MicroProfile ConfigSource with ordinal 600 (highest priority)</li>
+                <li>Dynamic configuration updates via REST API</li>
+                <li>Payment gateway endpoint configuration</li>
+                <li>Real-time configuration access for payment processing</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>API Endpoints</h2>
+            <ul class="endpoints">
+                <li><span class="method get">GET</span> /api/payment-config - Get current payment configuration</li>
+                <li><span class="method post">POST</span> /api/payment-config - Update payment configuration property</li>
+                <li><span class="method post">POST</span> /api/authorize - Process payment authorization</li>
+                <li><span class="method post">POST</span> /api/payment-config/process-example - Example payment processing with config</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Configuration Management</h2>
+            <p>This service implements a custom MicroProfile ConfigSource that allows dynamic configuration updates:</p>
+            <ul>
+                <li><strong>Configuration Priority:</strong> Custom ConfigSource (600) > System Properties (400) > Environment Variables (300) > microprofile-config.properties (100)</li>
+                <li><strong>Current Properties:</strong> payment.gateway.endpoint</li>
+                <li><strong>Update Method:</strong> POST to /api/payment-config with {"key": "payment.property.name", "value": "new-value"}</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>Links</h2>
+            <div class="links">
+                <a href="/payment/api/openapi-ui/">OpenAPI Documentation</a>
+                <a href="/payment/api/payment-config">View Current Config</a>
+                <a href="/health">Health Check</a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>MicroProfile Config Demo | Payment Service</p>
+        <p>Powered by Open Liberty & MicroProfile Config 3.0</p>
+    </footer>
+</body>
+</html>

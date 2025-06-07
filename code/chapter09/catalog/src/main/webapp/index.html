@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Catalog Service</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #0066cc;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #0066cc;
+        }
+        header h1 {
+            color: white;
+            margin: 0;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .endpoints {
+            background-color: #f9f9f9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: Monaco, monospace;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .status.online {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.maintenance {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+        .health-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .health-up {
+            background-color: #28a745;
+        }
+        .health-down {
+            background-color: #dc3545;
+        }
+        .health-unknown {
+            background-color: #ffc107;
+        }
+        .interactive-link {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Product Catalog Service</h1>
+        <p>A microservice for managing product information in the e-commerce platform</p>
+    </header>
+
+    <main>
+        <div class="card">
+            <h2>Service Overview</h2>
+            <p>The Product Catalog Service provides a REST API for managing product information, including:</p>
+            <ul>
+                <li>Creating new products</li>
+                <li>Retrieving product details</li>
+                <li>Updating existing products</li>
+                <li>Deleting products</li>
+                <li>Searching for products by various criteria</li>
+            </ul>
+            <div class="card" style="background-color: #f0f7ff; margin-top: 15px;">
+                <h3>MicroProfile Config Implementation</h3>
+                <p>This service implements configurability as per MicroProfile Config standards. Key configuration properties include:</p>
+                <ul>
+                    <li><code>product.maintenanceMode</code> - Controls whether the service is in maintenance mode (returns 503 responses)</li>
+                    <li><code>mp.openapi.scan</code> - Enables automatic OpenAPI documentation generation</li>
+                </ul>
+                <p>MicroProfile Config allows these properties to be changed via environment variables, system properties, or configuration files without requiring application redeployment.</p>
+            </div>
+        </div>
+
+        <div class="card endpoints">
+            <h2>API Endpoints</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Method</th>
+                        <th>URL</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>List All Products</td>
+                        <td>GET</td>
+                        <td><code>/api/products</code></td>
+                        <td>Retrieves a list of all products</td>
+                    </tr>
+                    <tr>
+                        <td>Get Product by ID</td>
+                        <td>GET</td>
+                        <td><code>/api/products/{id}</code></td>
+                        <td>Returns a product by its ID</td>
+                    </tr>
+                    <tr>
+                        <td>Create Product</td>
+                        <td>POST</td>
+                        <td><code>/api/products</code></td>
+                        <td>Creates a new product</td>
+                    </tr>
+                    <tr>
+                        <td>Update Product</td>
+                        <td>PUT</td>
+                        <td><code>/api/products/{id}</code></td>
+                        <td>Updates an existing product by its ID</td>
+                    </tr>
+                    <tr>
+                        <td>Delete Product</td>
+                        <td>DELETE</td>
+                        <td><code>/api/products/{id}</code></td>
+                        <td>Deletes a product by its ID</td>
+                    </tr>
+                    <tr>
+                        <td>Search Products</td>
+                        <td>GET</td>
+                        <td><code>/api/products/search</code></td>
+                        <td>Search products by criteria (name, description, price range)</td>
+                    </tr>
+                    <tr>
+                        <td>Product Count</td>
+                        <td>GET</td>
+                        <td><code>/api/products/count</code></td>
+                        <td>Returns the current number of products in catalog (used for metrics)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>API Documentation</h2>
+            <p>The API is documented using MicroProfile OpenAPI. You can access the Swagger UI at:</p>
+            <p><a href="/openapi/ui" target="_blank">/openapi/ui</a></p>
+            <p>The OpenAPI definition is available at:</p>
+            <p><a href="/openapi" target="_blank">/openapi</a></p>
+        </div>
+
+        <div class="card">
+            <h2>Health Checks</h2>
+            <p>The service implements comprehensive MicroProfile Health monitoring with three types of health checks:</p>
+            
+            <h3>Health Check Endpoints</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Endpoint</th>
+                        <th>Purpose</th>
+                        <th>Description</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="health-indicator health-unknown" id="overall-status"></span></td>
+                        <td><code>/health</code></td>
+                        <td>Overall Health</td>
+                        <td>Aggregated status of all health checks</td>
+                        <td><a href="/health" class="interactive-link" target="_blank">View</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="health-indicator health-unknown" id="startup-status"></span></td>
+                        <td><code>/health/started</code></td>
+                        <td>Startup Check</td>
+                        <td>Validates EntityManagerFactory initialization</td>
+                        <td><a href="/health/started" class="interactive-link" target="_blank">View</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="health-indicator health-unknown" id="readiness-status"></span></td>
+                        <td><code>/health/ready</code></td>
+                        <td>Readiness Check</td>
+                        <td>Tests database connectivity via EntityManager</td>
+                        <td><a href="/health/ready" class="interactive-link" target="_blank">View</a></td>
+                    </tr>
+                    <tr>
+                        <td><span class="health-indicator health-unknown" id="liveness-status"></span></td>
+                        <td><code>/health/live</code></td>
+                        <td>Liveness Check</td>
+                        <td>Monitors JVM memory usage (100MB threshold)</td>
+                        <td><a href="/health/live" class="interactive-link" target="_blank">View</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card" style="background-color: #e8f5e8; margin-top: 15px;">
+                <h3>Health Check Implementation Details</h3>
+                
+                <h4>🚀 Startup Health Check</h4>
+                <p><strong>Class:</strong> <code>ProductServiceStartupCheck</code></p>
+                <p><strong>Purpose:</strong> Verifies that the Jakarta Persistence EntityManagerFactory is properly initialized during application startup.</p>
+                <p><strong>Implementation:</strong> Uses <code>@PersistenceUnit</code> to inject EntityManagerFactory and checks if it's not null and open.</p>
+                
+                <h4>✅ Readiness Health Check</h4>
+                <p><strong>Class:</strong> <code>ProductServiceHealthCheck</code></p>
+                <p><strong>Purpose:</strong> Ensures the service is ready to handle requests by testing database connectivity.</p>
+                <p><strong>Implementation:</strong> Performs a lightweight database query using <code>entityManager.find(Product.class, 1L)</code> to verify the database connection.</p>
+                
+                <h4>💓 Liveness Health Check</h4>
+                <p><strong>Class:</strong> <code>ProductServiceLivenessCheck</code></p>
+                <p><strong>Purpose:</strong> Monitors system resources to detect if the application needs to be restarted.</p>
+                <p><strong>Implementation:</strong> Analyzes JVM memory usage with a 100MB available memory threshold, providing detailed memory diagnostics.</p>
+            </div>
+
+            <div class="card" style="background-color: #fff3cd; margin-top: 15px;">
+                <h3>Sample Health Check Response</h3>
+                <p>Example response from <code>/health</code> endpoint:</p>
+                <pre><code>{
+  "status": "UP",
+  "checks": [
+    {
+      "name": "ProductServiceStartupCheck",
+      "status": "UP"
+    },
+    {
+      "name": "ProductServiceReadinessCheck", 
+      "status": "UP"
+    },
+    {
+      "name": "systemResourcesLiveness",
+      "status": "UP",
+      "data": {
+        "FreeMemory": 524288000,
+        "MaxMemory": 2147483648,
+        "AllocatedMemory": 1073741824,
+        "UsedMemory": 549453824,
+        "AvailableMemory": 1598029824
+      }
+    }
+  ]
+}</code></pre>
+            </div>
+
+            <div class="card" style="background-color: #e3f2fd; margin-top: 15px;">
+                <h3>Testing Health Checks</h3>
+                <p>You can test the health check endpoints using curl commands:</p>
+                <pre><code># Test overall health
+curl -X GET http://localhost:9080/health
+
+# Test startup health
+curl -X GET http://localhost:9080/health/started
+
+# Test readiness health  
+curl -X GET http://localhost:9080/health/ready
+
+# Test liveness health
+curl -X GET http://localhost:9080/health/live</code></pre>
+                
+                <p><strong>Integration with Container Orchestration:</strong></p>
+                <p>For Kubernetes deployments, you can configure probes in your deployment YAML:</p>
+                <pre><code>livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 9080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 9080
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+startupProbe:
+  httpGet:
+    path: /health/started
+    port: 9080
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 30</code></pre>
+            </div>
+
+            <div class="card" style="background-color: #f0f7ff; margin-top: 15px;">
+                <h3>Health Check Benefits</h3>
+                <ul>
+                    <li><strong>Container Orchestration:</strong> Kubernetes and Docker can use these endpoints for health probes</li>
+                    <li><strong>Load Balancer Integration:</strong> Traffic routing based on readiness status</li>
+                    <li><strong>Operational Monitoring:</strong> Early detection of system issues</li>
+                    <li><strong>Startup Validation:</strong> Ensures all dependencies are initialized before serving traffic</li>
+                    <li><strong>Database Monitoring:</strong> Real-time database connectivity verification</li>
+                    <li><strong>Memory Management:</strong> Proactive detection of memory pressure</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>MicroProfile Metrics</h2>
+            <p>The service implements comprehensive monitoring using MicroProfile Metrics to track application performance and usage patterns. Three types of metrics are configured to provide insights into service behavior:</p>
+            
+            <h3>Metrics Endpoints</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Format</th>
+                        <th>Description</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>/metrics</code></td>
+                        <td>Prometheus</td>
+                        <td>All metrics (application + vendor + base)</td>
+                        <td><a href="/metrics" class="interactive-link" target="_blank">View</a></td>
+                    </tr>
+                    <tr>
+                        <td><code>/metrics?scope=application</code></td>
+                        <td>Prometheus</td>
+                        <td>Application-specific metrics only</td>
+                        <td><a href="/metrics?scope=application" class="interactive-link" target="_blank">View</a></td>
+                    </tr>
+                    <tr>
+                        <td><code>/metrics?scope=vendor</code></td>
+                        <td>Prometheus</td>
+                        <td>Open Liberty vendor metrics</td>
+                        <td><a href="/metrics?scope=vendor" class="interactive-link" target="_blank">View</a></td>
+                    </tr>
+                    <tr>
+                        <td><code>/metrics?scope=base</code></td>
+                        <td>Prometheus</td>
+                        <td>Base JVM and system metrics</td>
+                        <td><a href="/metrics?scope=base" class="interactive-link" target="_blank">View</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card" style="background-color: #f8f9fa; margin-top: 15px;">
+                <h3>Implemented Metrics</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 10px;">
+                    
+                    <div style="background-color: #e8f4fd; padding: 10px; border-radius: 5px;">
+                        <h4 style="color: #1976d2; margin-top: 0;">⏱️ Timer Metrics</h4>
+                        <p><strong>Metric:</strong> <code>productLookupTime</code></p>
+                        <p><strong>Endpoint:</strong> <code>GET /api/products/{id}</code></p>
+                        <p><strong>Purpose:</strong> Measures time spent retrieving individual products</p>
+                        <p><strong>Includes:</strong> Response times, rates, percentiles</p>
+                    </div>
+                    
+                    <div style="background-color: #f3e5f5; padding: 10px; border-radius: 5px;">
+                        <h4 style="color: #7b1fa2; margin-top: 0;">🔢 Counter Metrics</h4>
+                        <p><strong>Metric:</strong> <code>productAccessCount</code></p>
+                        <p><strong>Endpoint:</strong> <code>GET /api/products</code></p>
+                        <p><strong>Purpose:</strong> Counts how many times product list is accessed</p>
+                        <p><strong>Use Case:</strong> API usage patterns and load monitoring</p>
+                    </div>
+                    
+                    <div style="background-color: #e8f5e8; padding: 10px; border-radius: 5px;">
+                        <h4 style="color: #388e3c; margin-top: 0;">📊 Gauge Metrics</h4>
+                        <p><strong>Metric:</strong> <code>productCatalogSize</code></p>
+                        <p><strong>Endpoint:</strong> <code>GET /api/products/count</code></p>
+                        <p><strong>Purpose:</strong> Real-time count of products in catalog</p>
+                        <p><strong>Use Case:</strong> Inventory monitoring and capacity planning</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="background-color: #fff3cd; margin-top: 15px;">
+                <h3>Testing Metrics</h3>
+                <p>You can test the metrics endpoints using curl commands:</p>
+                <pre><code># View all metrics
+curl -X GET http://localhost:5050/metrics
+
+# View only application metrics  
+curl -X GET http://localhost:5050/metrics?scope=application
+
+# View specific metric by name
+curl -X GET "http://localhost:5050/metrics?name=productAccessCount"
+
+# Generate metric data by calling endpoints
+curl -X GET http://localhost:5050/api/products        # Increments counter
+curl -X GET http://localhost:5050/api/products/1      # Records timing
+curl -X GET http://localhost:5050/api/products/count  # Updates gauge</code></pre>
+            </div>
+
+            <div class="card" style="background-color: #e3f2fd; margin-top: 15px;">
+                <h3>Sample Metrics Output</h3>
+                <p>Example response from <code>/metrics?scope=application</code> endpoint:</p>
+                <pre><code># TYPE application_productLookupTime_seconds summary
+application_productLookupTime_seconds_count 5
+application_productLookupTime_seconds_sum 0.52487
+application_productLookupTime_seconds{quantile="0.5"} 0.1034
+application_productLookupTime_seconds{quantile="0.95"} 0.1123
+
+# TYPE application_productAccessCount_total counter
+application_productAccessCount_total 15
+
+# TYPE application_productCatalogSize gauge
+application_productCatalogSize 3</code></pre>
+            </div>
+
+            <div class="card" style="background-color: #f0f7ff; margin-top: 15px;">
+                <h3>Metrics Benefits</h3>
+                <ul>
+                    <li><strong>Performance Monitoring:</strong> Track response times and identify slow operations</li>
+                    <li><strong>Usage Analytics:</strong> Understand API usage patterns and frequency</li>
+                    <li><strong>Capacity Planning:</strong> Monitor catalog size and growth trends</li>
+                    <li><strong>Operational Insights:</strong> Real-time visibility into service behavior</li>
+                    <li><strong>Integration Ready:</strong> Prometheus-compatible format for monitoring systems</li>
+                    <li><strong>Troubleshooting:</strong> Correlation of performance issues with usage patterns</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Sample Usage</h2>
+            
+            <h3>List All Products</h3>
+            <pre><code>GET /api/products</code></pre>
+            <p>Response:</p>
+            <pre><code>[
+  {
+    "id": 1,
+    "name": "Smartphone X",
+    "description": "Latest smartphone with advanced features",
+    "price": 799.99
+  },
+  {
+    "id": 2,
+    "name": "Laptop Pro",
+    "description": "High-performance laptop for professionals",
+    "price": 1299.99
+  }
+]</code></pre>
+
+            <h3>Get Product by ID</h3>
+            <pre><code>GET /api/products/1</code></pre>
+            <p>Response:</p>
+            <pre><code>{
+  "id": 1,
+  "name": "Smartphone X",
+  "description": "Latest smartphone with advanced features",
+  "price": 799.99
+}</code></pre>
+            
+            <h3>Create a New Product</h3>
+            <pre><code>POST /api/products
+Content-Type: application/json
+
+{
+  "name": "Wireless Earbuds",
+  "description": "Premium wireless earbuds with noise cancellation",
+  "price": 149.99
+}</code></pre>
+            <p>Response:</p>
+            <pre><code>{
+  "id": 3,
+  "name": "Wireless Earbuds",
+  "description": "Premium wireless earbuds with noise cancellation",
+  "price": 149.99
+}</code></pre>
+
+            <h3>Update a Product</h3>
+            <pre><code>PUT /api/products/3
+Content-Type: application/json
+
+{
+  "name": "Wireless Earbuds Pro",
+  "description": "Premium wireless earbuds with advanced noise cancellation",
+  "price": 179.99
+}</code></pre>
+            <p>Response:</p>
+            <pre><code>{
+  "id": 3,
+  "name": "Wireless Earbuds Pro",
+  "description": "Premium wireless earbuds with advanced noise cancellation",
+  "price": 179.99
+}</code></pre>
+
+            <h3>Delete a Product</h3>
+            <pre><code>DELETE /api/products/3</code></pre>
+            <p>Response: No content (204)</p>
+
+            <h3>Search for Products</h3>
+            <pre><code>GET /api/products/search?name=laptop&minPrice=1000&maxPrice=2000</code></pre>
+            <p>Response:</p>
+            <pre><code>[
+  {
+    "id": 2,
+    "name": "Laptop Pro",
+    "description": "High-performance laptop for professionals",
+    "price": 1299.99
+  }
+]</code></pre>
+        </div>
+    </main>
+
+    <footer>
+        <p>Product Catalog Service</p>
+        <p>© 2025 - MicroProfile APT Tutorial</p>
+    </footer>
+
+    <script>
+        // Check if service is in maintenance mode
+        fetch('/api/products')
+            .then(response => {
+                const statusDiv = document.getElementById('serviceStatus');
+                if (response.status === 503) {
+                    statusDiv.className = 'status maintenance';
+                    statusDiv.textContent = 'Service Status: Maintenance Mode';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking service status:', error);
+                const statusDiv = document.getElementById('serviceStatus');
+                statusDiv.className = 'status maintenance';
+                statusDiv.textContent = 'Service Status: Error';
+            });
+
+        // Function to update health check status indicators
+        function updateHealthStatus(endpoint, elementId) {
+            fetch(endpoint)
+                .then(response => response.json())
+                .then(data => {
+                    const indicator = document.getElementById(elementId);
+                    if (data.status === 'UP') {
+                        indicator.className = 'health-indicator health-up';
+                        indicator.title = 'Health check is UP';
+                    } else {
+                        indicator.className = 'health-indicator health-down';
+                        indicator.title = 'Health check is DOWN';
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error checking ${endpoint}:`, error);
+                    const indicator = document.getElementById(elementId);
+                    indicator.className = 'health-indicator health-unknown';
+                    indicator.title = 'Health check status unknown';
+                });
+        }
+
+        // Check health status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateHealthStatus('/health', 'overall-status');
+            updateHealthStatus('/health/started', 'startup-status');
+            updateHealthStatus('/health/ready', 'readiness-status');
+            updateHealthStatus('/health/live', 'liveness-status');
+            
+            // Update health status every 30 seconds
+            setInterval(() => {
+                updateHealthStatus('/health', 'overall-status');
+                updateHealthStatus('/health/started', 'startup-status');
+                updateHealthStatus('/health/ready', 'readiness-status');
+                updateHealthStatus('/health/live', 'liveness-status');
+            }, 30000);
+        });
+    </script>
+</body>
+</html>

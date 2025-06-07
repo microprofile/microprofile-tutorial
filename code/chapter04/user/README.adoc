@@ -1,0 +1,548 @@
+= User Management Service
+:toc: left
+:icons: font
+:source-highlighter: highlightjs
+:sectnums:
+:imagesdir: images
+
+This document provides information about the User Management Service, part of the MicroProfile tutorial store application.
+
+== Overview
+
+The User Management Service is responsible for user operations including:
+
+* User registration and management
+* User profile information
+* Basic authentication
+
+This service demonstrates MicroProfile and Jakarta EE technologies in a microservice architecture.
+
+== Technology Stack
+
+The User Management Service uses the following technologies:
+
+* Jakarta EE 10
+** RESTful Web Services (JAX-RS 3.1)
+** Context and Dependency Injection (CDI 4.0)
+** Bean Validation 3.0
+** JSON-B 3.0
+* MicroProfile 6.1
+** OpenAPI 3.1
+* Open Liberty
+* Maven
+
+== Project Structure
+
+[source]
+----
+user/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── io/microprofile/tutorial/store/user/
+│   │   │       ├── entity/       # Domain objects
+│   │   │       ├── exception/    # Custom exceptions
+│   │   │       ├── repository/   # Data access layer
+│   │   │       ├── resource/     # REST endpoints
+│   │   │       ├── service/      # Business logic
+│   │   │       └── UserApplication.java
+│   │   ├── liberty/
+│   │   │   └── config/
+│   │   │       └── server.xml    # Liberty server configuration
+│   │   ├── resources/
+│   │   │   └── META-INF/
+│   │   │       └── microprofile-config.properties
+│   │   └── webapp/
+│   │       └── index.html        # Welcome page
+│   └── test/                     # Unit and integration tests
+└── pom.xml                       # Maven configuration
+----
+
+== API Endpoints
+
+The service exposes the following RESTful endpoints:
+
+[cols="2,1,4", options="header"]
+|===
+| Endpoint | Method | Description
+
+| `/api/users` | GET | Retrieve all users
+| `/api/users/{id}` | GET | Retrieve a specific user by ID
+| `/api/users` | POST | Create a new user
+| `/api/users/{id}` | PUT | Update an existing user
+| `/api/users/{id}` | DELETE | Delete a user
+| `/api/users/profile` | GET | Get authenticated user's profile (generic auth)
+| `/api/users/user-profile` | GET | Simple JWT demo endpoint
+| `/api/users/jwt` | GET | Get demo JWT token
+|===
+
+== Running the Service
+
+=== Prerequisites
+
+* JDK 17 or later
+* Maven 3.8+
+* Docker (optional, for containerized deployment)
+
+=== Local Development
+
+1. Download the source code:
++
+[source,bash]
+----
+# Download the code branch as ZIP and extract
+curl -L https://github.com/ttelang/microprofile-tutorial/archive/refs/heads/code.zip -o microprofile-tutorial.zip
+unzip microprofile-tutorial.zip
+cd microprofile-tutorial-code/user
+----
+
+2. Build the project:
++
+[source,bash]
+----
+mvn clean package
+----
+
+3. Run the service:
++
+[source,bash]
+----
+mvn liberty:run
+----
+
+4. The service will be available at:
++
+[source]
+----
+http://localhost:6050/user/api/users
+----
+
+=== Docker Deployment
+
+To build and run using Docker:
+
+[source,bash]
+----
+# Build the Docker image
+docker build -t microprofile-tutorial/user-service .
+
+# Run the container
+docker run -p 6050:6050 microprofile-tutorial/user-service
+----
+
+== Configuration
+
+The service can be configured using Liberty server.xml and MicroProfile Config:
+
+=== server.xml
+
+The main configuration file at `src/main/liberty/config/server.xml` includes:
+
+* HTTP endpoint configuration (port 6050)
+* Feature enablement (including `mpJwt-2.1` for JWT support)
+* Application context configuration
+* JWT authentication configuration
+
+=== MicroProfile JWT Configuration
+
+The service includes MicroProfile JWT 2.1 support for token-based authentication. JWT configuration in `server.xml`:
+
+[source,xml]
+----
+<mpJwt id="myMpJwt"
+       jwksUri="https://example.com/.well-known/jwks.json"
+       issuer="https://example.com"
+       audiences="user-service"
+       userNameAttribute="sub"
+       groupNameAttribute="groups"/>
+----
+
+==== JWT Configuration Parameters:
+
+* **`jwksUri`**: URL endpoint where JWT signing keys are published (JWKS endpoint)
+  - Example: `https://your-auth-server.com/.well-known/jwks.json`
+  - The service fetches public keys from this URL to verify JWT signatures
+  - Common with OAuth2/OpenID Connect providers (Keycloak, Auth0, etc.)
+
+* **`issuer`**: Expected issuer of JWT tokens (must match the `iss` claim in tokens)
+  - Example: `https://your-auth-server.com`
+  - Used to validate that tokens come from the expected authorization server
+
+* **`audiences`**: Expected audience for JWT tokens (must match the `aud` claim)
+  - Example: `user-service` or `microprofile-tutorial`
+  - Ensures tokens are intended for this specific service
+
+* **`userNameAttribute`**: JWT claim that contains the username
+  - Default: `sub` (subject claim)
+  - Used by `SecurityContext.getUserPrincipal().getName()`
+
+* **`groupNameAttribute`**: JWT claim that contains user roles/groups
+  - Default: `groups`
+  - Used for role-based authorization
+
+==== Development Configuration:
+
+For development and testing, you can use a shared secret instead of JWKS:
+
+[source,xml]
+----
+<mpJwt id="myMpJwt"
+       sharedKey="your-secret-key-here"
+       issuer="https://example.com"
+       audiences="user-service"/>
+----
+
+==== Common JWKS Providers:
+
+* **Keycloak**: `https://your-keycloak.com/realms/your-realm/protocol/openid-connect/certs`
+* **Auth0**: `https://your-domain.auth0.com/.well-known/jwks.json`
+* **Google**: `https://www.googleapis.com/oauth2/v3/certs`
+* **Microsoft**: `https://login.microsoftonline.com/common/discovery/v2.0/keys`
+
+=== MicroProfile Config
+
+Environment-specific configuration can be modified in:
+`src/main/resources/META-INF/microprofile-config.properties`
+
+== OpenAPI Documentation
+
+The service provides OpenAPI documentation of all endpoints.
+
+Access the OpenAPI UI at:
+[source]
+----
+http://localhost:6050/openapi/ui
+----
+
+Raw OpenAPI specification:
+[source]
+----
+http://localhost:6050/openapi
+----
+
+== Exception Handling
+
+The service includes a comprehensive exception handling strategy:
+
+* Custom exceptions for domain-specific errors
+* Global exception mapping to appropriate HTTP status codes
+* Consistent error response format
+
+Error responses follow this structure:
+
+[source,json]
+----
+{
+  "errorCode": "user_not_found",
+  "message": "User with ID 123 not found",
+  "timestamp": "2023-04-15T14:30:45Z"
+}
+----
+
+Common error scenarios:
+
+* 400 Bad Request - Invalid input data
+* 404 Not Found - Requested user doesn't exist
+* 409 Conflict - Email address already in use
+
+== Testing
+
+=== Prerequisites for Testing
+
+* Service running on http://localhost:6050
+* curl command-line tool or Postman
+* (Optional) JWT token for authentication endpoints
+
+=== Running Unit Tests
+
+Execute unit and integration tests with:
+
+[source,bash]
+----
+mvn test
+----
+
+=== Manual Testing with cURL
+
+==== Basic CRUD Operations
+
+*Get all users:*
+[source,bash]
+----
+curl -X GET http://localhost:6050/user/api/users \
+  -H "Accept: application/json"
+----
+
+*Get user by ID:*
+[source,bash]
+----
+curl -X GET http://localhost:6050/user/api/users/1 \
+  -H "Accept: application/json"
+----
+
+*Create new user:*
+[source,bash]
+----
+curl -X POST http://localhost:6050/user/api/users \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "passwordHash": "mypassword123",
+    "address": "123 Main St",
+    "phone": "+1234567890"
+  }'
+----
+
+*Update user:*
+[source,bash]
+----
+curl -X PUT http://localhost:6050/user/api/users/1 \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "name": "John Updated",
+    "email": "john.updated@example.com",
+    "passwordHash": "newpassword456",
+    "address": "456 New Address",
+    "phone": "+1987654321"
+  }'
+----
+
+*Delete user:*
+[source,bash]
+----
+curl -X DELETE http://localhost:6050/user/api/users/1
+----
+
+==== Authentication and Profile Endpoints
+
+*Get demo JWT token:*
+[source,bash]
+----
+curl -X GET http://localhost:6050/user/api/users/jwt \
+  -H "Accept: application/json"
+----
+
+*Test generic authentication profile (works with any auth):*
+[source,bash]
+----
+# Without authentication (should return 401)
+curl -X GET http://localhost:6050/user/api/users/profile \
+  -H "Accept: application/json"
+
+# With basic authentication (if configured)
+curl -X GET http://localhost:6050/user/api/users/profile \
+  -H "Accept: application/json" \
+  -u "username:password"
+----
+
+*Test JWT-specific profile endpoint:*
+[source,bash]
+----
+# Simple JWT demo - returns plain text
+curl -X GET http://localhost:6050/user/api/users/user-profile \
+  -H "Accept: text/plain" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
+----
+
+==== Testing Error Scenarios
+
+*Test user not found:*
+[source,bash]
+----
+curl -X GET http://localhost:6050/user/api/users/999 \
+  -H "Accept: application/json" \
+  -w "\nHTTP Status: %{http_code}\n"
+----
+
+*Test duplicate email:*
+[source,bash]
+----
+# First, create a user
+curl -X POST http://localhost:6050/user/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "email": "test@example.com",
+    "passwordHash": "password123"
+  }'
+
+# Then try to create another user with the same email
+curl -X POST http://localhost:6050/user/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Another User",
+    "email": "test@example.com",
+    "passwordHash": "password456"
+  }' \
+  -w "\nHTTP Status: %{http_code}\n"
+----
+
+*Test invalid input:*
+[source,bash]
+----
+curl -X POST http://localhost:6050/user/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "",
+    "email": "invalid-email",
+    "passwordHash": ""
+  }' \
+  -w "\nHTTP Status: %{http_code}\n"
+----
+
+=== Testing with Postman
+
+For a more user-friendly testing experience, you can import the following collection into Postman:
+
+1. Create a new Postman collection named "User Management Service"
+2. Add the following requests:
+
+==== Environment Variables
+Set up these Postman environment variables:
+* `baseUrl`: `http://localhost:6050/user/api`
+* `userId`: `1` (or any valid user ID)
+
+==== Sample Requests
+
+*GET All Users*
+- Method: GET
+- URL: `{{baseUrl}}/users`
+- Headers: `Accept: application/json`
+
+*POST Create User*
+- Method: POST  
+- URL: `{{baseUrl}}/users`
+- Headers: `Content-Type: application/json`
+- Body (raw JSON):
+[source,json]
+----
+{
+  "name": "Jane Smith",
+  "email": "jane@example.com", 
+  "passwordHash": "securepassword",
+  "address": "789 Oak Avenue",
+  "phone": "+1555000123"
+}
+----
+
+*GET User Profile (Generic Auth)*
+- Method: GET
+- URL: `{{baseUrl}}/users/profile`
+- Headers: `Accept: application/json`
+- Auth: Configure as needed (Basic, Bearer Token, etc.)
+
+*GET JWT Demo*
+- Method: GET  
+- URL: `{{baseUrl}}/users/user-profile`
+- Headers: `Accept: text/plain`
+- Auth: Bearer Token with JWT
+
+=== Load Testing
+
+For performance testing, you can use tools like Apache Bench (ab) or wrk:
+
+*Basic load test with Apache Bench:*
+[source,bash]
+----
+# Test GET all users with 100 requests, 10 concurrent
+ab -n 100 -c 10 http://localhost:6050/user/api/users
+
+# Test user creation with 50 requests, 5 concurrent
+ab -n 50 -c 5 -p user.json -T application/json http://localhost:6050/user/api/users
+----
+
+Where `user.json` contains:
+[source,json]
+----
+{
+  "name": "Load Test User",
+  "email": "loadtest@example.com",
+  "passwordHash": "testpassword"
+}
+----
+
+=== Integration Testing
+
+To test service integration with other microservices:
+
+*Health check:*
+[source,bash]
+----
+curl -X GET http://localhost:6050/health
+----
+
+*OpenAPI specification:*
+[source,bash]
+----
+curl -X GET http://localhost:6050/openapi
+----
+
+=== Expected Response Formats
+
+==== Successful User Response
+[source,json]
+----
+{
+  "userId": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "passwordHash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+  "address": "123 Main St",
+  "phone": "+1234567890"
+}
+----
+
+==== Error Response
+[source,json]  
+----
+{
+  "message": "User not found",
+  "status": 404
+}
+----
+
+==== JWT Demo Response
+[source,text]
+----
+User: 1234567890, Roles: [admin, user], Tenant: tenant123
+----
+
+== Implementation Notes
+
+=== In-Memory Storage
+
+The service currently uses thread-safe in-memory storage:
+
+* `ConcurrentHashMap` for storing user data
+* `AtomicLong` for generating sequence IDs
+* No persistence to external databases
+
+For production use, consider implementing a proper database persistence layer.
+
+=== Security Considerations
+
+* Passwords are stored as hashes (not encrypted or in plain text)
+* Input validation helps prevent injection attacks
+* No authentication mechanism is implemented (for demo purposes only)
+
+== Troubleshooting
+
+=== Common Issues
+
+* *Port conflicts:* Check if port 6050 is already in use
+* *CORS issues:* For browser access, check CORS configuration in server.xml
+* *404 errors:* Verify the application context root and API path
+
+=== Logs
+
+* Liberty server logs are in `target/liberty/wlp/usr/servers/defaultServer/logs/`
+* Application logs use standard JDK logging with info level by default
+
+== Further Resources
+
+* https://jakarta.ee/specifications/restful-ws/3.1/jakarta-restful-ws-spec-3.1.html[Jakarta RESTful Web Services Specification]
+* https://openliberty.io/docs/latest/documentation.html[Open Liberty Documentation]
+* https://download.eclipse.org/microprofile/microprofile-6.1/microprofile-spec-6.1.html[MicroProfile 6.1 Specification]

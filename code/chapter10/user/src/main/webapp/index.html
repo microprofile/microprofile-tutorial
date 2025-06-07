@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Service - MicroProfile E-Commerce Store</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .header h1 {
+            color: #4a5568;
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        .header p {
+            color: #718096;
+            font-size: 1.2em;
+            margin: 0;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        .card h2 {
+            color: #4a5568;
+            margin-top: 0;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .endpoint {
+            background: #f7fafc;
+            border-left: 4px solid #4299e1;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+            margin-right: 10px;
+        }
+        .get { background-color: #48bb78; }
+        .jwt-example {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .response-example {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 40px;
+            padding: 20px;
+        }
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .tech-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #48bb78;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="status-indicator"></span>User Service</h1>
+            <p>MicroProfile E-Commerce Store - User Management Microservice</p>
+        </div>
+
+        <div class="card">
+            <h2>🏗️ Technology Stack</h2>
+            <div class="tech-stack">
+                <span class="tech-badge">MicroProfile JWT</span>
+                <span class="tech-badge">Jakarta Restful Web Service</span>
+                <span class="tech-badge">MicroProfile OpenAPI</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🚀 API Endpoints</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/users/user-profile</strong>
+                <p>Returns the authenticated user's profile information extracted from the JWT token.</p>
+                <p><strong>Security:</strong> Requires valid JWT Bearer token with "user" role</p>
+                <div class="response-example">
+<strong>Response Example:</strong>
+User: user1@example.com, Roles: [user], Tenant: ecomm-tenant-1
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔐 JWT Authentication</h2>
+            <p>This service uses MicroProfile JWT for authentication. Include the JWT token in the Authorization header:</p>
+            <div class="jwt-example">Authorization: Bearer &lt;your-jwt-token&gt;</div>
+            
+            <h3>Required JWT Claims:</h3>
+            <ul>
+                <li><strong>iss:</strong> mp-ecomm-store (issuer must match service configuration)</li>
+                <li><strong>sub:</strong> User identifier (e.g., "user1")</li>
+                <li><strong>groups:</strong> Array containing "user" role</li>
+                <li><strong>tenant_id:</strong> Tenant identifier (custom claim)</li>
+                <li><strong>upn:</strong> User Principal Name (e.g., "user1@example.com")</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>📖 OpenAPI Documentation</h2>
+            <p>Interactive API documentation is available at:</p>
+            <ul>
+                <li><strong>OpenAPI Spec:</strong> <a href="/openapi" target="_blank"><code>/openapi</code></a></li>
+                <li><strong>Swagger UI:</strong> <a href="=/openapi/ui" target="_blank"><code>/openapi/ui</code></a></li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🛠️ Development & Testing</h2>
+            <p>To test the secured endpoints, you'll need a valid JWT token. You can generate one using the JWT tools in the <code>tools/</code> directory.</p>
+            
+            <h3>Quick Test Commands:</h3>
+            <div class="jwt-example">
+# Generate JWT token using jwtenizr
+cd tools && java -jar jwtenizr.jar
+
+# Test secured endpoint (with JWT)
+curl -H "Authorization: Bearer &lt;your-jwt-token&gt;" \
+     http://localhost:6050/user/api/users/user-profile
+
+# Test with generated token directly
+curl -H "Authorization: Bearer $(cat tools/token.jwt)" \
+     http://localhost:6050/user/api/users/user-profile
+
+# Generate token and test endpoint automatically
+cd tools && java -Dverbose -jar jwtenizr.jar http://localhost:6050/user/api/users/user-profile
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🏪 MicroProfile E-Commerce Store - User Service</p>
+            <p>Built with Open Liberty and MicroProfile</p>
+        </div>
+    </div>
+</body>
+</html>

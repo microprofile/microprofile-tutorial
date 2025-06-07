@@ -1,0 +1,186 @@
+= Inventory Service
+:toc: left
+:icons: font
+:source-highlighter: highlightjs
+
+A Jakarta EE and MicroProfile-based REST service for inventory management in the Liberty Rest App demo.
+
+== Features
+
+* Provides CRUD operations for inventory management
+* Tracks product inventory with inventory_id, product_id, and quantity
+* Uses Jakarta EE 10.0 and MicroProfile 6.1
+* Runs on Open Liberty runtime
+
+== Running the Application
+
+To start the application, run:
+
+[source,bash]
+----
+cd inventory
+mvn liberty:run
+----
+
+This will start the Open Liberty server on port 7050 (HTTP) and 7051 (HTTPS).
+
+== API Endpoints
+
+[cols="1,3,2", options="header"]
+|===
+|Method |URL |Description
+
+|GET
+|/api/inventories
+|Get all inventory items
+
+|GET
+|/api/inventories/{id}
+|Get inventory by ID
+
+|GET
+|/api/inventories/product/{productId}
+|Get inventory by product ID
+
+|POST
+|/api/inventories
+|Create new inventory
+
+|PUT
+|/api/inventories/{id}
+|Update inventory
+
+|DELETE
+|/api/inventories/{id}
+|Delete inventory
+
+|PATCH
+|/api/inventories/product/{productId}/quantity/{quantity}
+|Update product quantity
+|===
+
+== Testing with cURL
+
+=== Get all inventory items
+[source,bash]
+----
+curl -X GET http://localhost:7050/inventory/api/inventories
+----
+
+=== Get inventory by ID
+[source,bash]
+----
+curl -X GET http://localhost:7050/inventory/api/inventories/1
+----
+
+=== Create new inventory
+[source,bash]
+----
+curl -X POST http://localhost:7050/inventory/api/inventories \
+  -H "Content-Type: application/json" \
+  -d '{"productId": 123, "quantity": 50}'
+----
+
+=== Update inventory
+[source,bash]
+----
+curl -X PUT http://localhost:7050/inventory/api/inventories/1 \
+  -H "Content-Type: application/json" \
+  -d '{"productId": 123, "quantity": 75}'
+----
+
+=== Delete inventory
+[source,bash]
+----
+curl -X DELETE http://localhost:7050/inventory/api/inventories/1
+----
+
+=== Update product quantity
+[source,bash]
+----
+curl -X PATCH http://localhost:7050/inventory/api/inventories/product/123/quantity/100
+----
+
+== Project Structure
+
+[source]
+----
+inventory/
+├── src/
+│   └── main/
+│       ├── java/                              # Java source files
+│       │   └── io/microprofile/tutorial/store/inventory/
+│       │       ├── entity/                    # Domain entities
+│       │       ├── exception/                 # Custom exceptions
+│       │       ├── service/                   # Business logic
+│       │       └── resource/                  # REST endpoints
+│       ├── liberty/
+│       │   └── config/                        # Liberty server configuration
+│       └── webapp/                            # Web resources
+└── pom.xml                                    # Project dependencies and build
+----
+
+== Exception Handling
+
+The service implements a robust exception handling mechanism:
+
+[cols="1,2", options="header"]
+|===
+|Exception |Purpose
+
+|`InventoryNotFoundException`
+|Thrown when requested inventory item does not exist (HTTP 404)
+
+|`InventoryConflictException`
+|Thrown when attempting to create duplicate inventory (HTTP 409)
+|===
+
+Exceptions are handled globally using `@Provider`:
+
+[source,java]
+----
+@Provider
+public class InventoryExceptionMapper implements ExceptionMapper<RuntimeException> {
+    // Maps exceptions to appropriate HTTP responses
+}
+----
+
+== Transaction Management
+
+The service includes the Jakarta Transactions feature (`transaction-1.3`) but does not use database persistence. In this context, `@Transactional` has limited use:
+
+* Can be used for transaction-like behavior in memory operations
+* Useful when you need to ensure multiple operations are executed atomically
+* Provides rollback capability for in-memory state changes
+* Primarily used for maintaining consistency in distributed operations
+
+[NOTE]
+====
+Since this service doesn't use database persistence, `@Transactional` mainly serves as a boundary for:
+
+* Coordinating multiple service method calls
+* Managing concurrent access to shared resources
+* Ensuring atomic operations across multiple steps
+====
+
+Example usage:
+
+[source,java]
+----
+@ApplicationScoped
+public class InventoryService {
+    private final ConcurrentHashMap<Long, Inventory> inventoryStore;
+    
+    @Transactional
+    public void updateInventory(Long id, Inventory inventory) {
+        // Even without persistence, @Transactional can help manage
+        // atomic operations and coordinate multiple method calls
+        if (!inventoryStore.containsKey(id)) {
+            throw new InventoryNotFoundException(id);
+        }
+        // Multiple operations that need to be atomic
+        updateQuantity(id, inventory.getQuantity());
+        notifyInventoryChange(id);
+    }
+}
+----

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger-payment-tracing
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "14268:14268"   # HTTP collector endpoint
+      - "6831:6831/udp" # UDP collector endpoint
+      - "6832:6832/udp" # UDP collector endpoint
+      - "5778:5778"     # Agent config endpoint
+      - "4317:4317"     # OTLP gRPC endpoint
+      - "4318:4318"     # OTLP HTTP endpoint
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - LOG_LEVEL=debug
+    networks:
+      - jaeger-network
+
+networks:
+  jaeger-network:
+    driver: bridge

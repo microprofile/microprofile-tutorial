@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .endpoint {
+            background: #f8f8f8;
+            border-left: 4px solid #4CAF50;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inventory Management Service</h1>
+    <p>Welcome to the Inventory Management API, a Jakarta EE and MicroProfile demo.</p>
+    
+    <h2>Available Endpoints:</h2>
+    
+    <div class="endpoint">
+        <h3>OpenAPI Documentation</h3>
+        <p><code>GET /openapi</code> - Access OpenAPI documentation</p>
+        <a href="/openapi">View API Documentation</a>
+    </div>
+    
+    <div class="endpoint">
+        <h3>Inventory Operations</h3>
+        <p><code>GET /api/inventories</code> - Get all inventory items</p>
+        <p><code>GET /api/inventories/{id}</code> - Get inventory by ID</p>
+        <p><code>GET /api/inventories/product/{productId}</code> - Get inventory by product ID</p>
+        <p><code>POST /api/inventories</code> - Create new inventory</p>
+        <p><code>PUT /api/inventories/{id}</code> - Update inventory</p>
+        <p><code>DELETE /api/inventories/{id}</code> - Delete inventory</p>
+        <p><code>PATCH /api/inventories/product/{productId}/quantity/{quantity}</code> - Update product quantity</p>
+    </div>
+
+    <h2>Example Request</h2>
+    <pre><code>curl -X GET http://localhost:7050/inventory/api/inventories</code></pre>
+    
+    <footer>
+        <p>MicroProfile API Tutorial - &copy; 2025</p>
+    </footer>
+</body>
+</html>

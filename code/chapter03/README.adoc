@@ -1,0 +1,39 @@
+= MicroProfile E-Commerce Platform
+:toc: macro
+:toclevels: 3
+:icons: font
+:imagesdir: images
+:source-highlighter: highlight.js
+
+toc::[]
+
+== Overview
+
+This directory demonstrates modern Java enterprise development practices including REST API design, loose coupling, dependency injection, and unit testing strategies.
+
+== Projects
+
+=== mp-ecomm-store
+
+The MicroProfile E-Commerce Store service provides product catalog capabilities through a RESTful API. 
+
+*Key Features:*
+
+* Complete CRUD operations for product management
+* Memory based data storage for demonstration purposes
+* Comprehensive unit and integration testing
+* Logging interceptor for logging entry/exit of methods
+
+link:mp-ecomm-store/README.adoc[README file for mp-ecomm-store project]
+
+=== catalog
+
+The Catalog service provides persistent product catalog management using Jakarta Persistence with an embedded Derby database. It offers a more robust implementation with database persistence.
+
+*Key Features:*
+
+* CRUD operations for product catalog management
+* Database persistence with Jakarta Persistence and Derby
+* Entity-based domain model
+
+link:catalog/README.adoc[README file for Catalog service project]

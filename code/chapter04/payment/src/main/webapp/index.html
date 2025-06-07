@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Service - MicroProfile E-Commerce</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #0066cc;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 0;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            padding: 20px;
+        }
+        .endpoints {
+            list-style-type: none;
+            padding: 0;
+        }
+        .endpoints li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 60px;
+            text-align: center;
+        }
+        .get { background-color: #61affe; color: white; }
+        .post { background-color: #49cc90; color: white; }
+        .put { background-color: #fca130; color: white; }
+        .delete { background-color: #f93e3e; color: white; }
+        .patch { background-color: #50e3c2; color: white; }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .links {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .links a {
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .links a:hover {
+            background-color: #004999;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Payment Service</h1>
+        <p>Part of the MicroProfile E-Commerce Application</p>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2>About this Service</h2>
+            <p>The Payment Service handles processing payments for orders in the e-commerce system.</p>
+            <p>It provides endpoints for creating, updating, and managing payment transactions.</p>
+        </div>
+        
+        <div class="card">
+            <h2>API Endpoints</h2>
+            <ul class="endpoints">
+                <li><span class="method get">GET</span> /api/payments - Get all payments</li>
+                <li><span class="method get">GET</span> /api/payments/{id} - Get payment by ID</li>
+                <li><span class="method get">GET</span> /api/payments/user/{userId} - Get payments by user ID</li>
+                <li><span class="method get">GET</span> /api/payments/order/{orderId} - Get payments by order ID</li>
+                <li><span class="method get">GET</span> /api/payments/status/{status} - Get payments by status</li>
+                <li><span class="method post">POST</span> /api/payments - Create new payment</li>
+                <li><span class="method put">PUT</span> /api/payments/{id} - Update payment</li>
+                <li><span class="method patch">PATCH</span> /api/payments/{id}/status/{status} - Update payment status</li>
+                <li><span class="method post">POST</span> /api/payments/{id}/process - Process payment</li>
+                <li><span class="method delete">DELETE</span> /api/payments/{id} - Delete payment</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>Links</h2>
+            <div class="links">
+                <a href="/payment/api/openapi-ui/">OpenAPI Documentation</a>
+                <a href="/payment/api/payments">View All Payments</a>
+                <a href="/health">Health Check</a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>MicroProfile E-Commerce Demo Application | Payment Service</p>
+        <p>Powered by Open Liberty & MicroProfile</p>
+    </footer>
+</body>
+</html>

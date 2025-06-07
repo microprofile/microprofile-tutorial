@@ -1,0 +1,521 @@
+= User Service - MicroProfile E-Commerce Store
+:toc: left
+:toclevels: 3
+:sectnums:
+:source-highlighter: highlightjs
+
+== Overview
+
+The User Service is a core microservice in the MicroProfile E-Commerce Store application. It provides secure user management operations with JWT-based authentication and authorization.
+
+== Features
+
+* 🔐 **JWT Authentication**: Secure endpoints using MicroProfile JWT
+* 📋 **User Profile Management**: Extract and display user information from JWT claims
+* 📖 **OpenAPI Documentation**: Comprehensive API documentation with Swagger UI
+* 🏗️ **MicroProfile Compliance**: Built with Jakarta EE and MicroProfile standards
+
+== Technology Stack
+
+* **Runtime**: Open Liberty
+* **Framework**: MicroProfile, Jakarta EE
+* **Security**: MicroProfile JWT
+* **API**: Jakarta Restful Web Services, MicroProfile OpenAPI
+* **Build**: Maven
+
+== API Endpoints
+
+=== Secured Endpoints
+
+==== GET /users/user-profile
+Returns the authenticated user's profile information extracted from the JWT token.
+
+**Security**: Requires valid JWT Bearer token with `user` role
+
+**Response Example**:
+[source,text]
+----
+User: user1, Roles: [user], Tenant: ecomm-tenant-1
+----
+
+**HTTP Status Codes**:
+* `200` - User profile returned successfully
+* `401` - Unauthorized - JWT token is missing or invalid
+* `403` - Forbidden - User lacks required permissions
+
+== Authentication & Authorization
+
+=== JWT Token Requirements
+
+The service expects JWT tokens with the following claims:
+
+[cols="1,2,3"]
+|===
+|Claim |Required |Description
+
+|`iss`
+|Yes
+|Issuer - must match `mp.jwt.verify.issuer` configuration
+
+|`sub`
+|Yes
+|Subject - unique user identifier
+
+|`groups`
+|Yes
+|Array containing user roles (must include "user")
+
+|`tenant_id`
+|No
+|Custom claim for multi-tenant support
+
+|`exp`
+|Yes
+|Expiration timestamp
+
+|`iat`
+|Yes
+|Issued at timestamp
+|===
+
+=== Example JWT Payload
+
+[source,json]
+----
+{
+  "iss": "mp-ecomm-store",
+  "jti": "42",
+  "sub": "user1",
+  "upn": "user1@example.com",
+  "groups": ["user"],
+  "tenant_id": "ecomm-tenant-1",
+  "exp": 1748951611,
+  "iat": 1748950611
+}
+----
+
+== Configuration
+
+=== MicroProfile Configuration
+
+The service uses the following MicroProfile configuration properties:
+
+[source,properties]
+----
+# Enable OpenAPI scanning
+mp.openapi.scan=true
+
+# JWT verification settings
+mp.jwt.verify.publickey.location=/META-INF/publicKey.pem
+mp.jwt.verify.issuer=mp-ecomm-store
+
+# OpenAPI UI configuration
+mp.openapi.ui.enable=true
+----
+
+**Security Note**: CORS should be properly configured for production environments.
+
+=== Security Configuration
+
+The service requires:
+
+1. **Public Key**: RSA public key in PEM format located at `/META-INF/publicKey.pem`
+2. **Issuer Validation**: JWT tokens must have matching `iss` claim
+3. **Role-Based Access**: Endpoints require `user` role in JWT `groups` claim
+
+== Development Setup
+
+=== Prerequisites
+
+* Java 17 or higher
+* Maven 3.6+
+* Open Liberty runtime
+
+=== Building the Service
+
+[source,bash]
+----
+# Build the project
+mvn clean package
+
+# Run with Liberty dev mode
+mvn liberty:dev
+----
+
+=== Testing with JWT Tokens
+
+The User Service uses JWT-based authentication, so testing requires valid JWT tokens. The project includes the **jwtenizr** tool for comprehensive token generation and endpoint testing.
+
+==== jwtenizr - JWT Token Generator & Testing Tool
+
+The project includes **jwtenizr**, a lightweight Java command-line utility for generating JWT tokens and testing endpoints. This tool is essential for creating properly signed tokens that match the service's security configuration.
+
+===== Key Features
+
+* Generates RSA-signed JWT tokens with automatic expiration (default: 300 seconds)
+* Uses configurable payload and signing configuration
+* Outputs tokens ready for use with the User Service
+* Supports RS256 algorithm for token signing
+* Can test endpoints directly with generated tokens
+* Provides verbose output for debugging
+
+===== Quick Start Commands
+
+[source,bash]
+----
+# Navigate to tools directory
+cd tools/
+
+# Generate token and test endpoint directly (recommended)
+java -Dverbose -jar jwtenizr.jar http://localhost:6050/user/users/user-profile
+
+# Generate token silently
+java -jar jwtenizr.jar
+
+# Generate with verbose output
+java -Dverbose -jar jwtenizr.jar
+----
+
+**Command Options:**
+- **Basic**: `java -jar jwtenizr.jar` - Generates token silently
+- **Verbose**: `java -Dverbose -jar jwtenizr.jar` - Shows detailed token generation process  
+- **Test Endpoint**: `java -Dverbose -jar jwtenizr.jar <URL>` - Generates token and tests the specified endpoint automatically
+
+===== Configuration Files
+
+The tool uses three main files located in the `tools/` directory:
+
+====== 1. jwtenizr-config.json (Signing Configuration)
+
+Contains the RSA private key and algorithm settings:
+
+[source,json]
+----
+{
+  "algorithm": "RS256", 
+  "privateKey": "-----BEGIN PRIVATE KEY-----\n[RSA private key content]\n-----END PRIVATE KEY-----"
+}
+----
+
+**Security Notes:**
+- The private key must correspond to the public key in `/META-INF/publicKey.pem`
+- Only RS256 algorithm is currently supported
+- Keep private keys secure and out of public repositories
+
+====== 2. jwt-token.json (Token Payload)
+
+Defines the JWT claims and payload structure:
+
+[source,json]
+----
+{
+  "iss": "mp-ecomm-store",
+  "jti": "42",
+  "sub": "user1", 
+  "upn": "user1@example.com",
+  "groups": ["user"],
+  "tenant_id": "ecomm-tenant-1",
+  "exp": 1748951611,
+  "iat": 1748950611
+}
+----
+
+**Required Claims:**
+- `iss` (issuer): Must match `mp.jwt.verify.issuer` configuration ("mp-ecomm-store")
+- `sub` (subject): Unique user identifier  
+- `groups`: Array containing user roles (must include "user" for endpoint access)
+- `exp` (expiration): Unix timestamp (default: 300 seconds from generation)
+- `iat` (issued at): Unix timestamp for token creation
+
+**Optional Claims:**
+- `jti` (JWT ID): Unique identifier for the token
+- `upn` (User Principal Name): User's email or principal name
+- `tenant_id`: Custom claim for multi-tenant support
+
+====== 3. token.jwt (Generated Output)
+
+After running jwtenizr, this file contains the signed JWT token ready for use.
+
+===== Testing Methods
+
+====== Direct Endpoint Testing (Recommended)
+
+[source,bash]
+----
+# Generate token and test endpoint in one command
+java -Dverbose -jar jwtenizr.jar http://localhost:6050/user/users/user-profile
+----
+
+====== Manual Testing with curl
+
+[source,bash]
+----
+# Generate token first
+java -jar jwtenizr.jar
+
+# Test secured endpoint using generated token
+curl -H "Authorization: Bearer $(cat token.jwt)" \
+     http://localhost:6050/user/users/user-profile
+
+# Alternative: test with token variable
+TOKEN=$(cat token.jwt)
+curl -H "Authorization: Bearer $TOKEN" \
+     http://localhost:6050/user/users/user-profile
+----
+
+**Expected Response**:
+[source,text]
+----
+User: user1, Roles: [user], Tenant: ecomm-tenant-1
+----
+
+====== OpenAPI/Swagger UI Testing
+
+1. Navigate to `http://localhost:6050/user/openapi/ui`
+2. Click **"Authorize"** button (lock icon)
+3. Generate a token: `java -jar jwtenizr.jar`
+4. Enter token in **Value** field (with or without "Bearer " prefix)
+5. Click **"Authorize"** and test endpoints
+
+===== Advanced Configuration
+
+====== Custom Token Expiration
+
+[source,bash]
+----
+# Set expiration to 1 hour from now
+exp_time=$(date -d "+1 hour" +%s)
+sed -i "s/\"exp\": [0-9]*/\"exp\": $exp_time/" jwt-token.json
+
+# Generate new token
+java -jar jwtenizr.jar
+----
+
+====== Different User Profiles
+
+[source,bash]
+----
+# Copy default payload
+cp jwt-token.json jwt-token-admin.json
+
+# Modify for admin user
+sed -i 's/"sub": "user1"/"sub": "admin1"/' jwt-token-admin.json
+sed -i 's/"upn": "user1@example.com"/"upn": "admin1@example.com"/' jwt-token-admin.json
+sed -i 's/"groups": \["user"\]/"groups": ["user", "admin"]/' jwt-token-admin.json
+----
+
+===== Security Best Practices
+
+- Use jwtenizr for development and testing only
+- Never use development private keys in production
+- Rotate keys regularly and use proper key management
+- Consider proper identity providers (like Keycloak) for production
+- Keep private keys secure and out of version control
+
+== API Documentation
+
+=== OpenAPI Specification
+
+The service provides comprehensive OpenAPI documentation:
+
+* **OpenAPI JSON**: `http://localhost:6050/user/openapi`
+* **Swagger UI**: `http://localhost:6050/user/openapi/ui`
+
+=== Swagger UI Features
+
+* Interactive API testing
+* Request/response examples
+* Authentication configuration
+* Schema documentation
+
+=== Testing JWT Authentication via OpenAPI UI
+
+The OpenAPI/Swagger UI provides built-in support for testing JWT authentication:
+
+==== Step 1: Access Swagger UI
+Navigate to `http://localhost:6050/user/openapi/ui` in your browser.
+
+==== Step 2: Configure JWT Authentication
+
+1. Click the **"Authorize"** button (lock icon) at the top right of the Swagger UI
+2. In the **"jwt (http, bearer)"** section:
+   - Enter your JWT token in the **Value** field
+   - Format: `Bearer <your-jwt-token>` or just `<your-jwt-token>`
+   - Click **"Authorize"**
+
+==== Step 3: Test Secured Endpoints
+
+Once authenticated, you can test the secured endpoints:
+
+1. Expand the **GET /users/user-profile** endpoint
+2. Click **"Try it out"**
+3. Click **"Execute"**
+4. View the response with user profile information
+
+**Note**: Generate JWT tokens using the jwtenizr tool in the `/tools/` directory as described in the Testing section.
+
+=== OpenAPI Security Configuration
+
+The service automatically configures OpenAPI security through annotations:
+
+[source,java]
+----
+@SecurityScheme(
+    securitySchemeName = "jwt",
+    type = SecuritySchemeType.HTTP,
+    scheme = "bearer",
+    bearerFormat = "JWT",
+    description = "JWT authentication with bearer token"
+)
+----
+
+This configuration enables the "Authorize" button in Swagger UI and provides proper security documentation.
+
+== Troubleshooting
+
+=== JWT Token Generation Issues (jwtenizr)
+
+==== Common jwtenizr Problems
+
+**Issue**: `java.security.InvalidKeyException: Invalid key format`
+
+**Solution**: Verify the private key format in `jwtenizr-config.json`:
+- Ensure proper PEM formatting with `\n` line breaks
+- Check that the key starts with `-----BEGIN PRIVATE KEY-----`
+- Validate the key corresponds to the public key in the service
+
+**Issue**: `ClassNotFoundException` or `NoClassDefFoundError`
+
+**Solution**: Ensure Java runtime environment is properly configured:
+[source,bash]
+----
+# Check Java version (requires Java 11+)
+java -version
+
+# Verify jwtenizr.jar exists and is executable
+ls -la tools/jwtenizr.jar
+----
+
+**Issue**: Generated tokens fail service validation
+
+**Solution**: Check issuer and claims matching:
+[source,bash]
+----
+# Verify issuer matches service configuration
+grep "mp.jwt.verify.issuer" src/main/resources/META-INF/microprofile-config.properties
+
+# Verify token payload structure
+cat tools/jwt-token.json
+----
+
+=== Service Authentication Issues
+
+==== JWT Validation Errors
+
+**Error**: `CWWKS5523E: The MicroProfile JWT feature cannot authenticate the request`
+
+**Solutions**:
+1. Verify the JWT issuer matches the configuration ("mp-ecomm-store")
+2. Ensure the public key is correctly formatted and accessible
+3. Check token expiration time (default: 300 seconds)
+4. Validate token signature using corresponding public/private key pair
+
+==== Authorization Failures
+
+**Error**: `HTTP 403 Forbidden`
+
+**Solutions**:
+1. Ensure JWT contains `groups` claim with "user" role
+2. Verify token is not expired
+3. Check that the user principal is properly extracted
+4. Generate a fresh token using jwtenizr: `cd tools && java -jar jwtenizr.jar`
+
+==== Configuration Issues
+
+**Error**: `CWWKS6029E: Signing key cannot be found`
+
+**Solutions**:
+1. Verify `publicKey.pem` exists in `/META-INF/` directory
+2. Ensure the public key format is correct (PEM format)
+3. Check file permissions and deployment
+4. Validate the public key corresponds to the private key used in jwtenizr
+
+=== OpenAPI/Swagger UI Issues
+
+==== Authentication Problems in Swagger UI
+
+**Issue**: Swagger UI shows "Authorize" button but authentication fails
+
+**Solutions**:
+1. Generate a fresh token: `cd tools && java -jar jwtenizr.jar`
+2. Ensure correct token format in Swagger UI:
+   - Format: `Bearer <token>` or just `<token>`
+   - Use the full token from `tools/token.jwt`
+3. Verify the token includes all required claims (`iss`, `sub`, `groups`)
+4. Check token expiration (tokens expire after 300 seconds by default)
+
+**Example Token Input in Swagger UI**:
+```
+Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+Or simply:
+```
+eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Issue**: Valid token works in curl but fails in Swagger UI
+
+**Solutions**:
+1. Check browser network tab for actual request headers
+2. Verify Swagger UI is sending the Authorization header correctly
+3. Clear browser cache and cookies
+4. Try testing with a fresh JWT token
+
+==== CORS Issues
+
+**Issue**: Cross-origin requests blocked in browser
+
+**Solutions**:
+1. Add CORS configuration to `microprofile-config.properties`
+2. Use browser developer tools to check CORS headers
+3. For development, consider disabling browser security features
+
+=== Token Validation Best Practices
+
+For comprehensive JWT token validation, use the jwtenizr tool to verify:
+
+* JWT token structure and claims
+* Token signature validation
+* Issuer and audience matching
+* Expiration time settings
+
+**Quick Validation Commands**:
+[source,bash]
+----
+# Generate and test token in one command
+cd tools && java -Dverbose -jar jwtenizr.jar http://localhost:6050/user/users/user-profile
+
+# Check token expiration
+date -d @$(cat tools/jwt-token.json | grep -o '"exp": [0-9]*' | cut -d' ' -f2)
+
+# Verify service configuration
+grep -E "(issuer|publickey)" src/main/resources/META-INF/microprofile-config.properties
+----
+
+== Security Considerations
+
+=== Production Deployment
+
+* Remove or secure debug endpoints
+* Use proper certificate management for JWT keys
+* Implement token revocation mechanisms
+* Configure appropriate CORS policies
+* Enable HTTPS/TLS encryption
+
+=== Best Practices
+
+* Regularly rotate JWT signing keys
+* Implement proper token expiration policies
+* Use strong RSA keys (2048-bit minimum)
+* Validate all JWT claims server-side
+* Log security events for monitoring

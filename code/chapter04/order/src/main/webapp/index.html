@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .endpoint {
+            background: #f8f8f8;
+            border-left: 4px solid #4CAF50;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Management Service</h1>
+    <p>Welcome to the Order Management API, a Jakarta EE and MicroProfile demo.</p>
+    
+    <h2>Available Endpoints:</h2>
+    
+    <div class="endpoint">
+        <h3>OpenAPI Documentation</h3>
+        <p><code>GET /openapi</code> - Access OpenAPI documentation</p>
+        <a href="/openapi">View API Documentation</a>
+    </div>
+    
+    <h2>Order Operations</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URL</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/orders</td>
+            <td>Get all orders</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/orders/{id}</td>
+            <td>Get order by ID</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/orders/user/{userId}</td>
+            <td>Get orders by user ID</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/orders/status/{status}</td>
+            <td>Get orders by status</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/orders</td>
+            <td>Create new order</td>
+        </tr>
+        <tr>
+            <td>PUT</td>
+            <td>/api/orders/{id}</td>
+            <td>Update order</td>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td>/api/orders/{id}</td>
+            <td>Delete order</td>
+        </tr>
+        <tr>
+            <td>PATCH</td>
+            <td>/api/orders/{id}/status/{status}</td>
+            <td>Update order status</td>
+        </tr>
+    </table>
+    
+    <h2>Order Item Operations</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URL</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/orders/{orderId}/items</td>
+            <td>Get items for an order</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/orders/items/{orderItemId}</td>
+            <td>Get specific order item</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/orders/{orderId}/items</td>
+            <td>Add item to order</td>
+        </tr>
+        <tr>
+            <td>PUT</td>
+            <td>/api/orders/items/{orderItemId}</td>
+            <td>Update order item</td>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td>/api/orders/items/{orderItemId}</td>
+            <td>Delete order item</td>
+        </tr>
+    </table>
+
+    <h2>Example Request</h2>
+    <pre><code>curl -X GET http://localhost:8050/order/api/orders</code></pre>
+</body>
+</html>

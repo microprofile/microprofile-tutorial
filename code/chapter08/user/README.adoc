@@ -1,0 +1,280 @@
+= User Management Service
+:toc: left
+:icons: font
+:source-highlighter: highlightjs
+:sectnums:
+:imagesdir: images
+
+This document provides information about the User Management Service, part of the MicroProfile tutorial store application.
+
+== Overview
+
+The User Management Service is responsible for user operations including:
+
+* User registration and management
+* User profile information
+* Basic authentication
+
+This service demonstrates MicroProfile and Jakarta EE technologies in a microservice architecture.
+
+== Technology Stack
+
+The User Management Service uses the following technologies:
+
+* Jakarta EE 10
+** RESTful Web Services (JAX-RS 3.1)
+** Context and Dependency Injection (CDI 4.0)
+** Bean Validation 3.0
+** JSON-B 3.0
+* MicroProfile 6.1
+** OpenAPI 3.1
+* Open Liberty
+* Maven
+
+== Project Structure
+
+[source]
+----
+user/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── io/microprofile/tutorial/store/user/
+│   │   │       ├── entity/       # Domain objects
+│   │   │       ├── exception/    # Custom exceptions
+│   │   │       ├── repository/   # Data access layer
+│   │   │       ├── resource/     # REST endpoints
+│   │   │       ├── service/      # Business logic
+│   │   │       └── UserApplication.java
+│   │   ├── liberty/
+│   │   │   └── config/
+│   │   │       └── server.xml    # Liberty server configuration
+│   │   ├── resources/
+│   │   │   └── META-INF/
+│   │   │       └── microprofile-config.properties
+│   │   └── webapp/
+│   │       └── index.html        # Welcome page
+│   └── test/                     # Unit and integration tests
+└── pom.xml                       # Maven configuration
+----
+
+== API Endpoints
+
+The service exposes the following RESTful endpoints:
+
+[cols="2,1,4", options="header"]
+|===
+| Endpoint | Method | Description
+
+| `/api/users` | GET | Retrieve all users
+| `/api/users/{id}` | GET | Retrieve a specific user by ID
+| `/api/users` | POST | Create a new user
+| `/api/users/{id}` | PUT | Update an existing user
+| `/api/users/{id}` | DELETE | Delete a user
+|===
+
+== Running the Service
+
+=== Prerequisites
+
+* JDK 17 or later
+* Maven 3.8+
+* Docker (optional, for containerized deployment)
+
+=== Local Development
+
+1. Clone the repository:
++
+[source,bash]
+----
+git clone https://github.com/your-org/liberty-rest-app.git
+cd liberty-rest-app/user
+----
+
+2. Build the project:
++
+[source,bash]
+----
+mvn clean package
+----
+
+3. Run the service:
++
+[source,bash]
+----
+mvn liberty:run
+----
+
+4. The service will be available at:
++
+[source]
+----
+http://localhost:6050/user/api/users
+----
+
+=== Docker Deployment
+
+To build and run using Docker:
+
+[source,bash]
+----
+# Build the Docker image
+docker build -t microprofile-tutorial/user-service .
+
+# Run the container
+docker run -p 6050:6050 microprofile-tutorial/user-service
+----
+
+== Configuration
+
+The service can be configured using Liberty server.xml and MicroProfile Config:
+
+=== server.xml
+
+The main configuration file at `src/main/liberty/config/server.xml` includes:
+
+* HTTP endpoint configuration (port 6050)
+* Feature enablement
+* Application context configuration
+
+=== MicroProfile Config
+
+Environment-specific configuration can be modified in:
+`src/main/resources/META-INF/microprofile-config.properties`
+
+== OpenAPI Documentation
+
+The service provides OpenAPI documentation of all endpoints.
+
+Access the OpenAPI UI at:
+[source]
+----
+http://localhost:6050/openapi/ui
+----
+
+Raw OpenAPI specification:
+[source]
+----
+http://localhost:6050/openapi
+----
+
+== Exception Handling
+
+The service includes a comprehensive exception handling strategy:
+
+* Custom exceptions for domain-specific errors
+* Global exception mapping to appropriate HTTP status codes
+* Consistent error response format
+
+Error responses follow this structure:
+
+[source,json]
+----
+{
+  "errorCode": "user_not_found",
+  "message": "User with ID 123 not found",
+  "timestamp": "2023-04-15T14:30:45Z"
+}
+----
+
+Common error scenarios:
+
+* 400 Bad Request - Invalid input data
+* 404 Not Found - Requested user doesn't exist
+* 409 Conflict - Email address already in use
+
+== Testing
+
+=== Running Tests
+
+Execute unit and integration tests with:
+
+[source,bash]
+----
+mvn test
+----
+
+=== Testing with cURL
+
+*Get all users:*
+[source,bash]
+----
+curl -X GET http://localhost:6050/user/api/users
+----
+
+*Get user by ID:*
+[source,bash]
+----
+curl -X GET http://localhost:6050/user/api/users/1
+----
+
+*Create new user:*
+[source,bash]
+----
+curl -X POST http://localhost:6050/user/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "passwordHash": "hashed_password",
+    "address": "123 Main St",
+    "phone": "+1234567890"
+  }'
+----
+
+*Update user:*
+[source,bash]
+----
+curl -X PUT http://localhost:6050/user/api/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Updated",
+    "email": "john@example.com",
+    "passwordHash": "hashed_password",
+    "address": "456 New Address",
+    "phone": "+1234567890"
+  }'
+----
+
+*Delete user:*
+[source,bash]
+----
+curl -X DELETE http://localhost:6050/user/api/users/1
+----
+
+== Implementation Notes
+
+=== In-Memory Storage
+
+The service currently uses thread-safe in-memory storage:
+
+* `ConcurrentHashMap` for storing user data
+* `AtomicLong` for generating sequence IDs
+* No persistence to external databases
+
+For production use, consider implementing a proper database persistence layer.
+
+=== Security Considerations
+
+* Passwords are stored as hashes (not encrypted or in plain text)
+* Input validation helps prevent injection attacks
+* No authentication mechanism is implemented (for demo purposes only)
+
+== Troubleshooting
+
+=== Common Issues
+
+* *Port conflicts:* Check if port 6050 is already in use
+* *CORS issues:* For browser access, check CORS configuration in server.xml
+* *404 errors:* Verify the application context root and API path
+
+=== Logs
+
+* Liberty server logs are in `target/liberty/wlp/usr/servers/defaultServer/logs/`
+* Application logs use standard JDK logging with info level by default
+
+== Further Resources
+
+* https://jakarta.ee/specifications/restful-ws/3.1/jakarta-restful-ws-spec-3.1.html[Jakarta RESTful Web Services Specification]
+* https://openliberty.io/docs/latest/documentation.html[Open Liberty Documentation]
+* https://download.eclipse.org/microprofile/microprofile-6.1/microprofile-spec-6.1.html[MicroProfile 6.1 Specification]

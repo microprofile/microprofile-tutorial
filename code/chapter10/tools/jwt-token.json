@@ -1,0 +1,10 @@
+{
+  "iss": "mp-ecomm-store",
+  "jti": "42",
+  "sub": "user1",
+  "upn": "user1@example.com",
+  "groups": [
+    "user"
+  ],
+  "tenant_id": "ecomm-tenant-1"
+}

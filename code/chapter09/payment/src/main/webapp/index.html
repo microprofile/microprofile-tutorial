@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Service - MicroProfile Config Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #0066cc;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 0;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            padding: 20px;
+        }
+        .endpoints {
+            list-style-type: none;
+            padding: 0;
+        }
+        .endpoints li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 60px;
+            text-align: center;
+        }
+        .get { background-color: #61affe; color: white; }
+        .post { background-color: #49cc90; color: white; }
+        .put { background-color: #fca130; color: white; }
+        .delete { background-color: #f93e3e; color: white; }
+        .patch { background-color: #50e3c2; color: white; }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .links {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .links a {
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .links a:hover {
+            background-color: #004999;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Payment Service</h1>
+        <p>MicroProfile Config & Fault Tolerance Demo</p>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2>About this Service</h2>
+            <p>The Payment Service demonstrates MicroProfile Config integration with custom ConfigSource implementation and comprehensive Fault Tolerance patterns.</p>
+            <p>It provides endpoints for managing payment configuration and processing payments with retry policies, circuit breakers, and fallback mechanisms.</p>
+            <p><strong>Key Features:</strong></p>
+            <ul>
+                <li>Custom MicroProfile ConfigSource with ordinal 600 (highest priority)</li>
+                <li>Dynamic configuration updates via REST API</li>
+                <li>Payment gateway endpoint configuration</li>
+                <li>Real-time configuration access for payment processing</li>
+                <li><strong>MicroProfile Fault Tolerance with Retry Policies</strong></li>
+                <li><strong>Circuit Breaker protection for external services</strong></li>
+                <li><strong>Timeout protection and Fallback mechanisms</strong></li>
+                <li><strong>Bulkhead pattern for concurrency control</strong></li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>API Endpoints</h2>
+            <ul class="endpoints">
+                <li><span class="method get">GET</span> /api/payment-config - Get current payment configuration</li>
+                <li><span class="method post">POST</span> /api/payment-config - Update payment configuration property</li>
+                <li><span class="method post">POST</span> /api/authorize - Process payment authorization (with retry)</li>
+                <li><span class="method post">POST</span> /api/verify - Verify payment transaction (with telemetry tracing)</li>
+                <li><span class="method post">POST</span> /api/capture - Capture payment (circuit breaker + timeout)</li>
+                <li><span class="method post">POST</span> /api/refund - Process payment refund (conservative retry)</li>
+                <li><span class="method post">POST</span> /api/payment-config/process-example - Example payment processing with config</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Fault Tolerance Features</h2>
+            <p>The Payment Service implements comprehensive fault tolerance patterns:</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div style="background-color: #e8f4f8; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #0066cc; margin-top: 0;">🔄 Retry Policies</h4>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Authorization:</strong> 3 retries, 1s delay</li>
+                        <li><strong>Verification:</strong> 5 retries, 500ms delay</li>
+                        <li><strong>Capture:</strong> 2 retries, 2s delay</li>
+                        <li><strong>Refund:</strong> 1 retry, 3s delay</li>
+                    </ul>
+                </div>
+                <div style="background-color: #fff2e8; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #ff6600; margin-top: 0;">⚡ Circuit Breaker</h4>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Failure Ratio:</strong> 50%</li>
+                        <li><strong>Request Threshold:</strong> 4 requests</li>
+                        <li><strong>Recovery Delay:</strong> 5 seconds</li>
+                        <li><strong>Applied to:</strong> Payment capture</li>
+                    </ul>
+                </div>
+                <div style="background-color: #f0f8e8; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #009900; margin-top: 0;">⏱️ Timeout Protection</h4>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Capture Timeout:</strong> 3 seconds</li>
+                        <li><strong>Max Retry Duration:</strong> 10-15 seconds</li>
+                        <li><strong>Jitter:</strong> 200-500ms randomization</li>
+                    </ul>
+                </div>
+                <div style="background-color: #f8e8f8; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #990099; margin-top: 0;">🛟 Fallback Mechanisms</h4>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Authorization:</strong> Service unavailable</li>
+                        <li><strong>Verification:</strong> Queue for retry</li>
+                        <li><strong>Capture:</strong> Defer operation</li>
+                        <li><strong>Refund:</strong> Manual processing</li>
+                    </ul>
+                </div>
+                <div style="background-color: #e8f8f8; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #006666; margin-top: 0;">🧱 Bulkhead Pattern</h4>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Concurrent Requests:</strong> 5 maximum</li>
+                        <li><strong>Excess Requests:</strong> Rejected immediately</li>
+                        <li><strong>Recovery:</strong> Automatic when load decreases</li>
+                        <li><strong>Applied to:</strong> Payment operations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>MicroProfile Telemetry Features</h2>
+            <p>The Payment Service implements comprehensive distributed tracing with MicroProfile Telemetry:</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div style="background-color: #e8f0ff; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #2962ff; margin-top: 0;">🔍 Tracing Architecture</h4>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Implementation:</strong> OpenTelemetry API</li>
+                        <li><strong>Exporter:</strong> Zipkin integration</li>
+                        <li><strong>Service Name:</strong> payment-service</li>
+                        <li><strong>Trace Propagation:</strong> W3C format</li>
+                    </ul>
+                </div>
+                <div style="background-color: #fff0f7; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #c2185b; margin-top: 0;">📊 Span Hierarchy</h4>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Parent Spans:</strong> Payment operations</li>
+                        <li><strong>Child Spans:</strong> Validation, fraud, etc.</li>
+                        <li><strong>Propagation:</strong> Context propagation</li>
+                        <li><strong>Visualization:</strong> Zipkin dashboard</li>
+                    </ul>
+                </div>
+                <div style="background-color: #fffde7; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #f57f17; margin-top: 0;">📝 Span Attributes</h4>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Payment Amounts:</strong> Tracked on spans</li>
+                        <li><strong>Transaction IDs:</strong> Correlated across spans</li>
+                        <li><strong>Masked Card Data:</strong> Secure PII handling</li>
+                        <li><strong>Error States:</strong> Detailed error tracking</li>
+                    </ul>
+                </div>
+                <div style="background-color: #e0f7fa; padding: 15px; border-radius: 5px;">
+                    <h4 style="color: #00838f; margin-top: 0;">⏲️ Performance Metrics</h4>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Operation Timing:</strong> Detailed duration tracking</li>
+                        <li><strong>External Calls:</strong> Network latency monitoring</li>
+                        <li><strong>Processing Stages:</strong> Per-stage timing</li>
+                        <li><strong>Bottleneck Analysis:</strong> Visualization support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Configuration Management</h2>
+            <p>This service implements a custom MicroProfile ConfigSource that allows dynamic configuration updates:</p>
+            <ul>
+                <li><strong>Configuration Priority:</strong> Custom ConfigSource (600) > System Properties (400) > Environment Variables (300) > microprofile-config.properties (100)</li>
+                <li><strong>Payment Properties:</strong> payment.gateway.endpoint, payment.retry.*, payment.circuitbreaker.*, payment.timeout.*, payment.bulkhead.*</li>
+                <li><strong>Update Method:</strong> POST to /api/payment-config with {"key": "payment.property.name", "value": "new-value"}</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Testing Fault Tolerance</h2>
+            <p>Test the fault tolerance features with these examples:</p>
+            <ul>
+                <li><strong>Trigger Retries:</strong> Use card number ending in "0000" for authorization failures</li>
+                <li><strong>Circuit Breaker:</strong> Make multiple capture requests to trigger circuit opening</li>
+                <li><strong>Timeouts:</strong> Capture operations may timeout randomly for testing</li>
+                <li><strong>Fallbacks:</strong> All operations provide graceful degradation responses</li>
+                <li><strong>Bulkhead:</strong> Generate >5 concurrent requests to see request rejection in action</li>
+            </ul>
+            <p><strong>Monitor logs:</strong> <code>tail -f target/liberty/wlp/usr/servers/mpServer/logs/messages.log</code></p>
+            <p><strong>Run tests:</strong> <code>./test-payment-fault-tolerance-suite.sh</code> or <code>./test-payment-bulkhead.sh</code></p>
+        </div>
+        
+        <div class="card">
+            <h2>Testing Telemetry</h2>
+            <p>Test the MicroProfile Telemetry features with these examples:</p>
+            <ul>
+                <li><strong>Successful Trace:</strong> <code>curl -X POST "http://localhost:9080/payment/api/verify?amount=500&cardNumber=4111111111111111&cardHolder=Jane+Doe&expiryDate=12/25"</code></li>
+                <li><strong>Fraud Detection:</strong> <code>curl -X POST "http://localhost:9080/payment/api/verify?amount=250&cardNumber=4111111111110000&cardHolder=John+Smith&expiryDate=01/26"</code></li>
+                <li><strong>Insufficient Funds:</strong> <code>curl -X POST "http://localhost:9080/payment/api/verify?amount=1500&cardNumber=5555555555554444&cardHolder=Alice+Johnson&expiryDate=03/24"</code></li>
+            </ul>
+            <p><strong>Run test script:</strong> <code>./test-telemetry.sh</code> - This script will run all examples and start a Zipkin container</p>
+            <p><strong>View traces:</strong> Open Zipkin at <a href="http://localhost:9411/zipkin/">http://localhost:9411/zipkin/</a> to see distributed traces</p>
+            <p><strong>Analyze traces:</strong> Look for parent-child span relationships, error spans, timing information, and custom attributes</p>
+        </div>
+        
+        <div class="card">
+            <h2>Links</h2>
+            <div class="links">
+                <a href="/payment/api/openapi-ui/">OpenAPI Documentation</a>
+                <a href="/payment/api/payment-config">View Current Config</a>
+                <a href="/health">Health Check</a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>MicroProfile Config, Fault Tolerance & Telemetry Demo | Payment Service</p>
+        <p>Powered by Open Liberty, MicroProfile 6.1 (Config 3.0, Fault Tolerance 4.0, Telemetry 1.1)</p>
+    </footer>
+</body>
+</html>

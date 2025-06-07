@@ -1,0 +1,211 @@
+== Service Interactions
+
+The microservices in this application interact with each other to provide a complete e-commerce experience:
+
+[plantuml]
+----
+@startuml
+!theme cerulean
+
+actor "Customer" as customer
+component "User Service" as user
+component "Catalog Service" as catalog
+component "Inventory Service" as inventory
+component "Order Service" as order
+component "Payment Service" as payment
+component "Shopping Cart Service" as cart
+component "Shipment Service" as shipment
+
+customer --> user : Authenticate
+customer --> catalog : Browse products
+customer --> cart : Add to cart
+order --> inventory : Check availability
+cart --> inventory : Check availability
+cart --> catalog : Get product info
+customer --> order : Place order
+order --> payment : Process payment
+order --> shipment : Create shipment
+shipment --> order : Update order status
+
+payment --> user : Verify customer
+order --> user : Verify customer
+order --> catalog : Get product info
+order --> inventory : Update stock levels
+payment --> order : Update order status
+@enduml
+----
+
+=== Key Interactions
+
+1. *User Service* verifies user identity and provides authentication.
+2. *Catalog Service* provides product information and search capabilities.
+3. *Inventory Service* tracks stock levels for products.
+4. *Shopping Cart Service* manages cart contents:
+   a. Checks inventory availability (via Inventory Service)
+   b. Retrieves product details (via Catalog Service)
+   c. Validates quantity against available inventory
+5. *Order Service* manages the order process:
+   a. Verifies the user exists (via User Service)
+   b. Verifies product information (via Catalog Service)
+   c. Checks and updates inventory (via Inventory Service)
+   d. Initiates payment processing (via Payment Service)
+   e. Triggers shipment creation (via Shipment Service)
+6. *Payment Service* handles transaction processing:
+   a. Verifies the user (via User Service)
+   b. Processes payment transactions
+   c. Updates order status upon completion (via Order Service)
+7. *Shipment Service* manages the shipping process:
+   a. Creates shipments for paid orders
+   b. Tracks shipment status through delivery lifecycle
+   c. Updates order status (via Order Service)
+   d. Provides tracking information for customers
+
+=== Resilient Service Communication
+
+The microservices use MicroProfile's Fault Tolerance features to ensure robust communication:
+
+* *Circuit Breakers* prevent cascading failures
+* *Timeouts* ensure responsive service interactions
+* *Fallbacks* provide alternative paths when services are unavailable
+* *Bulkheads* isolate failures to prevent system-wide disruptions
+
+=== Payment Processing Flow
+
+The payment processing workflow involves several microservices working together:
+
+[plantuml]
+----
+@startuml
+!theme cerulean
+
+participant "Customer" as customer
+participant "Order Service" as order
+participant "Payment Service" as payment
+participant "User Service" as user
+participant "Inventory Service" as inventory
+
+customer -> order: Place order
+activate order
+order -> user: Validate user
+order -> inventory: Reserve inventory
+order -> payment: Request payment
+activate payment
+
+payment -> payment: Process transaction
+note right: Payment status transitions:\nPENDING → PROCESSING → COMPLETED/FAILED
+
+alt Successful payment
+    payment --> order: Payment completed
+    order -> order: Update order status to PAID
+    order -> inventory: Confirm inventory deduction
+else Failed payment
+    payment --> order: Payment failed
+    order -> order: Update order status to PAYMENT_FAILED
+    order -> inventory: Release reserved inventory
+end
+
+order --> customer: Order confirmation
+deactivate payment
+deactivate order
+@enduml
+----
+
+=== Shopping Cart Flow
+
+The shopping cart workflow involves interactions with multiple services:
+
+[plantuml]
+----
+@startuml
+!theme cerulean
+
+participant "Customer" as customer
+participant "Shopping Cart Service" as cart
+participant "Catalog Service" as catalog
+participant "Inventory Service" as inventory
+participant "Order Service" as order
+
+customer -> cart: Add product to cart
+activate cart
+cart -> inventory: Check product availability
+inventory --> cart: Available quantity
+cart -> catalog: Get product details
+catalog --> cart: Product information
+
+alt Product available
+    cart -> cart: Add item to cart
+    cart --> customer: Product added to cart
+else Insufficient inventory
+    cart --> customer: Product unavailable
+end
+deactivate cart
+
+customer -> cart: View cart
+cart --> customer: Cart contents
+
+customer -> cart: Checkout cart
+activate cart
+cart -> order: Create order from cart
+activate order
+order -> order: Process order
+order --> cart: Order created
+cart -> cart: Clear cart
+cart --> customer: Order confirmation
+deactivate order
+deactivate cart
+@enduml
+----
+
+=== Shipment Process Flow
+
+The shipment process flow involves the Order Service and Shipment Service working together:
+
+[plantuml]
+----
+@startuml
+!theme cerulean
+
+participant "Customer" as customer
+participant "Order Service" as order
+participant "Payment Service" as payment
+participant "Shipment Service" as shipment
+
+customer -> order: Place order
+activate order
+order -> payment: Process payment
+payment --> order: Payment successful
+order -> shipment: Create shipment
+activate shipment
+
+shipment -> shipment: Generate tracking number
+shipment -> order: Update order status to SHIPMENT_CREATED
+shipment --> order: Shipment created
+
+order --> customer: Order confirmed with tracking info
+deactivate order
+
+note over shipment: Shipment status transitions:\nPENDING → PROCESSING → SHIPPED → \nIN_TRANSIT → OUT_FOR_DELIVERY → DELIVERED
+
+shipment -> shipment: Update status to PROCESSING
+shipment -> order: Update order status
+
+shipment -> shipment: Update status to SHIPPED
+shipment -> order: Update order status to SHIPPED
+
+shipment -> shipment: Update status to IN_TRANSIT
+shipment -> order: Update order status
+
+shipment -> shipment: Update status to OUT_FOR_DELIVERY
+shipment -> order: Update order status
+
+shipment -> shipment: Update status to DELIVERED
+shipment -> order: Update order status to DELIVERED
+deactivate shipment
+
+customer -> order: Check order status
+order --> customer: Order status with tracking info
+
+customer -> shipment: Track shipment
+shipment --> customer: Shipment tracking details
+@enduml
+----

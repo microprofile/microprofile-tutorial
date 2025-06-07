@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Management Service API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .endpoint {
+            background-color: #f4f4f4;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #007acc;
+        }
+        .method {
+            font-weight: bold;
+            color: #007acc;
+        }
+        .status {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .description {
+            margin-top: 5px;
+            color: #666;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #007acc;
+            border-bottom: 2px solid #007acc;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Management Service API</h1>
+    <p>This service provides RESTful endpoints for managing users in the MicroProfile REST application.</p>
+    
+    <h2>Available Endpoints</h2>
+    
+    <div class="endpoint">
+        <div class="method">GET /api/users</div>
+        <div class="description">Get all users</div>
+        <div class="status">
+            Response: 200 (List of users), 204 (No users found)
+        </div>
+    </div>
+    
+    <div class="endpoint">
+        <div class="method">GET /api/users/{id}</div>
+        <div class="description">Get a specific user by ID</div>
+        <div class="status">
+            Response: 200 (User found), 404 (User not found)
+        </div>
+    </div>
+    
+    <div class="endpoint">
+        <div class="method">POST /api/users</div>
+        <div class="description">Create a new user</div>
+        <div class="status">
+            Request Body: User JSON object<br>
+            Response: 201 (User created), 400 (Invalid data), 409 (Email already in use)
+        </div>
+    </div>
+    
+    <div class="endpoint">
+        <div class="method">PUT /api/users/{id}</div>
+        <div class="description">Update an existing user</div>
+        <div class="status">
+            Request Body: Updated User JSON object<br>
+            Response: 200 (User updated), 400 (Invalid data), 404 (User not found), 409 (Email already in use)
+        </div>
+    </div>
+    
+    <div class="endpoint">
+        <div class="method">DELETE /api/users/{id}</div>
+        <div class="description">Delete a user by ID</div>
+        <div class="status">
+            Response: 204 (User deleted), 404 (User not found)
+        </div>
+    </div>
+
+    <h2>Features</h2>
+    <ul>
+        <li>Full CRUD operations for user management</li>
+        <li>Input validation using Bean Validation</li>
+        <li>HATEOAS links for improved API discoverability</li>
+        <li>OpenAPI documentation annotations</li>
+        <li>Proper HTTP status codes and error handling</li>
+        <li>Email uniqueness validation</li>
+    </ul>
+
+    <h2>Example User JSON</h2>
+    <pre style="background-color: #f8f8f8; padding: 10px; border: 1px solid #ddd;">
+{
+    "userId": 1,
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe"
+}
+    </pre>
+</body>
+</html>

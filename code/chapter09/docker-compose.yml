@@ -1,0 +1,87 @@
+version: '3'
+
+services:
+  user-service:
+    build: ./user
+    ports:
+      - "6050:6050"
+      - "6051:6051"
+    networks:
+      - ecommerce-network
+    environment:
+      - INVENTORY_SERVICE_URL=http://inventory-service:7050
+      - ORDER_SERVICE_URL=http://order-service:8050
+      - CATALOG_SERVICE_URL=http://catalog-service:9050
+
+  inventory-service:
+    build: ./inventory
+    ports:
+      - "7050:7050"
+      - "7051:7051"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - user-service
+
+  order-service:
+    build: ./order
+    ports:
+      - "8050:8050"
+      - "8051:8051"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - user-service
+      - inventory-service
+
+  catalog-service:
+    build: ./catalog
+    ports:
+      - "5050:5050"
+      - "5051:5051"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - inventory-service
+
+  payment-service:
+    build: ./payment
+    ports:
+      - "9050:9050"
+      - "9051:9051"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - user-service
+      - order-service
+      
+  shoppingcart-service:
+    build: ./shoppingcart
+    ports:
+      - "4050:4050"
+      - "4051:4051"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - inventory-service
+      - catalog-service
+    environment:
+      - INVENTORY_SERVICE_URL=http://inventory-service:7050
+      - CATALOG_SERVICE_URL=http://catalog-service:5050
+      
+  shipment-service:
+    build: ./shipment
+    ports:
+      - "8060:8060"
+      - "9060:9060"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - order-service
+    environment:
+      - ORDER_SERVICE_URL=http://order-service:8050/order
+      - MP_CONFIG_PROFILE=docker
+
+networks:
+  ecommerce-network:
+    driver: bridge
