@@ -1,0 +1,17 @@
+{
+	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"features": {
+		"ghcr.io/devcontainers-extra/features/node-asdf:0": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"GitHub.copilot",
+				"asciidoctor.asciidoctor-vscode",
+				"microprofile-community.vscode-microprofile-pack",
+				"vscjava.vscode-java-pack",
+				"Open-Liberty.liberty-tools-vscode"
+			]
+		}
+	}
+}

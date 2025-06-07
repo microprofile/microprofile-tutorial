@@ -1,0 +1,12 @@
+name: microprofile-tutorial
+title: MicroProfile Tutorial
+version: 6.1
+edit_url: https://github.com/ttelang/microprofile-tutorial/edit/patch-15/modules/ROOT/pages/{path}
+asciidoc:
+  attributes:
+    source-language: asciidoc@
+    table-caption: false
+    xrefstyle: full
+nav:
+  - modules/ROOT/pages/nav.adoc
+start_page: index.adoc

@@ -1,0 +1,184 @@
+== Choosing Right Modules for Your MicroProfile Application
+
+Choosing the right modules for your MicroProfile application is crucial for ensuring that your application is lean, maintainable, and only includes the necessary functionalities to meet its requirements. 
+
+Before diving into MicroProfile modules, it's essential to have a clear understanding of your application's requirements. Consider aspects such as configuration needs, security, health checks, data metrics, fault tolerance, and the need for distributed tracing. Mapping out these requirements will guide you in selecting the most relevant MicroProfile specifications. MicroProfile provides a selection of APIs that you can choose from based on the specific needs of your application. However, with the variety of specifications available, it's important to understand which ones best fit your project's needs. 
+
+This section aims to help you make informed decisions about which MicroProfile modules to use. 
+
+=== Use the Entire MicroProfile Dependency 
+
+If you're beginning a new MicroProfile-based project and are unsure which specifications you will need, starting with the entire MicroProfile dependency can give you immediate access to the full suite of MicroProfile APIs. This approach allows you to explore and experiment with different specifications without modifying your pom.xml to add or remove dependencies frequently.
+
+For projects that aim to leverage a wide range of MicroProfile specifications, including advanced features like telemetry, metrics, and fault tolerance, including the entire MicroProfile 6.1 dependency ensures that you have all the necessary APIs at your disposal. This approach simplifies dependency management, especially for complex applications.
+
+*Maven*
+
+[source, xml]
+----
+
+<!-- MicroProfile 6.1 API -->
+<dependency>
+    <groupId>org.eclipse.microprofile</groupId>
+    <artifactId>microprofile</artifactId>
+    <version>6.1</version>
+    <type>pom</type>
+    <scope>provided</scope>
+</dependency>
+----
+
+*Gradle*
+[source, xml]
+----
+dependencies {
+ compileOnly 'org.eclipse.microprofile:microprofile:6.1'
+}
+----
+
+=== Use Individual MicroProfile Specification Dependencies 
+
+For applications where size and startup time are critical (e.g., serverless functions, microservices with stringent resource constraints), including only the necessary MicroProfile specifications can help minimize the application's footprint. This selective approach ensures that your application includes only what it needs, potentially reducing memory usage and startup time.
+
+To prevent potential conflicts or security issues associated with unused dependencies, it's prudent to include only the specifications your application directly uses. This practice follows the principle of minimalism in software design, reducing the surface area for bugs and vulnerabilities.
+
+The list below is provided to help you select the appropriate modules for your MicroProfile application:
+
+* *MicroProfile Config* provides a way to fetch configurations from various sources dynamically. You should use this dependency in your microservices if they require external configuration or need to be run in different environments without requiring repackaging.
+
+*Maven*
+
+[source, xml]
+----
+<dependency>
+  <groupId>org.eclipse.microprofile.config</groupId>
+  <artifactId>microprofile-config-api</artifactId>
+  <version>3.1</version>
+</dependency>
+----
+
+
+* *MicroProfile Health* allows you to define health endpoints easily. If you're deploying your application in a environment where the service needs to report its health status.
+
+*Maven*
+
+[source, xml]
+----
+<dependency>
+  <groupId>org.eclipse.microprofile.health</groupId>
+  <artifactId>microprofile-health-api</artifactId>
+  <version>4.0.1</version>
+</dependency>
+----
+
+
+
+* *MicroProfile Metrics* offers a way to generate various metrics from your application, which can be consumed by monitoring tools. You should use this dependency in your microservices if you need to monitor the performance of your application.
+
+*Maven*
+
+[source, xml]
+----
+<dependency>
+  <groupId>org.eclipse.microprofile.metrics</groupId>
+  <artifactId>microprofile-metrics-api</artifactId>
+  <version>5.1.0</version>
+</dependency>
+----
+
+
+* *MicroProfile Fault Tolerance* helps applications in implementing patterns like timeout, retry, bulkhead, circuit breaker, and fallback. Applications requiring resilience and reliability, especially those facing network latency or failure in microservices environments, will benefit from it.
+
+[source, xml]
+----
+<dependency>
+  <groupId>org.eclipse.microprofile.fault-tolerance</groupId>
+  <artifactId>microprofile-fault-tolerance-api</artifactId>
+  <version>4.0.2</version>
+</dependency>
+----
+
+* *MicroProfile JWT Authentication* provides a method for using JWT tokens for securing your microservices, especially where propagation of identity and authentication information is needed across services. 
+
+[source, xml]
+----
+<dependency>
+  <groupId>org.eclipse.microprofile.jwt</groupId>
+  <artifactId>microprofile-jwt-auth-api</artifactId>
+  <version>2.1</version>
+</dependency>
+----
+
+
+* *MicroProfile OpenAPI* offers tools for generating OpenAPI descriptions of your endpoints automatically for documenting your REST APIs. 
+
+*Maven*
+
+[source, xml]
+----
+<dependency>
+  <groupId>org.eclipse.microprofile.openapi</groupId>
+  <artifactId>microprofile-openapi-api</artifactId>
+  <version>3.1.1</version>
+</dependency>
+----
+
+* *MicroProfile Rest Client* simplifies calling RESTful services over HTTP for type-safe invocations of HTTP services for type-safe invocations of HTTP services.
+
+*Maven*
+
+[source, xml]
+----
+<dependency>
+  <groupId>org.eclipse.microprofile.rest.client</groupId>
+  <artifactId>microprofile-rest-client-api</artifactId>
+  <version>3.0</version>
+</dependency>
+----
+
+* *MicroProfile Telemetry* integrates OpenTelemetry for distributed tracing For applications that need to trace requests across microservices to diagnose and monitor.
+
+*Maven*
+
+[source, xml]
+----
+<project>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-bom</artifactId>
+        <version>1.29.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-api</artifactId>
+    </dependency>
+  </dependencies>
+</project>
+----
+
+* *Jakarta EE Core Profile* dependency provides the API set included in the Jakarta EE 10 Core Profile, which is optimized for developing microservices and cloud-native Java applications with a reduced set of specifications for a lighter runtime footprint.
+
+*Maven*
+
+[source, xml]
+----
+<dependencies>
+    <!-- Jakarta EE 10 Core Profile -->
+    <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-api</artifactId>
+        <version>10.0.0</version>
+        <scope>provided</scope>
+    </dependency>
+</dependencies>
+----
+
+For rapidly evolving projects or those in the exploratory phase, starting with the full MicroProfile dependency might be advantageous. However, for production applications with well-defined requirements, opting for individual specifications can lead to more efficient and maintainable solutions.
+
+When choosing MicroProfile modules, start with the minimal set that meets your application's core requirements. You can always integrate additional specifications as your application evolves. This approach keeps your application lightweight and focused on its primary functionalities, improving maintainability and performance. Always consider the compatibility between different versions of MicroProfile and your runtime environment to ensure seamless integration and deployment.

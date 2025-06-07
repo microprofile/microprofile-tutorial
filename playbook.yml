@@ -1,0 +1,13 @@
+site:
+  title: "MicroProfile Tutorial"
+  url: "https://microprofile.io/tutorial"
+  start_page: "index.adoc"
+content:
+  sources:
+    - url: "https://github.com/ttelang/microprofile-tutorial.git"
+      branches: main
+      start_path: /
+ui:
+  bundle:
+    url: "https://gitlab.com/antora/antora-ui-default/-/archive/master/antora-ui-default-master.zip"
+    snapshot: true

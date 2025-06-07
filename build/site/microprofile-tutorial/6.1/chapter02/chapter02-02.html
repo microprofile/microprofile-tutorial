@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Untitled :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/microprofile-tutorial/6.1/chapter02/chapter02-02.html">
+    <meta name="generator" content="Antora 3.1.10">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" /><link rel="icon" href="../../../_/img/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="../../../_/img/favicon.png" type="image/png">
+<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png">
+      <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5WLCZXC');</script>
+    <!-- End Google Tag Manager -->  
+    <script>var uiRootPath = '../../../_'</script>
+    <script>!function (theme) {
+        if (theme === 'dark') document.documentElement.classList.add('theme-dark')
+      }(localStorage && localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)') && 'dark'))
+    </script>
+    <!-- Add Eclipse Foundation cookie consent to site for GA -->
+    <script src="//www.eclipse.org/eclipse.org-common/themes/solstice/public/javascript/vendor/cookieconsent/default.min.js"></script>
+      </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a id="site-title" class="navbar-item" href="https://microprofile.io">MicroProfile Tutorial</a>
+      <div class="navbar-item search hide-for-print">
+        <div id="search-field" class="field">
+          <input id="search-input" type="text" placeholder="Search the docs">
+        </div>
+      </div>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="../../../microprofile-tutorial/6.1/microprofile-tutorial.pdf">Download</a>
+          </span>
+        </div>
+      </div>
+      <div class="navbar-theme-switcher">
+        <span class="switch" title="Switch between Light and Dark Theme">
+          <input id="theme-switcher-checkbox" type="checkbox" />
+          <label for="theme-switcher-checkbox">Dark Theme</label>
+        </span>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="microprofile-tutorial" data-version="6.1">
+  <div class="toolbar"></div>
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">MicroProfile Tutorial</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Preface</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter01/chapter01.html">Introduction to MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter02-00.html">Getting Started with MicroProfile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter03/chapter03.html">Jakarta EE 10 Core Profile</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter04/chapter04.html">MicroProfile OpenAPI</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter05/chapter05.html">MicroProfile Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter06/chapter06.html">MicroProfile Health</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter07/chapter07.html">MicroProfile Metrics</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter08/chapter08.html">MicroProfile Fault Tolerance</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter09/index.html">MicroProfile Telemetry</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter10/chapter10.html">MicroProfile JWT</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter11/chapter11.html">MicroProfile Rest Client</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">MicroProfile Tutorial</span>
+    <span class="version">6.1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">MicroProfile Tutorial</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">6.1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/ttelang/microprofile-tutorial/edit/patch-15/modules/ROOT/pages/chapter02/chapter02-02.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<div class="sect1">
+<h2 id="choosing-right-modules-for-your-microprofile-application"><a class="anchor" href="#choosing-right-modules-for-your-microprofile-application"></a>Choosing Right Modules for Your MicroProfile Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Choosing the right modules for your MicroProfile application is crucial for ensuring that your application is lean, maintainable, and only includes the necessary functionalities to meet its requirements.</p>
+</div>
+<div class="paragraph">
+<p>Before diving into MicroProfile modules, it&#8217;s essential to have a clear understanding of your application&#8217;s requirements. Consider aspects such as configuration needs, security, health checks, data metrics, fault tolerance, and the need for distributed tracing. Mapping out these requirements will guide you in selecting the most relevant MicroProfile specifications. MicroProfile provides a selection of APIs that you can choose from based on the specific needs of your application. However, with the variety of specifications available, it&#8217;s important to understand which ones best fit your project&#8217;s needs.</p>
+</div>
+<div class="paragraph">
+<p>This section aims to help you make informed decisions about which MicroProfile modules to use.</p>
+</div>
+<div class="sect2">
+<h3 id="use-the-entire-microprofile-dependency"><a class="anchor" href="#use-the-entire-microprofile-dependency"></a>Use the Entire MicroProfile Dependency</h3>
+<div class="paragraph">
+<p>If you&#8217;re beginning a new MicroProfile-based project and are unsure which specifications you will need, starting with the entire MicroProfile dependency can give you immediate access to the full suite of MicroProfile APIs. This approach allows you to explore and experiment with different specifications without modifying your pom.xml to add or remove dependencies frequently.</p>
+</div>
+<div class="paragraph">
+<p>For projects that aim to leverage a wide range of MicroProfile specifications, including advanced features like telemetry, metrics, and fault tolerance, including the entire MicroProfile 6.1 dependency ensures that you have all the necessary APIs at your disposal. This approach simplifies dependency management, especially for complex applications.</p>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;!-- MicroProfile 6.1 API --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.eclipse.microprofile&lt;/groupId&gt;
+    &lt;artifactId&gt;microprofile&lt;/artifactId&gt;
+    &lt;version&gt;6.1&lt;/version&gt;
+    &lt;type&gt;pom&lt;/type&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Gradle</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">dependencies {
+ compileOnly 'org.eclipse.microprofile:microprofile:6.1'
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-individual-microprofile-specification-dependencies"><a class="anchor" href="#use-individual-microprofile-specification-dependencies"></a>Use Individual MicroProfile Specification Dependencies</h3>
+<div class="paragraph">
+<p>For applications where size and startup time are critical (e.g., serverless functions, microservices with stringent resource constraints), including only the necessary MicroProfile specifications can help minimize the application&#8217;s footprint. This selective approach ensures that your application includes only what it needs, potentially reducing memory usage and startup time.</p>
+</div>
+<div class="paragraph">
+<p>To prevent potential conflicts or security issues associated with unused dependencies, it&#8217;s prudent to include only the specifications your application directly uses. This practice follows the principle of minimalism in software design, reducing the surface area for bugs and vulnerabilities.</p>
+</div>
+<div class="paragraph">
+<p>The list below is provided to help you select the appropriate modules for your MicroProfile application:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Config</strong> provides a way to fetch configurations from various sources dynamically. You should use this dependency in your microservices if they require external configuration or need to be run in different environments without requiring repackaging.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.config&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-config-api&lt;/artifactId&gt;
+  &lt;version&gt;3.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Health</strong> allows you to define health endpoints easily. If you&#8217;re deploying your application in a environment where the service needs to report its health status.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.health&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-health-api&lt;/artifactId&gt;
+  &lt;version&gt;4.0.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Metrics</strong> offers a way to generate various metrics from your application, which can be consumed by monitoring tools. You should use this dependency in your microservices if you need to monitor the performance of your application.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.metrics&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-metrics-api&lt;/artifactId&gt;
+  &lt;version&gt;5.1.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Fault Tolerance</strong> helps applications in implementing patterns like timeout, retry, bulkhead, circuit breaker, and fallback. Applications requiring resilience and reliability, especially those facing network latency or failure in microservices environments, will benefit from it.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.fault-tolerance&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-fault-tolerance-api&lt;/artifactId&gt;
+  &lt;version&gt;4.0.2&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile JWT Authentication</strong> provides a method for using JWT tokens for securing your microservices, especially where propagation of identity and authentication information is needed across services.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.jwt&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-jwt-auth-api&lt;/artifactId&gt;
+  &lt;version&gt;2.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile OpenAPI</strong> offers tools for generating OpenAPI descriptions of your endpoints automatically for documenting your REST APIs.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.openapi&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-openapi-api&lt;/artifactId&gt;
+  &lt;version&gt;3.1.1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Rest Client</strong> simplifies calling RESTful services over HTTP for type-safe invocations of HTTP services for type-safe invocations of HTTP services.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.eclipse.microprofile.rest.client&lt;/groupId&gt;
+  &lt;artifactId&gt;microprofile-rest-client-api&lt;/artifactId&gt;
+  &lt;version&gt;3.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>MicroProfile Telemetry</strong> integrates OpenTelemetry for distributed tracing For applications that need to trace requests across microservices to diagnose and monitor.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;project&gt;
+  &lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;io.opentelemetry&lt;/groupId&gt;
+        &lt;artifactId&gt;opentelemetry-bom&lt;/artifactId&gt;
+        &lt;version&gt;1.29.0&lt;/version&gt;
+        &lt;type&gt;pom&lt;/type&gt;
+        &lt;scope&gt;import&lt;/scope&gt;
+      &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+  &lt;/dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;io.opentelemetry&lt;/groupId&gt;
+      &lt;artifactId&gt;opentelemetry-api&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/project&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Jakarta EE Core Profile</strong> dependency provides the API set included in the Jakarta EE 10 Core Profile, which is optimized for developing microservices and cloud-native Java applications with a reduced set of specifications for a lighter runtime footprint.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Maven</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependencies&gt;
+    &lt;!-- Jakarta EE 10 Core Profile --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;jakarta.platform&lt;/groupId&gt;
+        &lt;artifactId&gt;jakarta.jakartaee-api&lt;/artifactId&gt;
+        &lt;version&gt;10.0.0&lt;/version&gt;
+        &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For rapidly evolving projects or those in the exploratory phase, starting with the full MicroProfile dependency might be advantageous. However, for production applications with well-defined requirements, opting for individual specifications can lead to more efficient and maintainable solutions.</p>
+</div>
+<div class="paragraph">
+<p>When choosing MicroProfile modules, start with the minimal set that meets your application&#8217;s core requirements. You can always integrate additional specifications as your application evolves. This approach keeps your application lightweight and focused on its primary functionalities, improving maintainability and performance. Always consider the compatibility between different versions of MicroProfile and your runtime environment to ensure seamless integration and deployment.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+site:
+  title: MicroProfile Tutorial
+  url: https://microprofile.io
+  start_page: microprofile-tutorial::index.adoc
+  keys:
+    show_edit_page_link: true
+
+content:
+  sources:
+    - url: .
+      start_path: .
+      branches: HEAD
+
+ui:
+  bundle:
+    url: https://github.com/microprofile/microprofile-tutorial-ui/releases/download/latest/ui-bundle.zip
+    snapshot: true
+  supplemental_files: ./supplemental-ui
+
+asciidoc:
+  attributes:
+    experimental: true
+    idprefix: ''
+    idseparator: '-'
+    page-pagination: true
+    allow-uri-read: ''
+    page-pdf-download-name: microprofile-tutorial.pdf
+    source-language: asciidoc@
+    table-caption: false
+    xrefstyle: full
+  extensions:
+    - asciidoctor-plantuml
+    - asciidoctor-kroki
+    - '@asciidoctor/tabs'
+
+antora:
+  extensions:
+    - require: '@antora/lunr-extension'
+      index_latest_only: true
+    - require: '@antora/pdf-extension'
+      generate_index: true
+      index_filename: microprofile-tutorial
+      output_format: pdf
+
+output:
+  dir: ./build/site

@@ -32,6 +32,7 @@ Java user groups
 
 Corporate Members
 
+  * Hunan AsiaInfo Anhui 
   * IBM 
   * Fujitsu
   * Red Hat

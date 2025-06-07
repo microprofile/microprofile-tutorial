@@ -1,0 +1,273 @@
+<mxfile host="app.diagrams.net" modified="2024-03-03T03:57:07.609Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" etag="JqbD8jI4EI0kExExx8QJ" version="24.0.1" type="google">
+  <diagram name="Page-1" id="0YcZO2sCVYxOVOXQs7Kz">
+    <mxGraphModel dx="4204" dy="2379" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="bEJetSFqN9zp64WMlj3R-33" value="" style="group;fontFamily=Dosis;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DDosis;fontSize=48;fontStyle=0" parent="1" connectable="0" vertex="1">
+          <mxGeometry x="240" y="220" width="280" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-8" value="" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.octagon2;align=center;verticalAlign=middle;dx=39.51;fillColor=#1d2f42;strokeColor=#314354;fontColor=#ffffff;fontFamily=Helvetica;fontSize=12;" parent="bEJetSFqN9zp64WMlj3R-33" vertex="1">
+          <mxGeometry x="20" width="240" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-2" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffdb71;strokeColor=#d79b00;gradientColor=none;" parent="bEJetSFqN9zp64WMlj3R-33" vertex="1">
+          <mxGeometry x="60" y="40" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-5" value="" style="verticalLabelPosition=bottom;shadow=0;dashed=0;align=center;html=1;verticalAlign=top;strokeWidth=1;shape=mxgraph.mockup.misc.shoppingCart;strokeColor=#3A5431;direction=east;rotation=0;fillColor=#6d8764;fontColor=#ffffff;" parent="bEJetSFqN9zp64WMlj3R-33" vertex="1">
+          <mxGeometry x="80" y="65" width="120" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-23" value="&lt;h1 style=&quot;font-size: 48px;&quot;&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Shopping Cart&lt;/span&gt;&lt;/h1&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=48;fontStyle=0;fontFamily=Dosis;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DDosis;" parent="bEJetSFqN9zp64WMlj3R-33" vertex="1">
+          <mxGeometry y="260" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-85" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="bEJetSFqN9zp64WMlj3R-33" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="240" y="220" as="sourcePoint" />
+            <mxPoint x="540" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-86" value="&lt;span style=&quot;font-size: 36px;&quot;&gt;&lt;font style=&quot;font-size: 36px;&quot; data-font-src=&quot;https://fonts.googleapis.com/css?family=Lato&quot; face=&quot;Lato&quot;&gt;7. Shopping Cart&amp;nbsp;&lt;/font&gt;&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 36px;&quot;&gt;&lt;font face=&quot;Lato&quot;&gt;Details&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;" parent="bEJetSFqN9zp64WMlj3R-85" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="70" y="-20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-34" value="" style="group" parent="1" connectable="0" vertex="1">
+          <mxGeometry x="770" y="-390" width="290" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-27" value="" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.octagon2;align=center;verticalAlign=middle;dx=39.51;fillColor=#1d2f42;strokeColor=#314354;fontColor=#ffffff;" parent="bEJetSFqN9zp64WMlj3R-34" vertex="1">
+          <mxGeometry x="30" width="240" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-28" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffdb71;strokeColor=#d79b00;gradientColor=none;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;" parent="bEJetSFqN9zp64WMlj3R-34" vertex="1">
+          <mxGeometry x="70" y="40" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-30" value="" style="sketch=0;outlineConnect=0;fontColor=#ffffff;fillColor=#647687;strokeColor=#314354;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.user;" parent="bEJetSFqN9zp64WMlj3R-34" vertex="1">
+          <mxGeometry x="102.75" y="72.75" width="94.5" height="94.5" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-37" value="" style="group;fontFamily=Dosis;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DDosis;" parent="1" connectable="0" vertex="1">
+          <mxGeometry x="1370" y="500" width="280" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-25" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=Dosis&quot; face=&quot;Dosis&quot; style=&quot;font-size: 48px;&quot;&gt;Payment&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=17;fontStyle=0" parent="bEJetSFqN9zp64WMlj3R-37" vertex="1">
+          <mxGeometry y="260" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-36" value="" style="group" parent="bEJetSFqN9zp64WMlj3R-37" connectable="0" vertex="1">
+          <mxGeometry x="20" width="240" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-13" value="" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.octagon2;align=center;verticalAlign=middle;dx=39.51;fillColor=#1d2f42;strokeColor=#314354;fontColor=#ffffff;fontFamily=Helvetica;fontSize=12;" parent="bEJetSFqN9zp64WMlj3R-36" vertex="1">
+          <mxGeometry width="240" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-14" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffdb71;strokeColor=#d79b00;gradientColor=none;" parent="bEJetSFqN9zp64WMlj3R-36" vertex="1">
+          <mxGeometry x="40" y="40" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-16" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#ffffff;fillColor=none;strokeColor=#3A5431;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.payment_cryptography;" parent="bEJetSFqN9zp64WMlj3R-36" vertex="1">
+          <mxGeometry x="63" y="63" width="114" height="114" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-91" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="bEJetSFqN9zp64WMlj3R-37" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="20" y="180" as="sourcePoint" />
+            <mxPoint x="-320" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-92" value="&lt;span style=&quot;font-size: 36px;&quot;&gt;10. Payment &lt;br style=&quot;font-size: 36px;&quot;&gt;Confirmation&lt;/span&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;fontSize=36;fontFamily=Lato;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DLato;" parent="bEJetSFqN9zp64WMlj3R-91" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-7" y="25" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-38" value="" style="group" parent="1" connectable="0" vertex="1">
+          <mxGeometry x="780" y="80" width="280" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-35" value="" style="group" parent="bEJetSFqN9zp64WMlj3R-38" connectable="0" vertex="1">
+          <mxGeometry x="20" width="240" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-9" value="" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.octagon2;align=center;verticalAlign=middle;dx=39.51;fillColor=#1d2f42;strokeColor=#314354;fontColor=#ffffff;fontFamily=Helvetica;fontSize=12;" parent="bEJetSFqN9zp64WMlj3R-35" vertex="1">
+          <mxGeometry width="240" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-10" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffdb71;strokeColor=#d79b00;gradientColor=none;" parent="bEJetSFqN9zp64WMlj3R-35" vertex="1">
+          <mxGeometry x="40" y="40" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-12" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn2.iconfinder.com/data/icons/thin-line-icons-for-seo-and-development-1/64/SEO_site_map-128.png;imageBackground=none;imageBorder=none;strokeWidth=3;" parent="bEJetSFqN9zp64WMlj3R-35" vertex="1">
+          <mxGeometry x="56" y="56" width="128" height="128" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-39" value="" style="group" parent="1" connectable="0" vertex="1">
+          <mxGeometry x="1370" y="910" width="280" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-17" value="" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.octagon2;align=center;verticalAlign=middle;dx=39.51;fillColor=#1d2f42;strokeColor=#314354;fontColor=#ffffff;fontFamily=Helvetica;fontSize=12;" parent="bEJetSFqN9zp64WMlj3R-39" vertex="1">
+          <mxGeometry x="20" width="240" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-18" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffdb71;strokeColor=#d79b00;gradientColor=none;" parent="bEJetSFqN9zp64WMlj3R-39" vertex="1">
+          <mxGeometry x="60" y="40" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-20" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn0.iconfinder.com/data/icons/e-commerce-line-style/32/ecommerce_line_style-07-128.png" parent="bEJetSFqN9zp64WMlj3R-39" vertex="1">
+          <mxGeometry x="76" y="56" width="128" height="128" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-26" value="Shipping" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=48;fontFamily=Dosis;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DDosis;" parent="bEJetSFqN9zp64WMlj3R-39" vertex="1">
+          <mxGeometry y="260" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-41" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=Dosis&quot; face=&quot;Dosis&quot; style=&quot;font-size: 48px;&quot;&gt;Customer&lt;/font&gt;" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;strokeColor=#232F3E;fillColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.user;" parent="1" vertex="1">
+          <mxGeometry x="-30" y="-190" width="110" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-42" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="90" y="-40" as="sourcePoint" />
+            <mxPoint x="290" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-43" value="&lt;font style=&quot;font-size: 36px;&quot;&gt;4. Add Items&amp;nbsp;&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;to Cart&lt;/font&gt;&lt;/div&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;fontSize=36;" parent="bEJetSFqN9zp64WMlj3R-42" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="25" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-49" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="-220" as="sourcePoint" />
+            <mxPoint x="720" y="-330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-50" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=Lato&quot; face=&quot;Lato&quot; style=&quot;font-size: 36px;&quot;&gt;1. User Account Creation&lt;/font&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;fontSize=24;" parent="bEJetSFqN9zp64WMlj3R-49" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="5" y="5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-53" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="140" y="-130" as="sourcePoint" />
+            <mxPoint x="740" y="-240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-54" value="&lt;span style=&quot;font-size: 36px;&quot;&gt;2. User Authentication&lt;/span&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;fontFamily=Lato;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DLato;fontSize=36;" parent="bEJetSFqN9zp64WMlj3R-53" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="10" y="-5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-55" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="130" y="-80" as="sourcePoint" />
+            <mxPoint x="790" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-56" value="&lt;font style=&quot;font-size: 36px;&quot;&gt;3. Product Searches&lt;br style=&quot;font-size: 36px;&quot;&gt;&lt;/font&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;fontSize=36;" parent="bEJetSFqN9zp64WMlj3R-55" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="10" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-64" value="" style="group" parent="1" connectable="0" vertex="1">
+          <mxGeometry x="780" y="550" width="280" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-65" value="" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.octagon2;align=center;verticalAlign=middle;dx=39.51;fillColor=#1d2f42;strokeColor=#314354;fontColor=#ffffff;fontFamily=Helvetica;fontSize=12;" parent="bEJetSFqN9zp64WMlj3R-64" vertex="1">
+          <mxGeometry x="20" width="240" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-66" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffdb71;strokeColor=#d79b00;gradientColor=none;" parent="bEJetSFqN9zp64WMlj3R-64" vertex="1">
+          <mxGeometry x="60" y="40" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-71" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn0.iconfinder.com/data/icons/ui-interface-6/24/check-in-box-128.png;fontColor=#67AB9F;imageBorder=none;imageBackground=none;" parent="bEJetSFqN9zp64WMlj3R-64" vertex="1">
+          <mxGeometry x="76" y="56" width="128" height="128" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-77" value="&lt;font face=&quot;Dosis&quot; style=&quot;font-size: 48px;&quot;&gt;&lt;font style=&quot;font-size: 48px;&quot;&gt;External Payment&lt;/font&gt; Gateways&lt;/font&gt;" style="strokeColor=#dddddd;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;labelPosition=center;verticalLabelPosition=middle;align=center;verticalAlign=bottom;spacingLeft=0;fontColor=#999999;fontSize=12;whiteSpace=wrap;spacingBottom=2;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1920" y="480" width="260" height="265" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-78" value="" style="sketch=0;dashed=0;connectable=0;html=1;fillColor=#757575;strokeColor=none;shape=mxgraph.gcp2.payment;part=1;" parent="bEJetSFqN9zp64WMlj3R-77" vertex="1">
+          <mxGeometry x="0.5" width="50" height="40" relative="1" as="geometry">
+            <mxPoint x="-25" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-79" value="" style="ellipse;" parent="1" vertex="1">
+          <mxGeometry x="-820" y="180" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-80" value="" style="line;strokeWidth=2;direction=south;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1770" y="80" width="10" height="740" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-81" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-10" y="-30" as="sourcePoint" />
+            <mxPoint x="230" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-82" value="&lt;span style=&quot;font-size: 36px;&quot;&gt;6. Checkout&lt;/span&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;fontSize=36;" parent="bEJetSFqN9zp64WMlj3R-81" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-50" y="25" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-83" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="500" y="320" as="sourcePoint" />
+            <mxPoint x="800" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-84" value="&lt;font style=&quot;font-size: 36px;&quot;&gt;5. Verify&amp;nbsp;&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;Product Details&lt;/font&gt;&lt;/div&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;fontSize=36;" parent="bEJetSFqN9zp64WMlj3R-83" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-12" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-87" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="1" target="bEJetSFqN9zp64WMlj3R-13" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1050" y="630" as="sourcePoint" />
+            <mxPoint x="980" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-88" value="&lt;span style=&quot;font-size: 36px;&quot;&gt;8. Order Details&lt;/span&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;fontFamily=Lato;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DLato;fontSize=36;" parent="bEJetSFqN9zp64WMlj3R-87" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-7" y="-6" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-89" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="1" source="bEJetSFqN9zp64WMlj3R-13" target="bEJetSFqN9zp64WMlj3R-77" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1480" y="752" as="sourcePoint" />
+            <mxPoint x="1770" y="710" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-90" value="&lt;span style=&quot;font-size: 36px;&quot;&gt;9. Payment&amp;nbsp;&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 36px;&quot;&gt;Details&lt;/span&gt;&lt;/div&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;fontFamily=Lato;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DLato;fontSize=36;" parent="bEJetSFqN9zp64WMlj3R-89" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-7" y="5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-93" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="1" source="bEJetSFqN9zp64WMlj3R-58" target="bEJetSFqN9zp64WMlj3R-9" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1080" y="340" as="sourcePoint" />
+            <mxPoint x="970" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-94" value="&lt;span style=&quot;font-size: 36px;&quot;&gt;Update&amp;nbsp;&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 36px;&quot;&gt;Product Inventory&lt;/span&gt;&lt;/div&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;fontSize=36;" parent="bEJetSFqN9zp64WMlj3R-93" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-95" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;jumpStyle=none;spacingTop=24;spacingLeft=24;spacingBottom=24;spacingRight=24;textDirection=ltr;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="990" y="760" as="sourcePoint" />
+            <mxPoint x="1380" y="990" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-96" value="&lt;span style=&quot;font-size: 36px;&quot;&gt;&lt;font face=&quot;Lato&quot;&gt;11. Shipping &lt;br&gt;Details&lt;/font&gt;&lt;/span&gt;" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;spacingLeft=9;spacingBottom=10;" parent="bEJetSFqN9zp64WMlj3R-95" connectable="0" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-97" value="" style="group;fontFamily=Dosis;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DDosis;" parent="1" connectable="0" vertex="1">
+          <mxGeometry x="1370" y="80" width="280" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-58" value="" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.octagon2;align=center;verticalAlign=middle;dx=39.51;fillColor=#1d2f42;strokeColor=#314354;fontColor=#ffffff;fontFamily=Helvetica;fontSize=12;" parent="bEJetSFqN9zp64WMlj3R-97" vertex="1">
+          <mxGeometry x="30" width="240" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-59" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffdb71;strokeColor=#d79b00;gradientColor=none;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;" parent="bEJetSFqN9zp64WMlj3R-97" vertex="1">
+          <mxGeometry x="70" y="40" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-61" value="&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=Dosis&quot; face=&quot;Dosis&quot; style=&quot;font-size: 48px;&quot;&gt;Inventory&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=17;" parent="bEJetSFqN9zp64WMlj3R-97" vertex="1">
+          <mxGeometry y="260" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="3GqVpu8EgJMBrXUlduNZ-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="bEJetSFqN9zp64WMlj3R-97" source="bEJetSFqN9zp64WMlj3R-76" target="bEJetSFqN9zp64WMlj3R-61">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-76" value="" style="sketch=0;outlineConnect=0;fontColor=#ffffff;fillColor=#647687;strokeColor=#314354;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.inventory;" parent="bEJetSFqN9zp64WMlj3R-97" vertex="1">
+          <mxGeometry x="100" y="70" width="100" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-31" value="&lt;font style=&quot;font-size: 48px;&quot;&gt;User Management&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=48;fontFamily=Dosis;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DDosis;fontStyle=0" parent="1" vertex="1">
+          <mxGeometry x="770" y="-100" width="290" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-24" value="&lt;h1 style=&quot;font-size: 48px;&quot;&gt;&lt;font style=&quot;font-size: 48px; font-weight: normal;&quot; data-font-src=&quot;https://fonts.googleapis.com/css?family=Dosis&quot;&gt;Product Catalog&lt;/font&gt;&lt;/h1&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=48;fontFamily=Dosis;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DDosis;" parent="1" vertex="1">
+          <mxGeometry x="780" y="370" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bEJetSFqN9zp64WMlj3R-68" value="&lt;font style=&quot;font-size: 48px;&quot;&gt;Order Processing&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=48;fontFamily=Dosis;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DDosis;fontStyle=0" parent="1" vertex="1">
+          <mxGeometry x="780" y="840" width="280" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
