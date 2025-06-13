@@ -1,0 +1,920 @@
+= Payment Service
+:toc: macro
+:toclevels: 3
+:icons: font
+:source-highlighter: highlight.js
+:experimental:
+
+toc::[]
+
+This microservice is part of the Jakarta EE 10 and MicroProfile 6.1-based e-commerce application. It handles payment processing and transaction management.
+
+== Features
+
+* Payment transaction processing
+* Dynamic configuration management via MicroProfile Config
+* RESTful API endpoints with JSON support
+* Custom ConfigSource implementation
+* OpenAPI documentation
+* **MicroProfile Fault Tolerance with Retry Policies**
+* **Circuit Breaker protection for external services**
+* **Fallback mechanisms for service resilience**
+* **Bulkhead pattern for concurrency control**
+* **Timeout protection for long-running operations**
+
+== MicroProfile Fault Tolerance Implementation
+
+The Payment Service implements comprehensive fault tolerance patterns using MicroProfile Fault Tolerance annotations:
+
+=== Retry Policies
+
+The service implements different retry strategies based on operation criticality:
+
+==== Payment Authorization Retry (@Retry)
+* **Max Retries**: 3 attempts
+* **Delay**: 1000ms with 500ms jitter
+* **Max Duration**: 10 seconds
+* **Retry On**: RuntimeException, WebApplicationException
+* **Use Case**: Standard payment authorization with exponential backoff
+
+[source,java]
+----
+@Retry(
+    maxRetries = 3,
+    delay = 2000,
+    maxDuration = 10000
+    jitter = 500,
+    retryOn = {RuntimeException.class, WebApplicationException.class}
+)
+----
+
+=== Circuit Breaker Protection
+
+Payment capture operations use circuit breaker pattern:
+
+[source,java]
+----
+@CircuitBreaker(
+    failureRatio = 0.5,
+    requestVolumeThreshold = 4,
+    delay = 5000
+)
+----
+
+* **Failure Ratio**: 50% failure rate triggers circuit opening
+* **Request Volume**: Minimum 4 requests for evaluation
+* **Recovery Delay**: 5 seconds before attempting recovery
+
+=== Timeout Protection
+
+Operations with potential long delays are protected with timeouts:
+
+[source,java]
+----
+@Timeout(value = 3000)
+----
+
+=== Bulkhead Pattern
+
+The bulkhead pattern limits concurrent requests to prevent system overload:
+
+[source,java]
+----
+@Bulkhead(value = 5)
+----
+
+* **Concurrent Requests**: Limited to 5 concurrent requests
+* **Excess Requests**: Rejected immediately instead of queuing
+* **Use Case**: Protect service from traffic spikes and cascading failures
+
+=== Fallback Mechanisms
+
+All critical operations have fallback methods that provide graceful degradation:
+
+* **Payment Authorization Fallback**: Returns service unavailable with retry instructions
+
+== Endpoints
+
+=== GET /payment/api/payment-config
+* Returns all current payment configuration values
+* Example: `GET http://localhost:9080/payment/api/payment-config`
+* Response: `{"gateway.endpoint":"https://api.paymentgateway.com"}`
+
+=== POST /payment/api/payment-config
+* Updates a payment configuration value
+* Example: `POST http://localhost:9080/payment/api/payment-config`
+* Request body: `{"key": "payment.gateway.endpoint", "value": "https://new-api.paymentgateway.com"}`
+* Response: `{"key":"payment.gateway.endpoint","value":"https://new-api.paymentgateway.com","message":"Configuration updated successfully"}`
+
+=== POST /payment/api/authorize
+* Processes a payment authorization with retry policy
+* **Retry Configuration**: 3 attempts, 1s delay, 500ms jitter
+* **Fallback**: Service unavailable response
+* Example: `POST http://localhost:9080/payment/api/authorize`
+* Request body: `{"cardNumber":"4111111111111111", "cardHolderName":"Test User", "expiryDate":"12/25", "securityCode":"123", "amount":100.00}`
+* Response: `{"status":"success", "message":"Payment authorized successfully", "transactionId":"TXN1234567890", "amount":100.00}`
+* Fallback Response: `{"status":"failed", "message":"Payment gateway unavailable. Please try again later.", "fallback":true}`
+
+=== POST /payment/api/payment-config/process-example
+* Example endpoint demonstrating payment processing with configuration
+* Example: `POST http://localhost:9080/payment/api/payment-config/process-example`
+* Request body: `{"cardNumber":"4111111111111111", "cardHolderName":"Test User", "expiryDate":"12/25", "securityCode":"123", "amount":100.00}`
+* Response: `{"amount":100.00,"message":"Payment processed successfully","status":"success","configUsed":{"gatewayEndpoint":"https://new-api.paymentgateway.com"}}`
+
+== Building and Running the Service
+
+=== Prerequisites
+
+* JDK 17 or higher
+* Maven 3.6.0 or higher
+
+=== Local Development
+
+[source,bash]
+----
+# Build the application
+mvn clean package
+
+# Run the application with Liberty
+mvn liberty:run
+----
+
+The server will start on port 9080 (HTTP) and 9081 (HTTPS).
+
+=== Docker
+
+[source,bash]
+----
+# Build and run with Docker
+./run-docker.sh
+----
+
+== Project Structure
+
+* `src/main/java/io/microprofile/tutorial/PaymentRestApplication.java` - Jakarta Restful web service application class
+* `src/main/java/io/microprofile/tutorial/store/payment/config/` - Configuration classes
+* `src/main/java/io/microprofile/tutorial/store/payment/resource/` - REST resource endpoints
+* `src/main/java/io/microprofile/tutorial/store/payment/service/` - Business logic services
+* `src/main/java/io/microprofile/tutorial/store/payment/entity/` - Data models
+* `src/main/resources/META-INF/services/` - Service provider configuration
+* `src/main/liberty/config/` - Liberty server configuration
+
+== Custom ConfigSource
+
+The Payment Service implements a custom MicroProfile ConfigSource named `PaymentServiceConfigSource` that provides payment-specific configuration with high priority (ordinal: 600).
+
+=== Available Configuration Properties
+
+[cols="1,2,2", options="header"]
+|===
+|Property
+|Description
+|Default Value
+
+|payment.gateway.endpoint
+|Payment gateway endpoint URL
+|https://api.paymentgateway.com
+|===
+
+=== Testing ConfigSource Endpoints
+
+You can test the ConfigSource endpoints using curl or any REST client:
+
+[source,bash]
+----
+# Get current configuration
+curl -s http://localhost:9080/payment/api/payment-config | json_pp
+
+# Update configuration property
+curl -s -X POST -H "Content-Type: application/json" \
+  -d '{"key":"payment.gateway.endpoint", "value":"https://new-api.paymentgateway.com"}' \
+  http://localhost:9080/payment/api/payment-config | json_pp
+
+# Test payment processing with the configuration
+curl -s -X POST -H "Content-Type: application/json" \
+  -d '{"cardNumber":"4111111111111111", "cardHolderName":"Test User", "expiryDate":"12/25", "securityCode":"123", "amount":100.00}' \
+  http://localhost:9080/payment/api/payment-config/process-example | json_pp
+
+# Test basic payment authorization
+curl -s -X POST -H "Content-Type: application/json" \
+  http://localhost:9080/payment/api/authorize | json_pp
+----
+
+=== Implementation Details
+
+The custom ConfigSource is implemented in the following classes:
+
+* `PaymentServiceConfigSource.java` - Implements the MicroProfile ConfigSource interface
+* `PaymentConfig.java` - Utility class for accessing configuration properties
+
+Example usage in application code:
+
+[source,java]
+----
+// Inject standard MicroProfile Config
+@Inject
+@ConfigProperty(name="payment.gateway.endpoint")
+private String endpoint;
+
+// Or use the utility class
+String gatewayUrl = PaymentConfig.getConfigProperty("payment.gateway.endpoint");
+----
+
+The custom ConfigSource provides a higher priority (ordinal: 600) than system properties and environment variables, allowing for service-specific defaults while still enabling override via standard mechanisms.
+
+=== MicroProfile Config Sources
+
+MicroProfile Config uses a prioritized set of configuration sources. The payment service uses the following configuration sources in order of priority (highest to lowest):
+
+1. Custom ConfigSource (`PaymentServiceConfigSource`) - Ordinal: 600
+2. System properties - Ordinal: 400
+3. Environment variables - Ordinal: 300
+4. microprofile-config.properties file - Ordinal: 100
+
+==== Updating Configuration Values
+
+You can update configuration properties through different methods:
+
+===== 1. Using the REST API (runtime)
+
+This uses the custom ConfigSource and persists only for the current server session:
+
+[source,bash]
+----
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"key":"payment.gateway.endpoint", "value":"https://test-api.paymentgateway.com"}' \
+  http://localhost:9080/payment/api/payment-config
+----
+
+===== 2. Using System Properties (startup)
+
+[source,bash]
+----
+# Linux/macOS
+mvn liberty:run -Dpayment.gateway.endpoint=https://sys-api.paymentgateway.com
+
+# Windows
+mvn liberty:run "-Dpayment.gateway.endpoint=https://sys-api.paymentgateway.com"
+----
+
+===== 3. Using Environment Variables (startup)
+
+Environment variable names must follow the MicroProfile Config convention (uppercase with underscores):
+
+[source,bash]
+----
+# Linux/macOS
+export PAYMENT_GATEWAY_ENDPOINT=https://env-api.paymentgateway.com
+mvn liberty:run
+
+# Windows PowerShell
+$env:PAYMENT_GATEWAY_ENDPOINT="https://env-api.paymentgateway.com"
+mvn liberty:run
+
+# Windows CMD
+set PAYMENT_GATEWAY_ENDPOINT=https://env-api.paymentgateway.com
+mvn liberty:run
+----
+
+===== 4. Using microprofile-config.properties File
+
+Edit the file at `src/main/resources/META-INF/microprofile-config.properties`:
+
+[source,properties]
+----
+# Update the endpoint
+payment.gateway.endpoint=https://config-api.paymentgateway.com
+----
+
+Then rebuild and restart the application:
+
+[source,bash]
+----
+mvn clean package liberty:run
+----
+
+==== Testing Configuration Changes
+
+After changing a configuration property, you can verify it was updated by calling:
+
+[source,bash]
+----
+curl http://localhost:9080/payment/api/payment-config
+----
+
+== Documentation
+
+=== OpenAPI
+
+The payment service automatically generates OpenAPI documentation using MicroProfile OpenAPI annotations.
+
+* OpenAPI UI: `http://localhost:9080/payment/api/openapi-ui/`
+* OpenAPI JSON: `http://localhost:9080/payment/api/openapi`
+
+=== MicroProfile Config Specification
+
+For more information about MicroProfile Config, refer to the official documentation:
+
+* https://download.eclipse.org/microprofile/microprofile-config-3.1/microprofile-config-spec-3.1.html
+
+=== Related Resources
+
+* MicroProfile: https://microprofile.io/
+* Jakarta EE: https://jakarta.ee/
+* Open Liberty: https://openliberty.io/
+
+== Troubleshooting
+
+=== Common Issues
+
+==== Port Conflicts
+
+If you encounter a port conflict when starting the server, you can change the ports in the `pom.xml` file:
+
+[source,xml]
+----
+<liberty.var.default.http.port>9080</liberty.var.default.http.port>
+<liberty.var.default.https.port>9081</liberty.var.default.https.port>
+----
+
+==== ConfigSource Not Loading
+
+If the custom ConfigSource is not loading, check the following:
+
+1. Verify the service provider configuration file exists at:
+   `src/main/resources/META-INF/services/org.eclipse.microprofile.config.spi.ConfigSource`
+
+2. Ensure it contains the correct fully qualified class name:
+   `io.microprofile.tutorial.store.payment.config.PaymentServiceConfigSource`
+
+==== Deployment Errors
+
+For CWWKZ0004E deployment errors, check the server logs at:
+`target/liberty/wlp/usr/servers/mpServer/logs/messages.log`
+
+== Testing Fault Tolerance Features
+
+=== Automated Test Scripts
+
+The Payment Service includes several test scripts to demonstrate and validate fault tolerance features:
+
+==== test-payment-basic.sh
+
+Basic functionality test to verify core payment operations:
+
+* Configuration retrieval
+* Simple payment processing
+* Error handling
+
+[source,bash]
+----
+# Test basic payment operations
+chmod +x test-payment-basic.sh
+./test-payment-basic.sh
+----
+
+==== test-payment-retry.sh
+Tests various retry scenarios with different triggers:
+
+* Normal payment processing (successful)
+* Failed payment with retry (card ending in "0000")
+* Verification with random failures
+* Invalid input handling
+
+[source,bash]
+----
+# Test retry scenarios
+chmod +x test-payment-retry.sh
+./test-payment-retry.sh
+----
+
+==== test-payment-concurrent-load.sh
+
+Tests the service under concurrent load:
+
+* Multiple simultaneous requests
+* Observing thread handling
+* Response time analysis
+
+[source,bash]
+----
+# Test service under concurrent load
+chmod +x test-payment-concurrent-load.sh
+./test-payment-concurrent-load.sh
+----
+
+==== test-payment-async.sh
+
+Analyzes asynchronous processing behavior:
+
+* Response time measurement
+* Thread utilization
+* Future completion patterns
+
+[source,bash]
+----
+# Analyze asynchronous processing
+chmod +x test-payment-async.sh
+./test-payment-async.sh
+----
+
+==== test-payment-bulkhead.sh
+Demonstrates the bulkhead pattern by sending concurrent requests:
+
+* Concurrent request handling
+* Bulkhead limit verification (5 requests)
+* Rejection of excess requests
+* Service recovery after load reduction
+
+[source,bash]
+----
+# Test bulkhead functionality with concurrent requests
+chmod +x test-payment-bulkhead.sh
+./test-payment-bulkhead.sh
+----
+
+=== Running the Tests
+
+To run any of these test scripts:
+
+[source,bash]
+----
+# Make the script executable
+chmod +x test-payment-bulkhead.sh
+
+# Run the script
+./test-payment-bulkhead.sh
+----
+
+You can also run all test scripts in sequence:
+
+[source,bash]
+----
+# Run all test scripts
+for script in test-payment-*.sh; do
+  echo "Running $script..."
+  chmod +x $script
+  ./$script
+  echo "----------------------------------------"
+  sleep 2
+done
+----
+
+== Configuration Properties
+
+=== Fault Tolerance Configuration
+
+The following properties can be configured via MicroProfile Config:
+
+[cols="1,2,2", options="header"]
+|===
+|Property
+|Description
+|Default Value
+
+|payment.gateway.endpoint
+|Payment gateway endpoint URL
+|https://api.paymentgateway.com
+
+|payment.retry.maxRetries
+|Maximum retry attempts for payment operations
+|3
+
+|payment.retry.delay
+|Delay between retry attempts (milliseconds)
+|1000
+
+|payment.circuitbreaker.failureRatio
+|Circuit breaker failure ratio threshold
+|0.5
+
+|payment.circuitbreaker.requestVolumeThreshold
+|Minimum requests for circuit breaker evaluation
+|4
+
+|payment.timeout.duration
+|Timeout duration for payment operations (milliseconds)
+|3000
+
+|payment.bulkhead.value
+|Maximum concurrent requests for bulkhead
+|5
+|===
+
+== Fault Tolerance Implementation Details
+
+=== Server Configuration
+
+The MicroProfile Fault Tolerance feature is enabled in the Liberty server configuration:
+
+[source,xml]
+----
+<feature>mpFaultTolerance</feature>
+----
+
+=== Code Implementation
+
+==== PaymentService Class
+
+The PaymentService class is annotated with `@ApplicationScoped` to ensure proper fault tolerance behavior:
+
+[source,java]
+----
+@ApplicationScoped
+public class PaymentService {
+    // ...
+}
+----
+
+==== Authorization Method
+
+[source,java]
+----
+@Retry(maxRetries = 3, 
+        delay = 2000, 
+        jitter = 500, 
+        retryOn = PaymentProcessingException.class, 
+        abortOn = CriticalPaymentException.class)
+    @Fallback(fallbackMethod = "fallbackProcessPayment")
+public PaymentResponse processPayment(PaymentRequest request) {
+    // Payment processing logic
+}
+
+public PaymentResponse fallbackPaymentAuthorization(PaymentRequest request) {
+    // Fallback logic for payment authorization
+    return new PaymentResponse("failed", "Payment gateway unavailable. Please try again later.", true);
+}
+----
+
+=== Key Implementation Benefits
+
+==== 1. Resilience
+- Service continues operating despite external service failures
+- Automatic recovery from transient failures
+- Protection against cascading failures
+
+==== 2. User Experience
+- Reduced timeout errors through retry mechanisms
+- Graceful degradation with meaningful error messages
+- Improved service availability
+
+==== 3. Operational Excellence
+- Configurable fault tolerance parameters
+- Comprehensive logging and monitoring
+- Clear separation of concerns between business logic and resilience
+
+==== 4. Enterprise Readiness
+- Production-ready fault tolerance patterns
+- Compliance with microservices best practices
+- Integration with MicroProfile ecosystem
+
+== MicroProfile Fault Tolerance Patterns
+
+=== Retry Pattern
+
+The retry pattern allows the service to automatically retry failed operations:
+
+* **@Retry**: Automatically retries failed operations
+* **Parameters**: maxRetries, delay, jitter, maxDuration, retryOn, abortOn
+* **Use Case**: Transient failures in external service calls
+
+=== Circuit Breaker Pattern
+
+The circuit breaker pattern prevents cascading failures:
+
+* **@CircuitBreaker**: Tracks failure rates and opens circuit when threshold is reached
+* **Parameters**: failureRatio, requestVolumeThreshold, delay
+* **States**: Closed (normal), Open (failing), Half-Open (testing recovery)
+* **Use Case**: Protect against downstream service failures
+
+=== Timeout Pattern
+
+The timeout pattern prevents operations from hanging indefinitely:
+
+* **@Timeout**: Sets maximum duration for operations
+* **Parameters**: value, unit
+* **Use Case**: Prevent indefinite waiting for slow external services
+
+=== Bulkhead Pattern
+
+The bulkhead pattern limits concurrent requests:
+
+* **@Bulkhead**: Sets maximum concurrent executions
+* **Parameters**: value, waitingTaskQueue (for async)
+* **Use Case**: Prevent system overload during traffic spikes
+
+=== Fallback Pattern
+
+The fallback pattern provides alternatives when operations fail:
+
+* **@Fallback**: Specifies alternative method when operation fails
+* **Parameters**: fallbackMethod, applyOn, skipOn
+* **Use Case**: Graceful degradation for failed operations
+
+== Fault Tolerance Best Practices
+
+=== Configuring Retry Policies
+
+When configuring retry policies, consider these best practices:
+
+* **Operation Criticality**: Use more aggressive retry policies for critical operations
+* **Retry Delay**: Implement exponential backoff for external service calls
+* **Jitter**: Add random jitter to prevent thundering herd problems
+* **Max Duration**: Set an overall timeout to prevent excessive retries
+* **Abort Conditions**: Define specific exceptions that should abort retry attempts
+
+=== Circuit Breaker Configuration
+
+For effective circuit breaker implementation:
+
+* **Failure Ratio**: Set appropriate threshold based on expected error rates (typically 0.3-0.5)
+* **Request Volume**: Set minimum request count to prevent premature circuit opening
+* **Recovery Delay**: Allow sufficient time for downstream services to recover
+* **Monitoring**: Track circuit state transitions for operational visibility
+
+=== Bulkhead Strategies
+
+Choose the appropriate bulkhead strategy:
+
+* **Synchronous Bulkhead**: Limits concurrent executions for thread-constrained systems
+* **Asynchronous Bulkhead**: Provides a waiting queue for manageable load spikes
+* **Isolation Levels**: Consider using separate bulkheads for different types of operations
+
+=== Fallback Implementation
+
+Implement effective fallback mechanisms:
+
+* **Graceful Degradation**: Return partial results when possible
+* **Meaningful Responses**: Provide clear error messages to clients
+* **Operation Queuing**: Queue failed operations for later processing
+* **Fallback Chain**: Implement multiple fallback levels for critical operations
+
+=== Combining Fault Tolerance Annotations
+
+When combining multiple fault tolerance annotations:
+
+* **Execution Order**: Understand the execution order (Fallback → Retry → CircuitBreaker → Timeout → Bulkhead)
+* **Compatibility**: Ensure annotations work together as expected
+* **Resource Impact**: Consider the resource impact of combined annotations
+* **Testing**: Test all combinations of annotation behaviors
+
+== Troubleshooting Fault Tolerance Issues
+
+=== Common Fault Tolerance Issues
+
+==== 1. Ineffective Retry Policies
+
+**Symptoms**:
+* Operations fail without retrying
+* Excessive retries causing performance issues
+
+**Solutions**:
+* Verify exceptions match retryOn parameter
+* Check that delay and jitter are appropriate
+* Ensure maxDuration allows sufficient time for retries
+
+==== 2. Circuit Breaker Problems
+
+**Symptoms**:
+* Circuit opens too frequently
+* Circuit never opens despite failures
+* Circuit remains open indefinitely
+
+**Solutions**:
+* Adjust failureRatio based on expected error rates
+* Increase requestVolumeThreshold if premature opening occurs
+* Verify that delay allows sufficient recovery time
+* Ensure exceptions are properly handled
+
+==== 3. Timeout Issues
+
+**Symptoms**:
+* Operations timeout too quickly
+* Timeouts not triggering as expected
+
+**Solutions**:
+* Adjust timeout duration based on operation complexity
+* Ensure timeout is shorter than upstream timeouts
+* Verify that timeout unit is properly specified
+
+==== 4. Bulkhead Restrictions
+
+**Symptoms**:
+* Too many rejections during normal load
+* Service overloaded despite bulkhead
+
+**Solutions**:
+* Adjust bulkhead value based on resource capacity
+* Consider using asynchronous bulkheads with waiting queue
+* Implement client-side load balancing for better distribution
+
+==== 5. Fallback Failures
+
+**Symptoms**:
+* Fallbacks not triggering despite failures
+* Fallbacks throwing unexpected exceptions
+
+**Solutions**:
+* Verify fallback method signature matches original method
+* Ensure fallback method handles exceptions properly
+* Check that fallback logic is fully tested
+
+=== Diagnosing with Metrics
+
+MicroProfile Metrics provides valuable insight into fault tolerance behavior:
+
+=== Diagnosing with Metrics
+
+MicroProfile Metrics provides valuable insight into fault tolerance behavior:
+
+[source,bash]
+----
+# Total number of retry attempts
+curl https://localhost:9080/metrics?name=ft_retry_retries_total
+
+# Bulkhead calls total
+curl http://localhost:9080/metrics?name=ft_bulkhead_calls_total
+
+# Timeout execution duration
+curl http://localhost:9080/payment/metrics/application?name=ft_timeout_executionDuration_nanoseconds
+----
+
+=== Server Log Analysis
+
+Liberty server logs provide detailed information about fault tolerance operations:
+
+[source,bash]
+----
+tail -f target/liberty/wlp/usr/servers/mpServer/logs/messages.log | grep -E "Retry|CircuitBreaker|Timeout|Bulkhead|Fallback"
+----
+
+Look for messages indicating:
+* Retry attempts and success/failure
+* Circuit breaker state transitions
+* Timeout exceptions
+* Bulkhead rejections
+* Fallback method invocations
+
+== Resources and References
+
+=== MicroProfile Fault Tolerance Specification
+
+For detailed information about MicroProfile Fault Tolerance, refer to:
+
+* https://download.eclipse.org/microprofile/microprofile-fault-tolerance-4.0/microprofile-fault-tolerance-spec-4.0.html
+
+=== API Documentation
+
+* https://download.eclipse.org/microprofile/microprofile-fault-tolerance-4.0/apidocs/
+
+=== Fault Tolerance Guides
+
+* https://openliberty.io/guides/microprofile-fallback.html
+* https://openliberty.io/guides/retry-timeout.html
+* https://openliberty.io/guides/circuit-breaker.html
+* https://openliberty.io/guides/bulkhead.html
+
+=== Best Practices Resources
+
+* https://microprofile.io/
+* https://www.ibm.com/docs/en/was-liberty/base?topic=liberty-microprofile-fault-tolerance
+
+== Payment Flow
+
+The Payment Service implements a complete payment processing flow:
+
+[plantuml,payment-flow,png]
+----
+@startuml
+skinparam backgroundColor transparent
+skinparam handwritten true
+
+state "PENDING" as pending
+state "PROCESSING" as processing
+state "COMPLETED" as completed
+state "FAILED" as failed
+state "REFUNDED" as refunded
+state "CANCELLED" as cancelled
+
+[*] --> pending : Create payment
+pending --> processing : Process payment
+processing --> completed : Success
+processing --> failed : Error
+completed --> refunded : Refund request
+pending --> cancelled : Cancel
+failed --> [*]
+refunded --> [*]
+cancelled --> [*]
+completed --> [*]
+@enduml
+----
+
+1. **Create a payment** with status `PENDING` (POST /api/payments)
+2. **Process the payment** to change status to `PROCESSING` (POST /api/payments/{id}/process)
+3. Payment will automatically be updated to either:
+   * `COMPLETED` - Successful payment processing
+   * `FAILED` - Payment rejected or processing error
+4. If needed, payments can be:
+   * `REFUNDED` - For returning funds to the customer
+   * `CANCELLED` - For stopping a pending payment
+
+=== Payment Status Rules
+
+[cols="1,2,2", options="header"]
+|===
+|Status
+|Description
+|Available Actions
+
+|PENDING
+|Payment created but not yet processed
+|Process, Cancel
+
+|PROCESSING
+|Payment being processed by payment gateway
+|None (transitional state)
+
+|COMPLETED
+|Payment successfully processed
+|Refund
+
+|FAILED
+|Payment processing unsuccessful
+|Create new payment
+
+|REFUNDED
+|Payment returned to customer
+|None (terminal state)
+
+|CANCELLED
+|Payment cancelled before processing
+|Create new payment
+|===
+
+=== Test Scenarios
+
+For testing purposes, the following scenarios are simulated:
+
+* Payments with amounts ending in `.00` will fail
+* Payments with card numbers ending in `0000` trigger retry mechanisms
+* Verification has a 50% random failure rate to demonstrate retry capabilities
+* Empty amount values in refund requests trigger abort conditions
+
+== Integration with Other Services
+
+The Payment Service integrates with several other microservices in the application:
+
+=== Order Service Integration
+
+* **Direction**: Bi-directional
+* **Endpoints Used**:
+  - `GET /order/api/orders/{orderId}` - Get order details before payment
+  - `PATCH /order/api/orders/{orderId}/status` - Update order status after payment
+* **Integration Flow**:
+  1. Payment Service receives payment request with orderId
+  2. Payment Service validates order exists and status is valid for payment
+  3. After payment processing, Payment Service updates Order status
+  4. Payment status `COMPLETED` → Order status `PAID`
+  5. Payment status `FAILED` → Order status `PAYMENT_FAILED`
+
+=== User Service Integration
+
+* **Direction**: Outbound only
+* **Endpoints Used**:
+  - `GET /user/api/users/{userId}` - Validate user exists
+  - `GET /user/api/users/{userId}/payment-methods` - Get saved payment methods
+* **Integration Flow**:
+  1. Payment Service validates user exists before processing payment
+  2. Payment Service can retrieve saved payment methods for user
+  3. User payment history is updated after successful payment
+
+=== Inventory Service Integration
+
+* **Direction**: Indirect via Order Service
+* **Purpose**: Ensure inventory is reserved during payment processing
+* **Flow**:
+  1. Order Service has already reserved inventory
+  2. Successful payment confirms inventory allocation
+  3. Failed payment may release inventory (via Order Service)
+
+=== Authentication Integration
+
+* **Security**: Secured endpoints require valid JWT token
+* **Claims Required**:
+  - `sub` - Subject identifier (user ID)
+  - `roles` - User roles for authorization
+* **Authorization Rules**:
+  - View payment history: Authenticated user or admin
+  - Process payments: Authenticated user
+  - Refund payments: Admin role only
+  - View all payments: Admin role only
+
+=== Integration Testing
+
+Integration tests are available that validate the complete payment flow across services:
+
+[source,bash]
+----
+# Test complete order-to-payment flow
+./test-payment-integration.sh
+----

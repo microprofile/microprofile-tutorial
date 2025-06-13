@@ -1,0 +1,41 @@
+<server description="MicroProfile Tutorial Liberty Server">
+    <featureManager>
+        <platform>jakartaEE-10.0</platform>
+        <platform>microProfile-6.1</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>mpConfig</feature>
+        <feature>mpOpenAPI</feature>
+        <feature>mpHealth</feature>
+        <feature>mpMetrics</feature>
+        <feature>persistence</feature>
+        <feature>jdbc</feature>
+    </featureManager>
+
+    <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
+                  id="defaultHttpEndpoint" host="*" />
+
+    <!-- Disable authentication for metrics endpoint -->
+    <mpMetrics authentication="false" />
+
+    <!-- Derby DataSource Configuration -->
+    <dataSource id="DefaultDataSource" jndiName="jdbc/catalogDB" type="javax.sql.DataSource">
+        <jdbcDriver>
+            <library>
+                <fileset dir="${server.config.dir}/derby"/>
+            </library>
+        </jdbcDriver>
+        <properties databaseName="catalogDB" createDatabase="create" 
+                   connectionAttributes="upgrade=true"/>
+    </dataSource>
+
+    <!-- Derby Embedded Driver -->
+    <library id="derbyLib">
+        <fileset dir="${server.config.dir}/derby" includes="*.jar"/>
+    </library>
+
+    <webApplication location="catalog.war" contextRoot="${app.context.root}"/>
+
+</server>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+             https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    
+    <persistence-unit name="catalogPU">
+        <jta-data-source>jdbc/catalogDB</jta-data-source>
+        <class>io.microprofile.tutorial.store.product.entity.Product</class>
+        <properties>
+            <!-- Derby-specific properties -->
+            <property name="jakarta.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:derby:catalogDB;create=true"/>
+            
+            <!-- JPA Schema generation - only database action, no script generation -->
+            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
+            
+            <!-- Data loading -->
+            <property name="jakarta.persistence.sql-load-script-source" value="META-INF/load-data.sql"/>
+            
+            <!-- Logging (optional, for debugging) -->
+            <property name="eclipselink.logging.level" value="INFO"/>
+            <property name="eclipselink.logging.logger" value="DefaultLogger"/>
+        </properties>
+    </persistence-unit>
+    
+</persistence>

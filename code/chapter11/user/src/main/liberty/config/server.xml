@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="MicroProfile User Service Server">
+
+    <featureManager>
+        <feature>restfulWS-3.1</feature>
+        <feature>jsonp-2.1</feature>
+        <feature>jsonb-3.0</feature>
+        <feature>cdi-4.0</feature>
+        <feature>microProfile-6.1</feature>
+    </featureManager>
+
+    <httpEndpoint httpPort="6020" httpsPort="6021"
+                  id="defaultHttpEndpoint" host="*" />
+
+    <webApplication location="user.war" contextRoot="/user"/>
+</server>

@@ -1,0 +1,22 @@
+<server description="MicroProfile Tutorial Liberty Server">
+    <featureManager>
+        <platform>jakartaEE-10.0</platform>
+        <platform>microProfile-6.1</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>mpConfig</feature>
+        <feature>mpOpenAPI</feature>
+        <feature>mpHealth</feature>
+        <feature>mpMetrics</feature>
+        <feature>mpFaultTolerance</feature>
+    </featureManager>
+
+    <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
+                  id="defaultHttpEndpoint" host="*" />
+    <mpMetrics authentication="false"/>
+    <webApplication location="payment.war" contextRoot="${app.context.root}"/>
+    <logging traceSpecification="*=info:com.ibm.ws.webcontainer*=all:com.ibm.ws.jaxrs*=all:com.ibm.ws.app.manager*=all:com.ibm.ws.microprofile.health.*=all:io.microprofile.tutorial.store.product.*=all:io.microprofile.tutorial.store.payment.*=all" />
+    
+</server>

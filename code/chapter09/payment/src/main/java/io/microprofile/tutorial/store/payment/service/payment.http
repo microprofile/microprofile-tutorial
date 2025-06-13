@@ -1,0 +1,9 @@
+POST https://orange-zebra-r745vp6rjcxp67-9080.app.github.dev/payment/authorize
+
+{
+    "cardNumber": "4111111111111111",
+    "cardHolderName": "John Doe",
+    "expiryDate": "12/25",
+    "securityCode": "123",
+    "amount": 100.00
+}

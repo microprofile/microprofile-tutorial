@@ -1,0 +1,1300 @@
+= MicroProfile Catalog Service
+:toc: macro
+:toclevels: 3
+:icons: font
+:source-highlighter: highlight.js
+:experimental:
+
+toc::[]
+
+== Overview
+
+The MicroProfile Catalog Service is a modern Jakarta EE 10 application built with MicroProfile 6.1 specifications and running on Open Liberty. This service provides a RESTful API for product catalog management with enhanced MicroProfile features and flexible persistence options.
+
+This project demonstrates the key capabilities of MicroProfile OpenAPI, MicroProfile Health, CDI qualifiers, and dual persistence architecture with both JPA/Derby database and in-memory implementations.
+
+== Features
+
+* *RESTful API* using Jakarta RESTful Web Services
+* *OpenAPI Documentation* with Swagger UI
+* *MicroProfile Health* with comprehensive startup, readiness, and liveness checks
+* *MicroProfile Metrics* with Timer, Counter, and Gauge metrics for performance monitoring
+* *Dual Persistence Implementation* with configurable JPA/Derby database and in-memory storage options
+* *CDI Qualifiers* for dependency injection and implementation switching
+* *Derby Database Support* with automatic JAR deployment via Liberty Maven plugin
+* *Maintenance Mode* support with configuration-based toggles
+
+== MicroProfile Features Implemented
+
+=== MicroProfile OpenAPI
+
+The application provides OpenAPI documentation for its REST endpoints. API documentation is generated automatically from annotations in the code:
+
+[source,java]
+----
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+@Operation(summary = "Get all products", description = "Returns a list of all products")
+@APIResponses({
+    @APIResponse(responseCode = "200", description = "List of products", 
+                content = @Content(mediaType = "application/json", 
+                schema = @Schema(implementation = Product.class)))
+})
+public Response getAllProducts() {
+    // Implementation
+}
+----
+
+The OpenAPI documentation is available at: `/openapi` (in various formats) and `/openapi/ui` (Swagger UI)
+
+=== MicroProfile Metrics
+
+The application implements comprehensive performance monitoring using MicroProfile Metrics with three types of metrics:
+
+* *Timer Metrics* (`@Timed`) - Track response times for product lookups
+* *Counter Metrics* (`@Counted`) - Monitor API usage frequency  
+* *Gauge Metrics* (`@Gauge`) - Real-time catalog size monitoring
+
+Metrics are available at `/metrics` endpoints in Prometheus format for integration with monitoring systems.
+
+=== Dual Persistence Architecture
+
+The application implements a flexible persistence layer with two implementations that can be switched via CDI qualifiers:
+
+1. *JPA/Derby Database Implementation* (Default) - For production use with persistent data storage
+2. *In-Memory Implementation* - For development, testing, and scenarios where persistence across restarts is not required
+
+==== CDI Qualifiers for Implementation Switching
+
+The application uses CDI qualifiers to select between different persistence implementations:
+
+[source,java]
+----
+// JPA Qualifier
+@Qualifier
+@Retention(RUNTIME)
+@Target({METHOD, FIELD, PARAMETER, TYPE})
+public @interface JPA {
+}
+
+// In-Memory Qualifier  
+@Qualifier
+@Retention(RUNTIME)
+@Target({METHOD, FIELD, PARAMETER, TYPE})
+public @interface InMemory {
+}
+----
+
+==== Service Layer with CDI Injection
+
+The service layer uses CDI qualifiers to inject the appropriate repository implementation:
+
+[source,java]
+----
+@ApplicationScoped
+public class ProductService {
+    
+    @Inject
+    @JPA  // Uses Derby database implementation by default
+    private ProductRepositoryInterface repository;
+    
+    public List<Product> findAllProducts() {
+        return repository.findAllProducts();
+    }
+    // ... other service methods
+}
+----
+
+==== JPA/Derby Database Implementation
+
+The JPA implementation provides persistent data storage using Apache Derby database:
+
+[source,java]
+----
+@ApplicationScoped
+@JPA
+@Transactional
+public class ProductJpaRepository implements ProductRepositoryInterface {
+    
+    @PersistenceContext(unitName = "catalogPU")
+    private EntityManager entityManager;
+    
+    @Override
+    public List<Product> findAllProducts() {
+        TypedQuery<Product> query = entityManager.createNamedQuery("Product.findAll", Product.class);
+        return query.getResultList();
+    }
+    
+    @Override
+    public Product createProduct(Product product) {
+        entityManager.persist(product);
+        return product;
+    }
+    // ... other JPA operations
+}
+----
+
+*Key Features of JPA Implementation:*
+* Persistent data storage across application restarts
+* ACID transactions with @Transactional annotation
+* Named queries for efficient database operations
+* Automatic schema generation and data loading
+* Derby embedded database for simplified deployment
+
+==== In-Memory Implementation
+
+The in-memory implementation uses thread-safe collections for fast data access:
+
+[source,java]
+----
+@ApplicationScoped
+@InMemory
+public class ProductInMemoryRepository implements ProductRepositoryInterface {
+    
+    // Thread-safe storage using ConcurrentHashMap
+    private final Map<Long, Product> productsMap = new ConcurrentHashMap<>();
+    private final AtomicLong idGenerator = new AtomicLong(1);
+    
+    @Override
+    public List<Product> findAllProducts() {
+        return new ArrayList<>(productsMap.values());
+    }
+    
+    @Override
+    public Product createProduct(Product product) {
+        if (product.getId() == null) {
+            product.setId(idGenerator.getAndIncrement());
+        }
+        productsMap.put(product.getId(), product);
+        return product;
+    }
+    // ... other in-memory operations
+}
+----
+
+*Key Features of In-Memory Implementation:*
+* Fast in-memory access without database I/O
+* Thread-safe operations using ConcurrentHashMap and AtomicLong
+* No external dependencies or database configuration
+* Suitable for development, testing, and stateless deployments
+
+=== How to Switch Between Implementations
+
+You can switch between JPA and In-Memory implementations in several ways:
+
+==== Method 1: CDI Qualifier Injection (Compile Time)
+
+Change the qualifier in the service class:
+
+[source,java]
+----
+@ApplicationScoped
+public class ProductService {
+    
+    // For JPA/Derby implementation (default)
+    @Inject
+    @JPA
+    private ProductRepositoryInterface repository;
+    
+    // OR for In-Memory implementation
+    // @Inject
+    // @InMemory  
+    // private ProductRepositoryInterface repository;
+}
+----
+
+==== Method 2: MicroProfile Config (Runtime)
+
+Configure the implementation type in `microprofile-config.properties`:
+
+[source,properties]
+----
+# Repository configuration
+product.repository.type=JPA     # Use JPA/Derby implementation
+# product.repository.type=InMemory  # Use In-Memory implementation
+
+# Database configuration
+product.database.enabled=true
+product.database.name=catalogDB
+----
+
+The application can use the configuration to determine which implementation to inject.
+
+==== Method 3: Alternative Annotations (Deployment Time)
+
+Use CDI @Alternative annotation to enable/disable implementations via beans.xml:
+
+[source,xml]
+----
+<!-- beans.xml -->
+<alternatives>
+    <class>io.microprofile.tutorial.store.product.repository.ProductInMemoryRepository</class>
+</alternatives>
+----
+
+=== Database Configuration and Setup
+
+==== Derby Database Configuration
+
+The Derby database is automatically configured through the Liberty Maven plugin and server.xml:
+
+*Maven Dependencies and Plugin Configuration:*
+[source,xml]
+----
+<dependencies>
+    <!-- Apache Derby Database Driver -->
+    <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derby</artifactId>
+        <version>10.16.1.1</version>
+    </dependency>
+    <!-- Derby Shared Components -->
+    <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derbyshared</artifactId>
+        <version>10.16.1.1</version>
+    </dependency>
+    <!-- Derby Tools (optional) -->
+    <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derbytools</artifactId>
+        <version>10.16.1.1</version>
+    </dependency>
+</dependencies>
+
+<plugin>
+    <groupId>io.openliberty.tools</groupId>
+    <artifactId>liberty-maven-plugin</artifactId>
+    <configuration>
+        <serverName>mpServer</serverName>
+        <copyDependencies>
+            <location>${project.build.directory}/liberty/wlp/usr/servers/mpServer/derby</location>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbyshared</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbytools</artifactId>
+            </dependency>
+        </copyDependencies>
+    </configuration>
+</plugin>
+----
+
+*Server.xml Configuration:*
+[source,xml]
+----
+<!-- Derby DataSource Configuration -->
+<dataSource id="DefaultDataSource" jndiName="jdbc/catalogDB" type="javax.sql.DataSource">
+    <jdbcDriver>
+        <library>
+            <fileset dir="${server.config.dir}/derby"/>
+        </library>
+    </jdbcDriver>
+    <properties databaseName="catalogDB" createDatabase="create" 
+               connectionAttributes="upgrade=true"/>
+</dataSource>
+
+<!-- Derby Embedded Driver -->
+<library id="derbyLib">
+    <fileset dir="${server.config.dir}/derby" includes="*.jar"/>
+</library>
+----
+
+*JPA Configuration (persistence.xml):*
+[source,xml]
+----
+<persistence-unit name="catalogPU">
+    <jta-data-source>jdbc/catalogDB</jta-data-source>
+    <class>io.microprofile.tutorial.store.product.entity.Product</class>
+    <properties>
+        <!-- Derby-specific properties -->
+        <property name="jakarta.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+        <property name="jakarta.persistence.jdbc.url" value="jdbc:derby:catalogDB;create=true"/>
+        
+        <!-- JPA Schema generation -->
+        <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
+        
+        <!-- Data loading -->
+        <property name="jakarta.persistence.sql-load-script-source" value="META-INF/load-data.sql"/>
+    </properties>
+</persistence-unit>
+----
+
+==== Implementation Comparison
+
+[cols="1,1,1", options="header"]
+|===
+| Feature | JPA/Derby Implementation | In-Memory Implementation
+| Data Persistence | Survives application restarts | Lost on restart
+| Performance | Database I/O overhead | Fastest access (memory)
+| Configuration | Requires datasource setup | No configuration needed
+| Dependencies | Derby JARs, JPA provider | None (Java built-ins)
+| Threading | JPA managed transactions | ConcurrentHashMap + AtomicLong
+| Development Setup | Database initialization | Immediate startup
+| Production Use | Recommended for production | Development/testing only
+| Scalability | Database connection limits | Memory limitations
+| Data Integrity | ACID transactions | Thread-safe operations
+| Error Handling | Database exceptions | Simple validation
+|===
+
+[source,java]
+----
+@ApplicationScoped
+public class ProductRepository {
+    // In-memory storage using ConcurrentHashMap for thread safety
+    private final Map<Long, Product> productsMap = new ConcurrentHashMap<>();
+    
+    // ID generator
+    private final AtomicLong idGenerator = new AtomicLong(1);
+    
+    // CRUD operations...
+}
+----
+
+==== Atomic ID Generation with AtomicLong
+
+The repository uses `java.util.concurrent.atomic.AtomicLong` for thread-safe ID generation:
+
+[source,java]
+----
+// ID generation in createProduct method
+if (product.getId() == null) {
+    product.setId(idGenerator.getAndIncrement());
+}
+----
+
+`AtomicLong` provides several key benefits:
+
+* *Thread Safety*: Guarantees atomic operations without explicit locking
+* *Performance*: Uses efficient compare-and-swap (CAS) operations instead of locks
+* *Consistency*: Ensures unique, sequential IDs even under concurrent access
+* *No Synchronization*: Avoids the overhead of synchronized blocks
+
+===== Advanced AtomicLong Operations
+
+The ProductRepository implements an advanced pattern for handling both system-generated and client-provided IDs:
+
+[source,java]
+----
+public Product createProduct(Product product) {
+    // Generate ID if not provided
+    if (product.getId() == null) {
+        product.setId(idGenerator.getAndIncrement());
+    } else {
+        // Update idGenerator if the provided ID is greater than current
+        long nextId = product.getId() + 1;
+        while (true) {
+            long currentId = idGenerator.get();
+            if (nextId <= currentId || idGenerator.compareAndSet(currentId, nextId)) {
+                break;
+            }
+        }
+    }
+    
+    productsMap.put(product.getId(), product);
+    return product;
+}
+----
+
+This implementation demonstrates several key AtomicLong patterns:
+
+1. *Initialization*: `AtomicLong` is initialized with a starting value of 1 to avoid using 0 as a valid ID
+2. *getAndIncrement*: Atomically returns the current value and increments it in one operation
+3. *compareAndSet*: Safely updates the ID generator if a client provides a higher ID value, preventing ID collisions
+4. *Retry Logic*: Uses a spinlock pattern for handling concurrent updates to the AtomicLong when needed
+
+The initialization of the idGenerator with a specific starting value ensures the IDs begin at a predictable value:
+
+[source,java]
+----
+private final AtomicLong idGenerator = new AtomicLong(1); // Start IDs at 1
+----
+
+This approach ensures that each product receives a unique ID without risk of duplicate IDs in a concurrent environment.
+
+Key benefits of this in-memory persistence approach:
+
+* *Simplicity*: No need for database configuration or ORM mapping
+* *Performance*: Fast in-memory access without network or disk I/O
+* *Thread Safety*: ConcurrentHashMap provides thread-safe operations without blocking
+* *Scalability*: Suitable for containerized deployments
+
+==== Thread Safety Implementation Details
+
+The implementation ensures thread safety through multiple mechanisms:
+
+1. *ConcurrentHashMap*: Uses lock striping to allow concurrent reads and thread-safe writes
+2. *AtomicLong*: Provides atomic operations for ID generation
+3. *Immutable Returns*: Returns new collections rather than internal references:
++
+[source,java]
+----
+// Returns a copy of the collection to prevent concurrent modification issues
+public List<Product> findAllProducts() {
+    return new ArrayList<>(productsMap.values());
+}
+----
+
+4. *Atomic Operations*: Uses atomic map operations like `putIfAbsent` and `compute` where appropriate
+
+NOTE: This implementation is suitable for development, testing, and scenarios where persistence across restarts is not required.
+
+=== MicroProfile Health
+
+The application implements comprehensive health monitoring using MicroProfile Health specifications with three types of health checks:
+
+==== Startup Health Check
+
+The startup health check verifies that the JPA EntityManagerFactory is properly initialized during application startup:
+
+[source,java]
+----
+@Startup
+@ApplicationScoped
+public class ProductServiceStartupCheck implements HealthCheck {
+
+    @PersistenceUnit
+    private EntityManagerFactory emf;
+
+    @Override
+    public HealthCheckResponse call() {
+        if (emf != null && emf.isOpen()) {
+            return HealthCheckResponse.up("ProductServiceStartupCheck");
+        } else {
+            return HealthCheckResponse.down("ProductServiceStartupCheck");
+        }
+    }
+}
+----
+
+*Key Features:*
+* Validates EntityManagerFactory initialization
+* Ensures JPA persistence layer is ready
+* Runs during application startup phase
+* Critical for database-dependent applications
+
+==== Readiness Health Check
+
+The readiness health check verifies database connectivity and ensures the service is ready to handle requests:
+
+[source,java]
+----
+@Readiness
+@ApplicationScoped
+public class ProductServiceHealthCheck implements HealthCheck {
+
+    @PersistenceContext
+    EntityManager entityManager;
+
+    @Override
+    public HealthCheckResponse call() {
+        if (isDatabaseConnectionHealthy()) {
+            return HealthCheckResponse.named("ProductServiceReadinessCheck")
+                    .up()
+                    .build();
+        } else {
+            return HealthCheckResponse.named("ProductServiceReadinessCheck")
+                    .down()
+                    .build();
+        }
+    }
+
+    private boolean isDatabaseConnectionHealthy(){
+        try {
+            // Perform a lightweight query to check the database connection
+            entityManager.find(Product.class, 1L);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Database connection is not healthy: " + e.getMessage());
+            return false;
+        }
+    }
+}
+----
+
+*Key Features:*
+* Tests actual database connectivity via EntityManager
+* Performs lightweight database query
+* Indicates service readiness to receive traffic
+* Essential for load balancer health routing
+
+==== Liveness Health Check
+
+The liveness health check monitors system resources and memory availability:
+
+[source,java]
+----
+@Liveness
+@ApplicationScoped
+public class ProductServiceLivenessCheck implements HealthCheck {
+
+   @Override
+   public HealthCheckResponse call() {
+       Runtime runtime = Runtime.getRuntime();
+       long maxMemory = runtime.maxMemory();
+       long allocatedMemory = runtime.totalMemory();
+       long freeMemory = runtime.freeMemory();
+       long usedMemory = allocatedMemory - freeMemory;
+       long availableMemory = maxMemory - usedMemory;
+
+       long threshold = 100 * 1024 * 1024; // threshold: 100MB
+
+       HealthCheckResponseBuilder responseBuilder = HealthCheckResponse.named("systemResourcesLiveness")
+            .withData("FreeMemory", freeMemory)
+            .withData("MaxMemory", maxMemory)
+            .withData("AllocatedMemory", allocatedMemory)
+            .withData("UsedMemory", usedMemory)
+            .withData("AvailableMemory", availableMemory);
+
+        if (availableMemory > threshold) {
+            responseBuilder = responseBuilder.up();
+        } else {
+            responseBuilder = responseBuilder.down();
+        }
+
+        return responseBuilder.build();
+    }
+}
+----
+
+*Key Features:*
+* Monitors JVM memory usage and availability
+* Uses fixed 100MB threshold for available memory
+* Provides comprehensive memory diagnostics
+* Indicates if application should be restarted
+
+==== Health Check Endpoints
+
+The health checks are accessible via standard MicroProfile Health endpoints:
+
+* `/health` - Overall health status (all checks)
+* `/health/live` - Liveness checks only
+* `/health/ready` - Readiness checks only
+* `/health/started` - Startup checks only
+
+Example health check response:
+[source,json]
+----
+{
+  "status": "UP",
+  "checks": [
+    {
+      "name": "ProductServiceStartupCheck",
+      "status": "UP"
+    },
+    {
+      "name": "ProductServiceReadinessCheck", 
+      "status": "UP"
+    },
+    {
+      "name": "systemResourcesLiveness",
+      "status": "UP",
+      "data": {
+        "FreeMemory": 524288000,
+        "MaxMemory": 2147483648,
+        "AllocatedMemory": 1073741824,
+        "UsedMemory": 549453824,
+        "AvailableMemory": 1598029824
+      }
+    }
+  ]
+}
+----
+
+==== Health Check Benefits
+
+The comprehensive health monitoring provides:
+
+* *Startup Validation*: Ensures all dependencies are initialized before serving traffic
+* *Readiness Monitoring*: Validates service can handle requests (database connectivity)
+* *Liveness Detection*: Identifies when application needs restart (memory issues)
+* *Operational Visibility*: Detailed diagnostics for troubleshooting
+* *Container Orchestration*: Kubernetes/Docker health probe integration
+* *Load Balancer Integration*: Traffic routing based on health status
+
+=== MicroProfile Metrics
+
+The application implements comprehensive monitoring using MicroProfile Metrics to track application performance and usage patterns. Three types of metrics are implemented to provide insights into the product catalog service behavior.
+
+==== Metrics Implementation
+
+The metrics are implemented using MicroProfile Metrics annotations directly on the REST resource methods:
+
+[source,java]
+----
+@Path("/products")
+@ApplicationScoped
+public class ProductResource {
+    
+    @GET
+    @Path("/{id}")
+    @Timed(name = "productLookupTime", 
+           description = "Time spent looking up products")
+    public Response getProductById(@PathParam("id") Long id) {
+        // Processing delay to demonstrate timing metrics
+        try {
+            Thread.sleep(100); // 100ms processing time
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        // Product lookup logic...
+    }
+    
+    @GET
+    @Counted(name = "productAccessCount", absolute = true,
+             description = "Number of times list of products is requested")
+    public Response getAllProducts() {
+        // Product listing logic...
+    }
+    
+    @GET
+    @Path("/count")
+    @Gauge(name = "productCatalogSize", unit = "none",
+           description = "Current number of products in catalog")
+    public int getProductCount() {
+        // Return current product count...
+    }
+}
+----
+
+==== Metric Types Implemented
+
+*1. Timer Metrics (@Timed)*
+
+The `productLookupTime` timer measures the time spent retrieving individual products:
+
+* *Purpose*: Track performance of product lookup operations
+* *Method*: `getProductById(Long id)`
+* *Use Case*: Identify performance bottlenecks in product retrieval
+* *Processing Delay*: Includes a 100ms processing delay to demonstrate measurable timing
+
+*2. Counter Metrics (@Counted)*
+
+The `productAccessCount` counter tracks how frequently the product list is accessed:
+
+* *Purpose*: Monitor usage patterns and API call frequency
+* *Method*: `getAllProducts()`
+* *Configuration*: Uses `absolute = true` for consistent naming
+* *Use Case*: Understanding service load and usage patterns
+
+*3. Gauge Metrics (@Gauge)*
+
+The `productCatalogSize` gauge provides real-time catalog size information:
+
+* *Purpose*: Monitor the current state of the product catalog
+* *Method*: `getProductCount()`
+* *Unit*: Specified as "none" for simple count values
+* *Use Case*: Track catalog growth and current inventory levels
+
+==== Metrics Configuration
+
+The metrics feature is configured in the Liberty `server.xml`:
+
+[source,xml]
+----
+<server>
+    <!-- MicroProfile Metrics configuration -->
+    <mpMetrics authentication="false" />
+    
+    <!-- Other server configuration... -->
+</server>
+----
+
+*Key Configuration Features:*
+* *Authentication Disabled*: Allows easy access to metrics endpoints for development
+* *Default Endpoints*: Standard MicroProfile Metrics endpoints are automatically enabled
+
+==== Metrics Endpoints
+
+The metrics are accessible via standard MicroProfile Metrics endpoints:
+
+* `/metrics` - All metrics in Prometheus format
+* `/metrics?scope=application` - Application-specific metrics only
+* `/metrics?scope=vendor` - Vendor-specific metrics (Open Liberty)
+* `/metrics?scope=base` - Base system metrics (JVM, memory, etc.)
+* `/metrics?name=<metric_name>` - Specific metric by name
+* `/metrics?scope=<scope>&name=<metric_name>` - Specific metric from specific scope
+
+==== Sample Metrics Output
+
+Example metrics output from `/metrics?scope=application`:
+
+[source,prometheus]
+----
+# TYPE application_productLookupTime_rate_per_second gauge
+application_productLookupTime_rate_per_second 0.0
+
+# TYPE application_productLookupTime_one_min_rate_per_second gauge  
+application_productLookupTime_one_min_rate_per_second 0.0
+
+# TYPE application_productLookupTime_five_min_rate_per_second gauge
+application_productLookupTime_five_min_rate_per_second 0.0
+
+# TYPE application_productLookupTime_fifteen_min_rate_per_second gauge
+application_productLookupTime_fifteen_min_rate_per_second 0.0
+
+# TYPE application_productLookupTime_seconds summary
+application_productLookupTime_seconds_count 5
+application_productLookupTime_seconds_sum 0.52487
+application_productLookupTime_seconds{quantile="0.5"} 0.1034
+application_productLookupTime_seconds{quantile="0.75"} 0.1089
+application_productLookupTime_seconds{quantile="0.95"} 0.1123
+application_productLookupTime_seconds{quantile="0.98"} 0.1123
+application_productLookupTime_seconds{quantile="0.99"} 0.1123
+application_productLookupTime_seconds{quantile="0.999"} 0.1123
+
+# TYPE application_productAccessCount_total counter
+application_productAccessCount_total 15
+
+# TYPE application_productCatalogSize gauge
+application_productCatalogSize 3
+----
+
+==== Testing Metrics
+
+You can test the metrics implementation using curl commands:
+
+[source,bash]
+----
+# View all metrics
+curl -X GET http://localhost:5050/metrics
+
+# View only application metrics
+curl -X GET http://localhost:5050/metrics?scope=application
+
+# View specific metric by name
+curl -X GET "http://localhost:5050/metrics?name=productAccessCount"
+
+# View specific metric from application scope
+curl -X GET "http://localhost:5050/metrics?scope=application&name=productLookupTime"
+
+# Generate some metric data by calling endpoints
+curl -X GET http://localhost:5050/api/products        # Increments counter
+curl -X GET http://localhost:5050/api/products/1      # Records timing
+curl -X GET http://localhost:5050/api/products/count  # Updates gauge
+----
+
+==== Metrics Benefits
+
+The metrics implementation provides:
+
+* *Performance Monitoring*: Track response times and identify slow operations
+* *Usage Analytics*: Understand API usage patterns and frequency
+* *Capacity Planning*: Monitor catalog size and growth trends
+* *Operational Insights*: Real-time visibility into service behavior
+* *Integration Ready*: Prometheus-compatible format for monitoring systems
+* *Troubleshooting*: Correlation of performance issues with usage patterns
+
+=== MicroProfile Config
+
+The application uses MicroProfile Config to externalize configuration:
+
+[source,properties]
+----
+# Enable OpenAPI scanning
+mp.openapi.scan=true
+
+# Maintenance mode configuration
+product.maintenanceMode=false
+product.maintenanceMessage=The product catalog service is currently in maintenance mode. Please try again later.
+----
+
+The maintenance mode configuration allows dynamic control of service availability:
+
+* `product.maintenanceMode` - When set to `true`, the service returns a 503 Service Unavailable response
+* `product.maintenanceMessage` - Customizable message displayed when the service is in maintenance mode
+
+==== Maintenance Mode Implementation
+
+The service checks the maintenance mode configuration before processing requests:
+
+[source,java]
+----
+@Inject
+@ConfigProperty(name="product.maintenanceMode", defaultValue="false")
+private boolean maintenanceMode;
+    
+@Inject
+@ConfigProperty(name="product.maintenanceMessage", 
+                defaultValue="The product catalog service is currently in maintenance mode. Please try again later.")
+private String maintenanceMessage;
+
+// In request handling method
+if (maintenance.isMaintenanceMode()) {
+    return Response
+            .status(Response.Status.SERVICE_UNAVAILABLE)
+            .entity(maintenance.getMaintenanceMessage())
+            .build();
+}
+----
+
+This pattern enables:
+
+* Graceful service degradation during maintenance periods
+* Dynamic control without redeployment (when using external configuration sources)
+* Clear communication to API consumers
+
+== Architecture
+
+The application follows a layered architecture pattern:
+
+* *REST Layer* (`ProductResource`) - Handles HTTP requests and responses
+* *Service Layer* (`ProductService`) - Contains business logic
+* *Repository Layer* (`ProductRepository`) - Manages data access with in-memory storage
+* *Model Layer* (`Product`) - Represents the business entities
+
+=== Persistence Evolution
+
+This application originally used JPA with Derby for persistence, but has been refactored to use an in-memory implementation:
+
+[cols="1,1", options="header"]
+|===
+| Original JPA/Derby | Current In-Memory Implementation
+| Required database configuration | No database configuration needed
+| Persistence across restarts | Data reset on restart
+| Used EntityManager and transactions | Uses ConcurrentHashMap and AtomicLong
+| Required datasource in server.xml | No datasource configuration required
+| Complex error handling | Simplified error handling
+|===
+
+Key architectural benefits of this change:
+
+* *Simplified Deployment*: No external database required
+* *Faster Startup*: No database initialization delay
+* *Reduced Dependencies*: Fewer libraries and configurations
+* *Easier Testing*: No test database setup needed
+* *Consistent Development Environment*: Same behavior across all development machines
+
+=== Containerization with Docker
+
+The application can be packaged into a Docker container:
+
+[source,bash]
+----
+# Build the application
+mvn clean package
+
+# Build the Docker image
+docker build -t catalog-service .
+
+# Run the container
+docker run -d -p 5050:5050 --name catalog-service catalog-service
+----
+
+==== AtomicLong in Containerized Environments
+
+When running the application in Docker or Kubernetes, some important considerations about AtomicLong behavior:
+
+1. *Per-Container State*: Each container has its own AtomicLong instance and state
+2. *ID Collisions in Scaling*: When running multiple replicas, IDs are only unique within each container
+3. *Persistence and Restarts*: AtomicLong resets on container restart, potentially causing ID reuse
+
+To handle these issues in production multi-container environments:
+
+* *External ID Generation*: Consider using a distributed ID generator service
+* *Database Sequences*: For database implementations, use database sequences
+* *Universally Unique IDs*: Consider UUIDs instead of sequential numeric IDs
+* *Centralized Counter Service*: Use Redis or other distributed counter
+
+Example of adapting the code for distributed environments:
+
+[source,java]
+----
+// Using UUIDs for distributed environments
+private String generateId() {
+    return UUID.randomUUID().toString();
+}
+----
+
+== Development Workflow
+
+=== Running Locally
+
+To run the application in development mode:
+
+[source,bash]
+----
+mvn clean liberty:dev
+----
+
+This starts the server in development mode, which:
+
+* Automatically deploys your code changes
+* Provides hot reload capability
+* Enables a debugger on port 7777
+
+== Project Structure
+
+[source]
+----
+catalog/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── io/microprofile/tutorial/store/
+│   │   │       └── product/
+│   │   │           ├── entity/          # Domain entities
+│   │   │           ├── resource/        # REST resources
+│   │   │           └── ProductRestApplication.java
+│   │   ├── liberty/
+│   │   │   └── config/
+│   │   │       └── server.xml          # Liberty server configuration
+│   │   ├── resources/
+│   │   │   └── META-INF/
+│   │   │       └── microprofile-config.properties
+│   │   └── webapp/                     # Web resources
+│   │       ├── index.html              # Landing page with API documentation
+│   │       └── WEB-INF/
+│   │           └── web.xml             # Web application configuration
+│   └── test/                           # Test classes
+└── pom.xml                             # Maven build file
+----
+
+== Getting Started
+
+=== Prerequisites
+
+* JDK 17+
+* Maven 3.8+
+
+=== Building and Running
+
+To build and run the application:
+
+[source,bash]
+----
+# Clone the repository
+git clone https://github.com/yourusername/liberty-rest-app.git
+cd code/catalog
+
+# Build the application
+mvn clean package
+
+# Run the application
+mvn liberty:run
+----
+
+=== Testing the Application
+
+==== Testing MicroProfile Features
+
+[source,bash]
+----
+# OpenAPI documentation
+curl -X GET http://localhost:5050/openapi
+
+# Check if service is in maintenance mode
+curl -X GET http://localhost:5050/api/products
+
+# Health check endpoints
+curl -X GET http://localhost:5050/health
+curl -X GET http://localhost:5050/health/live
+curl -X GET http://localhost:5050/health/ready
+curl -X GET http://localhost:5050/health/started
+----
+
+*Health Check Testing:*
+* `/health` - Overall health status with all checks
+* `/health/live` - Liveness checks (memory monitoring)
+* `/health/ready` - Readiness checks (database connectivity)  
+* `/health/started` - Startup checks (EntityManagerFactory initialization)
+
+*Metrics Testing:*
+[source,bash]
+----
+# View all metrics
+curl -X GET http://localhost:5050/metrics
+
+# View only application metrics
+curl -X GET http://localhost:5050/metrics?scope=application
+
+# View specific metrics by name
+curl -X GET "http://localhost:5050/metrics?name=productAccessCount"
+
+# Generate metric data by calling endpoints
+curl -X GET http://localhost:5050/api/products        # Increments counter
+curl -X GET http://localhost:5050/api/products/1      # Records timing
+curl -X GET http://localhost:5050/api/products/count  # Updates gauge
+----
+
+* `/metrics` - All metrics (application + vendor + base)
+* `/metrics?scope=application` - Application-specific metrics only
+* `/metrics?scope=vendor` - Open Liberty vendor metrics
+* `/metrics?scope=base` - Base JVM and system metrics
+* `/metrics/base` - Base JVM and system metrics
+
+To view the Swagger UI, open the following URL in your browser:
+http://localhost:5050/openapi/ui
+
+To view the landing page with API documentation:
+http://localhost:5050/
+
+== Server Configuration
+
+The application uses the following Liberty server configuration:
+
+[source,xml]
+----
+<server description="MicroProfile Tutorial Liberty Server">
+    <featureManager>
+        <platform>jakartaEE-10.0</platform>
+        <platform>microProfile-6.1</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>mpConfig</feature>
+        <feature>mpOpenAPI</feature>
+        <feature>mpHealth</feature>
+    </featureManager>
+
+    <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
+                  id="defaultHttpEndpoint" host="*" />
+    <webApplication location="catalog.war" contextRoot="${app.context.root}"/>
+</server>
+----
+
+== Development
+
+=== Adding a New Endpoint
+
+To add a new endpoint:
+
+1. Create a new method in the `ProductResource` class
+2. Add appropriate Jakarta Restful Web Service annotations
+3. Add OpenAPI annotations for documentation
+4. Implement the business logic
+
+Example:
+
+[source,java]
+----
+@GET
+@Path("/search")
+@Produces(MediaType.APPLICATION_JSON)
+@Operation(summary = "Search products", description = "Search products by name")
+@APIResponses({
+    @APIResponse(responseCode = "200", description = "Products matching search criteria")
+})
+public Response searchProducts(@QueryParam("name") String name) {
+    List<Product> matchingProducts = products.stream()
+        .filter(p -> p.getName().toLowerCase().contains(name.toLowerCase()))
+        .collect(Collectors.toList());
+    return Response.ok(matchingProducts).build();
+}
+----
+
+=== Performance Considerations
+
+The in-memory data store provides excellent performance for read operations, but there are important considerations:
+
+* *Memory Usage*: Large data sets may consume significant memory
+* *Persistence*: Data is lost when the application restarts
+* *Scalability*: In a multi-instance deployment, each instance will have its own data store
+
+For production scenarios requiring data persistence, consider:
+
+1. Adding a database layer (PostgreSQL, MongoDB, etc.)
+2. Implementing a distributed cache (Hazelcast, Redis, etc.)
+3. Adding data synchronization between instances
+
+=== Concurrency Implementation Details
+
+==== AtomicLong vs Synchronized Counter
+
+The repository uses `AtomicLong` rather than traditional synchronized counters:
+
+[cols="1,1", options="header"]
+|===
+| Traditional Approach | AtomicLong Approach
+| `private long counter = 0;` | `private final AtomicLong idGenerator = new AtomicLong(1);`
+| `synchronized long getNextId() { return ++counter; }` | `long nextId = idGenerator.getAndIncrement();`
+| Locks entire method | Lock-free operation
+| Subject to contention | Uses CPU compare-and-swap
+| Performance degrades with multiple threads | Maintains performance under concurrency
+|===
+
+==== AtomicLong vs Other Concurrency Options
+
+[cols="1,1,1,1", options="header"]
+|===
+| Feature | AtomicLong | Synchronized | java.util.concurrent.locks.Lock
+| Type | Non-blocking | Intrinsic lock | Explicit lock
+| Granularity | Single variable | Method/block | Customizable
+| Performance under contention | High | Lower | Medium
+| Visibility guarantee | Yes | Yes | Yes
+| Atomicity guarantee | Yes | Yes | Yes
+| Fairness policy | No | No | Optional
+| Try/timeout support | Yes (compareAndSet) | No | Yes
+| Multiple operations atomicity | Limited | Yes | Yes
+| Implementation complexity | Simple | Simple | Complex
+|===
+
+===== When to Choose AtomicLong
+
+* *High-Contention Scenarios*: When many threads need to access/modify a counter
+* *Single Variable Operations*: When only one variable needs atomic operations
+* *Performance-Critical Code*: When minimizing lock contention is essential
+* *Read-Heavy Workloads*: When reads significantly outnumber writes
+
+For this in-memory product repository, AtomicLong provides an optimal balance of safety and performance.
+
+==== Implementation in createProduct Method
+
+The ID generation logic handles both automatic and manual ID assignment:
+
+[source,java]
+----
+public Product createProduct(Product product) {
+    // Generate ID if not provided
+    if (product.getId() == null) {
+        product.setId(idGenerator.getAndIncrement());
+    } else {
+        // Update idGenerator if the provided ID is greater than current
+        long nextId = product.getId() + 1;
+        while (true) {
+            long currentId = idGenerator.get();
+            if (nextId <= currentId || idGenerator.compareAndSet(currentId, nextId)) {
+                break;
+            }
+        }
+    }
+    
+    productsMap.put(product.getId(), product);
+    return product;
+}
+----
+
+This implementation ensures ID integrity while supporting both system-generated and client-provided IDs.
+
+This enables scanning of OpenAPI annotations in the application.
+
+== Troubleshooting
+
+=== Common Issues
+
+* *OpenAPI documentation not available*: Make sure `mp.openapi.scan=true` is set in the properties file
+* *Concurrent modification exceptions*: Ensure proper use of thread-safe collections and operations
+* *Service always in maintenance mode*: Check the `product.maintenanceMode` property in `microprofile-config.properties`
+* *API returning 503 responses*: The service is likely in maintenance mode; set `product.maintenanceMode=false` in configuration
+* *OpenAPI documentation not available*: Make sure `mp.openapi.scan=true` is set in the properties file
+* *Concurrent modification exceptions*: Ensure proper use of thread-safe collections and operations
+
+=== Thread Safety Troubleshooting
+
+If experiencing concurrency issues:
+
+1. *Verify AtomicLong Usage*: Ensure all ID generation uses `AtomicLong.getAndIncrement()` instead of manual increment
+2. *Check Collection Returns*: Always return copies of collections, not direct references:
++
+[source,java]
+----
+public List<Product> findAllProducts() {
+    return new ArrayList<>(productsMap.values());  // Correct: returns a new copy
+}
+----
+
+3. *Use ConcurrentHashMap Methods*: Prefer atomic methods like `compute`, `computeIfAbsent`, or `computeIfPresent` for complex operations
+4. *Avoid Iteration + Modification*: Don't modify the map while iterating over it
+
+=== Understanding AtomicLong Internals
+
+If you need to debug issues with AtomicLong, understanding its internal mechanisms is helpful:
+
+==== Compare-And-Swap Operation
+
+AtomicLong relies on hardware-level atomic instructions, specifically Compare-And-Swap (CAS):
+
+[source,text]
+----
+function CAS(address, expected, new):
+    atomically:
+        if memory[address] == expected:
+            memory[address] = new
+            return true
+        else:
+            return false
+----
+
+The implementation of `getAndIncrement()` uses this mechanism:
+
+[source,java]
+----
+// Simplified implementation of getAndIncrement
+public long getAndIncrement() {
+    while (true) {
+        long current = get();
+        long next = current + 1;
+        if (compareAndSet(current, next))
+            return current;
+    }
+}
+----
+
+==== Memory Ordering and Visibility
+
+AtomicLong ensures that memory visibility follows the Java Memory Model:
+
+* All writes to the AtomicLong by one thread are visible to reads from other threads
+* Memory barriers are established when performing atomic operations
+* Volatile semantics are guaranteed without using the volatile keyword
+
+==== Diagnosing AtomicLong Issues
+
+1. *Unexpected ID Values*: Check for manual ID assignment bypassing the AtomicLong
+2. *Duplicate IDs*: Verify the initialization value and ensure all ID assignments go through AtomicLong
+3. *Performance Issues*: Look for excessive contention (many threads updating simultaneously)
+
+=== Logs
+
+Server logs can be found at:
+
+[source]
+----
+target/liberty/wlp/usr/servers/defaultServer/logs/
+----
+
+== Resources
+
+* https://microprofile.io/[MicroProfile]
+
+=== HTML Landing Page
+
+The application includes a user-friendly HTML landing page (`index.html`) that provides:
+
+* Service overview with comprehensive documentation
+* API endpoints documentation with methods and descriptions
+* Interactive examples for all API operations
+* Links to OpenAPI/Swagger documentation
+
+==== Maintenance Mode Configuration in the UI
+
+The index.html page is designed to work seamlessly with the maintenance mode configuration. When maintenance mode is enabled via the `product.maintenanceMode` property, all API endpoints return a 503 Service Unavailable response with the configured maintenance message.
+
+The landing page displays comprehensive documentation about the API regardless of the maintenance state, allowing developers to continue learning about the API even when the service is undergoing maintenance.
+
+Key features of the landing page:
+
+* *Responsive Design*: Works well on desktop and mobile devices
+* *Comprehensive API Documentation*: All endpoints with sample requests and responses
+* *Interactive Examples*: Detailed sample requests and responses for each endpoint
+* *Modern Styling*: Clean, professional appearance with card-based layout
+
+The landing page is configured as the welcome file in `web.xml`:
+
+[source,xml]
+----
+<welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+</welcome-file-list>
+----
+
+This provides a user-friendly entry point for API consumers and developers.
+
+

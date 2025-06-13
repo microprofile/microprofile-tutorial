@@ -1,0 +1,387 @@
+= Inventory Service
+:toc: left
+:icons: font
+:source-highlighter: highlightjs
+
+A comprehensive Jakarta EE and MicroProfile-based REST service for inventory management demonstrating advanced MicroProfile Rest Client integration patterns.
+
+== Overview
+
+The Inventory Service is a production-ready microservice built with Jakarta EE 10.0 and MicroProfile 6.1, showcasing comprehensive REST client integration patterns with the Catalog Service. This service demonstrates three different approaches to MicroProfile Rest Client usage:
+
+* **Injected REST Client** (`@RestClient`) for standard operations
+* **RestClientBuilder** with custom timeouts for availability checks  
+* **Advanced RestClientBuilder** with fine-tuned configuration for detailed operations
+
+== Key Features
+
+=== Core Functionality
+* Complete CRUD operations for inventory management
+* Product validation against catalog service
+* Inventory reservation system with availability checks
+* Bulk operations support
+* Enriched inventory data with product information
+* Pagination and filtering capabilities
+
+=== MicroProfile Rest Client Integration
+* **Three distinct REST client approaches** for different use cases
+* **Product validation** before inventory operations
+* **Service integration** with catalog service on port 5050
+* **Error handling** for non-existent products and service failures
+* **Timeout configurations** optimized for different operation types
+
+=== Advanced Features
+* Bean validation for input data
+* Comprehensive exception handling
+* Transaction management for atomic operations
+* OpenAPI documentation with Swagger UI
+* Health checks and service monitoring
+
+== Running the Application
+
+To start the application, run:
+
+[source,bash]
+----
+cd inventory
+mvn liberty:run
+----
+
+This will start the Open Liberty server on port 7050 (HTTP) and 7051 (HTTPS).
+
+== MicroProfile Rest Client Implementations
+
+=== 1. Injected REST Client (`@RestClient`)
+Used for standard product validation operations:
+
+[source,java]
+----
+@Inject
+@RestClient
+private ProductServiceClient productServiceClient;
+----
+
+**Configuration** (microprofile-config.properties):
+[source,properties]
+----
+product-service/mp-rest/url=http://localhost:5050/catalog/api
+product-service/mp-rest/scope=jakarta.inject.Singleton
+product-service/mp-rest/connectTimeout=5000
+product-service/mp-rest/readTimeout=10000
+----
+
+=== 2. RestClientBuilder (5s/10s timeout)
+Used for lightweight availability checks during reservation:
+
+[source,java]
+----
+ProductServiceClient dynamicClient = RestClientBuilder.newBuilder()
+    .baseUri(catalogServiceUri)
+    .connectTimeout(5, TimeUnit.SECONDS)
+    .readTimeout(10, TimeUnit.SECONDS)
+    .build(ProductServiceClient.class);
+----
+
+=== 3. Advanced RestClientBuilder (3s/8s timeout)
+Used for detailed product information retrieval:
+
+[source,java]
+----
+ProductServiceClient customClient = RestClientBuilder.newBuilder()
+    .baseUri(catalogServiceUri)
+    .connectTimeout(3, TimeUnit.SECONDS)
+    .readTimeout(8, TimeUnit.SECONDS)
+    .build(ProductServiceClient.class);
+----
+
+== Complete API Endpoints
+
+[cols="1,3,2,3", options="header"]
+|===
+|Method |URL |MicroProfile Client |Description
+
+|GET
+|/api/inventories
+|None
+|Get all inventory items with pagination/filtering
+
+|POST
+|/api/inventories
+|@RestClient
+|Create new inventory (validates product exists)
+
+|GET
+|/api/inventories/{id}
+|None
+|Get inventory by ID
+
+|PUT
+|/api/inventories/{id}
+|@RestClient
+|Update inventory (validates product exists)
+
+|DELETE
+|/api/inventories/{id}
+|None
+|Delete inventory
+
+|GET
+|/api/inventories/product/{productId}
+|None
+|Get inventory by product ID
+
+|PATCH
+|/api/inventories/product/{productId}/quantity/{quantity}
+|None
+|Update product quantity
+
+|PATCH
+|/api/inventories/product/{productId}/reserve/{quantity}
+|RestClientBuilder (5s/10s)
+|Reserve inventory with availability check
+
+|GET
+|/api/inventories/product-info/{productId}
+|Advanced RestClientBuilder (3s/8s)
+|Get product details using custom client
+
+|GET
+|/api/inventories/{id}/with-product-info
+|@RestClient
+|Get enriched inventory with product information
+
+|POST
+|/api/inventories/bulk
+|@RestClient
+|Bulk create inventories with validation
+|===
+
+== Service Integration
+
+=== Catalog Service Integration
+The inventory service integrates with the catalog service running on port 5050 to:
+
+* **Validate products** before creating or updating inventory
+* **Check product availability** during reservation operations
+* **Enrich inventory data** with product details (name, description, price)
+* **Handle service failures** gracefully with appropriate error responses
+
+=== Error Handling
+* **404 responses** when products don't exist in catalog
+* **Service timeout handling** with different timeout configurations per operation
+* **Fallback behavior** for service communication failures
+* **Validation errors** for invalid inventory data
+
+== Testing with cURL
+
+=== Basic Operations
+
+==== Get all inventory items
+[source,bash]
+----
+curl -X GET http://localhost:7050/inventory/api/inventories
+----
+
+==== Get inventory by ID
+[source,bash]
+----
+curl -X GET http://localhost:7050/inventory/api/inventories/1
+----
+
+==== Create new inventory (with product validation)
+[source,bash]
+----
+curl -X POST http://localhost:7050/inventory/api/inventories \
+  -H "Content-Type: application/json" \
+  -d '{"productId": 1, "quantity": 50, "location": "Warehouse A"}'
+----
+
+==== Update inventory (with product validation)
+[source,bash]
+----
+curl -X PUT http://localhost:7050/inventory/api/inventories/1 \
+  -H "Content-Type: application/json" \
+  -d '{"productId": 1, "quantity": 75, "location": "Warehouse B"}'
+----
+
+==== Delete inventory
+[source,bash]
+----
+curl -X DELETE http://localhost:7050/inventory/api/inventories/1
+----
+
+=== Advanced Operations
+
+==== Reserve inventory (uses RestClientBuilder)
+[source,bash]
+----
+curl -X PATCH http://localhost:7050/inventory/api/inventories/product/1/reserve/10
+----
+
+==== Get product info (uses Advanced RestClientBuilder)
+[source,bash]
+----
+curl -X GET http://localhost:7050/inventory/api/inventories/product-info/1
+----
+
+==== Get enriched inventory with product details
+[source,bash]
+----
+curl -X GET http://localhost:7050/inventory/api/inventories/1/with-product-info
+----
+
+==== Bulk create inventories
+[source,bash]
+----
+curl -X POST http://localhost:7050/inventory/api/inventories/bulk \
+  -H "Content-Type: application/json" \
+  -d '[
+    {"productId": 1, "quantity": 50, "location": "Warehouse A"},
+    {"productId": 2, "quantity": 30, "location": "Warehouse B"}
+  ]'
+----
+
+==== Get inventory with pagination and filtering
+[source,bash]
+----
+
+# Filter by location
+curl -X GET "http://localhost:6050/inventory/api/inventories?location=Warehouse%20A"
+
+# Filter by minimum quantity
+curl -X GET "http://localhost:6050/inventory/api/inventories?minQuantity=10"
+----
+
+== Test Scripts
+
+Comprehensive test scripts are available to test all functionality:
+
+* **`test-inventory-endpoints.sh`** - Complete test suite covering all endpoints and MicroProfile Rest Client features
+* **`quick-test-commands.sh`** - Quick reference commands for manual testing
+* **`TEST-SCRIPTS-README.md`** - Detailed documentation of test scenarios and expected responses
+
+[source,bash]
+----
+# Run comprehensive test suite
+./test-inventory-endpoints.sh
+
+# View test documentation
+cat TEST-SCRIPTS-README.md
+----
+
+== Configuration
+
+=== MicroProfile Config Properties
+
+**REST Client Configuration** (`microprofile-config.properties`):
+[source,properties]
+----
+# Injected REST Client configuration
+product-service/mp-rest/url=http://localhost:5050/catalog/api
+product-service/mp-rest/scope=jakarta.inject.Singleton
+product-service/mp-rest/connectTimeout=5000
+product-service/mp-rest/readTimeout=10000
+product-service/mp-rest/followRedirects=true
+----
+
+**RestClientBuilder Configuration** (programmatic):
+[source,java]
+----
+# Availability check client (5s/10s timeout)
+URI catalogServiceUri = URI.create("http://localhost:5050/catalog/api");
+
+# Product info client (3s/8s timeout)  
+URI catalogServiceUri = URI.create("http://localhost:5050/catalog/api");
+----
+
+== OpenAPI Documentation
+
+View the complete API documentation:
+
+* **Swagger UI**: http://localhost:7050/inventory/api/openapi-ui/
+* **OpenAPI JSON**: http://localhost:7050/inventory/api/openapi
+* **Service Landing Page**: http://localhost:7050/inventory/
+
+== Project Structure
+
+[source]
+----
+inventory/
+├── src/
+│   └── main/
+│       ├── java/                              # Java source files
+│       │   └── io/microprofile/tutorial/store/inventory/
+│       │       ├── entity/                    # Domain entities
+│       │       ├── exception/                 # Custom exceptions
+│       │       ├── service/                   # Business logic
+│       │       └── resource/                  # REST endpoints
+│       ├── liberty/
+│       │   └── config/                        # Liberty server configuration
+│       └── webapp/                            # Web resources
+└── pom.xml                                    # Project dependencies and build
+----
+
+== Exception Handling
+
+The service implements a robust exception handling mechanism:
+
+[cols="1,2", options="header"]
+|===
+|Exception |Purpose
+
+|`InventoryNotFoundException`
+|Thrown when requested inventory item does not exist (HTTP 404)
+
+|`InventoryConflictException`
+|Thrown when attempting to create duplicate inventory (HTTP 409)
+|===
+
+Exceptions are handled globally using `@Provider`:
+
+[source,java]
+----
+@Provider
+public class InventoryExceptionMapper implements ExceptionMapper<RuntimeException> {
+    // Maps exceptions to appropriate HTTP responses
+}
+----
+
+== Transaction Management
+
+The service includes the Jakarta Transactions feature (`transaction-1.3`) but does not use database persistence. In this context, `@Transactional` has limited use:
+
+* Can be used for transaction-like behavior in memory operations
+* Useful when you need to ensure multiple operations are executed atomically
+* Provides rollback capability for in-memory state changes
+* Primarily used for maintaining consistency in distributed operations
+
+[NOTE]
+====
+Since this service doesn't use database persistence, `@Transactional` mainly serves as a boundary for:
+
+* Coordinating multiple service method calls
+* Managing concurrent access to shared resources
+* Ensuring atomic operations across multiple steps
+====
+
+Example usage:
+
+[source,java]
+----
+@ApplicationScoped
+public class InventoryService {
+    private final ConcurrentHashMap<Long, Inventory> inventoryStore;
+    
+    @Transactional
+    public void updateInventory(Long id, Inventory inventory) {
+        // Even without persistence, @Transactional can help manage
+        // atomic operations and coordinate multiple method calls
+        if (!inventoryStore.containsKey(id)) {
+            throw new InventoryNotFoundException(id);
+        }
+        // Multiple operations that need to be atomic
+        updateQuantity(id, inventory.getQuantity());
+        notifyInventoryChange(id);
+    }
+}
+----

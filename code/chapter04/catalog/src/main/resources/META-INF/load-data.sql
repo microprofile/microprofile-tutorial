@@ -1,0 +1,8 @@
+INSERT INTO PRODUCTS (NAME, DESCRIPTION, PRICE) VALUES ('iPhone 15', 'Apple iPhone 15 with advanced features', 999.99)
+INSERT INTO PRODUCTS (NAME, DESCRIPTION, PRICE) VALUES ('MacBook Air', 'Apple MacBook Air M2 chip', 1299.00)
+INSERT INTO PRODUCTS (NAME, DESCRIPTION, PRICE) VALUES ('iPad Pro', 'Apple iPad Pro 12.9-inch', 799.00)
+INSERT INTO PRODUCTS (NAME, DESCRIPTION, PRICE) VALUES ('Samsung Galaxy S24', 'Samsung Galaxy S24 Ultra smartphone', 1199.99)
+INSERT INTO PRODUCTS (NAME, DESCRIPTION, PRICE) VALUES ('Dell XPS 13', 'Dell XPS 13 laptop with Intel i7', 1099.00)
+INSERT INTO PRODUCTS (NAME, DESCRIPTION, PRICE) VALUES ('Sony WH-1000XM4', 'Sony noise-canceling headphones', 299.99)
+INSERT INTO PRODUCTS (NAME, DESCRIPTION, PRICE) VALUES ('Nintendo Switch', 'Nintendo Switch gaming console', 299.00)
+INSERT INTO PRODUCTS (NAME, DESCRIPTION, PRICE) VALUES ('Google Pixel 8', 'Google Pixel 8 smartphone', 699.99)

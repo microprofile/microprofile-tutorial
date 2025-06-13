@@ -1,0 +1,149 @@
+= MicroProfile E-Commerce Store
+:toc:
+:icons: font
+:source-highlighter: highlight.js
+:experimental:
+
+== Overview
+
+This project demonstrates a MicroProfile-based e-commerce microservice. It provides REST endpoints for product management and showcases Jakarta EE 10 and MicroProfile 6.1 features in a practical application.
+
+== Development Environment
+
+This project includes a GitHub Codespace configuration with:
+
+* JDK 17 via SDKMAN
+* Maven build tools
+* VS Code extensions for Java and MicroProfile development
+
+=== Installing SDKMAN
+
+If SDKMAN is not already installed, follow the official instructions at https://sdkman.io/install/ or run:
+
+[source,bash]
+----
+curl -s "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+----
+
+=== Switching Java Versions
+
+SDKMAN allows easy switching between Java versions:
+
+[source,bash]
+----
+# List installed Java versions
+sdk list java | grep -E ".*\s+installed"
+
+# Switch to JDK 17 for the current shell session
+sdk use java 17.0.15-ms
+
+# Make JDK 17 the default for all sessions
+sdk default java 17.0.15-ms
+
+# Verify the current Java version
+java -version
+----
+
+== Project Structure
+
+[source]
+----
+mp-ecomm-store/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── io/microprofile/tutorial/store/product/
+│   │   │       ├── entity/
+│   │   │       │   └── Product.java
+│   │   │       ├── resource/
+│   │   │       │   └── ProductResource.java
+│   │   │       └── ProductRestApplication.java
+│   │   ├── liberty/config/
+│   │   │   └── server.xml
+│   │   └── webapp/
+│   │       └── WEB-INF/
+│   │           └── web.xml
+│   └── test/
+└── pom.xml
+----
+
+== REST Endpoints
+
+[cols="2,1,3"]
+|===
+|Endpoint |Method |Description
+
+|`/mp-ecomm-store/api/products`
+|GET
+|Returns a list of products in JSON format
+|===
+
+== Technology Stack
+
+* Jakarta EE 10
+* MicroProfile 6.1
+* Open Liberty
+* Lombok
+* JUnit 5
+
+== Model Class
+
+The Product model demonstrates the use of Lombok annotations for boilerplate code reduction:
+
+[source,java]
+----
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Product {
+    private Long id;
+    private String name;
+    private String description;
+    private Double price;
+}
+----
+
+== Building the Application
+
+[source,bash]
+----
+mvn clean package
+----
+
+== Running the Application
+
+=== Using Liberty Maven Plugin
+
+[source,bash]
+----
+mvn liberty:dev
+----
+
+This starts Open Liberty server in development mode with hot reloading enabled, allowing for rapid development cycles.
+
+=== Accessing the Application
+
+Once the server is running, you can access:
+
+* Products Endpoint: http://<hostname>:5050/mp-ecomm-store/api/products
+
+Replace <hostname> with _localhost_ or the hostname of the system, where you are running this code.
+
+=== Running Unit Tests
+
+To run the `ProductResourceTest.java` unit test, use the following Maven command from the project root:
+
+[source,bash]
+----
+mvn test -Dtest=io.microprofile.tutorial.store.product.resource.ProductResourceTest
+----
+
+This will execute the test and display the results in the terminal.
+
+== Key Features
+
+Current features:
+
+* Basic product listing functionality
+* JSON-B serialization

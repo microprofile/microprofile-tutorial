@@ -1,0 +1,361 @@
+= MicroProfile Catalog Service
+:toc:
+:icons: font
+:source-highlighter: highlight.js
+:imagesdir: images
+:url-quickstart: https://openliberty.io/guides/
+
+== Overview
+
+The MicroProfile Catalog Service is a Jakarta EE 10 and MicroProfile 6.1 application that provides a RESTful API for managing product catalog information in an e-commerce platform. It demonstrates the use of modern Jakarta EE features including CDI, Jakarta Persistence, Jakarta RESTful Web Services, and Bean Validation.
+
+== Features
+
+* RESTful API using Jakarta RESTful Web Services
+* Persistence with Jakarta Persistence API and Derby embedded database
+* CDI (Contexts and Dependency Injection) for component management
+* Bean Validation for input validation
+* Running on Open Liberty for lightweight deployment
+
+== Project Structure
+
+[source]
+----
+catalog/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── io/microprofile/tutorial/store/product/
+│   │   │       ├── entity/      # Domain models (Product)
+│   │   │       ├── repository/  # Data access layer
+│   │   │       ├── resource/    # REST endpoints
+│   │   │       ├── service/     # Business logic
+│   │   │       └── ProductRestApplication.java
+│   │   ├── liberty/
+│   │   │   └── config/
+│   │   │       └── server.xml  # Liberty server configuration
+│   │   └── resources/
+│   │       └── META-INF/       # Persistence configuration
+│   └── test/
+│       └── java/               # Unit and integration tests
+└── pom.xml                     # Project build configuration
+----
+
+== Architecture
+
+This application follows a layered architecture:
+
+1. *REST Resources* (`/resource`) - Provides HTTP endpoints for clients
+2. *Services* (`/service`) - Implements business logic and transaction management
+3. *Repositories* (`/repository`) - Data access objects for database operations
+4. *Entities* (`/entity`) - Domain models with JPA annotations
+
+== Database Configuration
+
+The application uses an embedded Derby database that is automatically provisioned by Open Liberty. The database configuration is defined in the `server.xml` file:
+
+[source,xml]
+----
+<dataSource id="productjpadatasource" jndiName="jdbc/productjpadatasource">
+    <jdbcDriver libraryRef="derbyJDBCLib" />
+    <properties.derby.embedded databaseName="ProductDB" createDatabase="create" />
+</dataSource>
+----
+
+== Liberty Server Configuration
+
+The Open Liberty server is configured in `src/main/liberty/config/server.xml`:
+
+[source,xml]
+----
+<server description="MicroProfile Tutorial Liberty Server">
+    <featureManager>
+        <platform>jakartaEE-10.0</platform>
+        <platform>microProfile-6.1</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>persistence</feature>
+        <feature>jdbc</feature>
+    </featureManager>
+
+    <application location="catalog.war" contextRoot="catalog"/>
+
+    <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
+        id="defaultHttpEndpoint" host="*" />
+
+    <!-- Derby Library Configuration -->
+    <library id="derbyJDBCLib">
+        <fileset dir="${shared.resource.dir}/" includes="derby*.jar" />
+    </library>
+
+    <dataSource id="productjpadatasource" jndiName="jdbc/productjpadatasource">
+        <jdbcDriver libraryRef="derbyJDBCLib" />
+        <properties.derby.embedded databaseName="ProductDB" createDatabase="create" />
+    </dataSource>
+</server>
+----
+
+== Building and Running
+
+=== Prerequisites
+
+* JDK 17 or higher
+* Maven 3.8.x or higher
+* Docker (optional, for containerization)
+
+=== Development Mode
+
+To run the application in development mode with hot reload:
+
+[source,bash]
+----
+mvn liberty:dev
+----
+
+This will start the server on port 5050 (configured in pom.xml).
+
+=== Building the Application
+
+To build the application:
+
+[source,bash]
+----
+mvn clean package
+----
+
+This will create a WAR file in the `target/` directory.
+
+=== Running the Tests
+
+To run the tests:
+
+[source,bash]
+----
+mvn test
+----
+
+=== Deployment
+
+The application can be deployed to any Jakarta EE 10 compliant server. With Liberty:
+
+[source,bash]
+----
+mvn liberty:run
+----
+
+== API Endpoints
+
+The API is accessible at the base path `/catalog/api`.
+
+=== Products API
+
+|===
+| Method | Path | Description | Status Codes
+
+| GET    | `/products`     | List all products | 200 OK
+| GET    | `/products/{id}` | Get product by ID | 200 OK, 404 Not Found
+| POST   | `/products`     | Create a product  | 201 Created
+| PUT    | `/products/{id}` | Update a product | 200 OK, 404 Not Found
+| DELETE | `/products/{id}` | Delete a product | 204 No Content, 404 Not Found
+|===
+
+== Request/Response Examples
+
+=== Get all products
+
+Request:
+[source]
+----
+GET /catalog/api/products
+Accept: application/json
+----
+
+Response:
+[source,json]
+----
+[
+  {
+    "id": 1,
+    "name": "Laptop",
+    "description": "High-performance laptop",
+    "price": 999.99
+  },
+  {
+    "id": 2,
+    "name": "Smartphone",
+    "description": "Latest model smartphone",
+    "price": 699.99
+  }
+]
+----
+
+=== Create a product
+
+Request:
+[source]
+----
+POST /catalog/api/products
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "name": "Tablet",
+  "description": "10-inch tablet with high resolution display",
+  "price": 499.99
+}
+----
+
+Response:
+[source]
+----
+HTTP/1.1 201 Created
+Location: /catalog/api/products/3
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "id": 3,
+  "name": "Tablet",
+  "description": "10-inch tablet with high resolution display",
+  "price": 499.99
+}
+----
+
+=== Common Issues
+
+* *404 Not Found*: Ensure you're using the correct context root (`/catalog`) and API base path (`/api`).
+* *500 Internal Server Error*: Check server logs for exceptions.
+* *Database issues*: Check if Derby is properly configured and the `productjpadatasource` is available.
+* *EntityManager is null*: This can happen due to constructor-related issues with CDI. Make sure your repositories are properly injected and not manually instantiated.
+* *SQL errors*: Ensure SQL statements in `import.sql` end with semicolons. Each INSERT statement must end with a semicolon (;) to be properly executed.
+
+=== SQL Script Format
+
+When writing SQL scripts for initialization, ensure each statement ends with a semicolon:
+
+[source,sql]
+----
+-- Correct format
+INSERT INTO Product (id, name, description, price) VALUES (1, 'iPhone', 'Apple iPhone 15', 999.99)
+INSERT INTO Product (id, name, description, price) VALUES (2, 'MacBook', 'Apple MacBook Air', 1299.0)
+----
+
+=== JPA and CDI Pitfalls
+
+* *Manual instantiation*: Never use `new ProductRepository()` - always let CDI handle injection
+* *Scope mismatch*: Ensure your beans have appropriate scopes (@ApplicationScoped for repositories)
+* *Missing constructor*: Provide a no-args constructor for CDI beans with injected fields
+* *Transaction boundaries*: Use @Transactional on methods that interact with the database
+
+=== Logs
+
+Server logs are available at:
+
+[source]
+----
+target/liberty/wlp/usr/servers/mpServer/logs/
+----
+
+== Derby Database Details
+
+The application uses an embedded Derby database, which is initialized on startup. Here are some important details:
+
+=== Database Schema
+
+The database schema is automatically generated based on JPA entity annotations using the following configuration in persistence.xml:
+
+[source,xml]
+----
+<property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
+<property name="jakarta.persistence.sql-load-script-source" value="META-INF/sql/import.sql"/>
+----
+
+=== Initial Data Loading
+
+Initial product data is loaded from `META-INF/sql/import.sql`. This script is executed after the schema is created.
+
+[source,sql]
+----
+-- Initial product data
+INSERT INTO Product (id, name, description, price) VALUES (1, 'iPhone', 'Apple iPhone 15', 999.99);
+INSERT INTO Product (id, name, description, price) VALUES (2, 'MacBook', 'Apple MacBook Air', 1299.0);
+INSERT INTO Product (id, name, description, price) VALUES (3, 'iPad', 'Apple iPad Pro', 799.99);
+INSERT INTO Product (id, name, description, price) VALUES (4, 'AirPods', 'Apple AirPods Pro', 249.99);
+INSERT INTO Product (id, name, description, price) VALUES (5, 'Apple Watch', 'Apple Watch Series 8', 399.99);
+----
+
+=== Database Location
+
+The Derby database is created in the Liberty server working directory. The location depends on the server configuration, but it's typically under:
+
+[source]
+----
+target/liberty/wlp/usr/servers/mpServer/
+----
+
+=== Connecting to Derby Database
+
+For debugging purposes, you can use the Derby ij tool to connect to the database:
+
+[source,bash]
+----
+java -cp target/liberty/wlp/usr/shared/resources/derby-10.16.1.1.jar:target/liberty/wlp/usr/shared/resources/derbytools-10.16.1.1.jar org.apache.derby.tools-10.16.1.1.ij
+----
+
+Once connected, you can execute SQL commands:
+
+[source,sql]
+----
+CONNECT 'jdbc:derby:CatalogDB';
+SELECT * FROM PRODUCTS;
+DESCRIBE PRODUCTS;
+----
+
+Note: The database name is `CatalogDB` and the table name is `PRODUCTS` as configured in our persistence.xml and entity mapping.
+
+== Performance Considerations
+
+=== Connection Pooling
+
+Liberty automatically provides connection pooling for JDBC datasources. You can configure the pool size in server.xml:
+
+[source,xml]
+----
+<dataSource id="productjpadatasource" jndiName="jdbc/productjpadatasource" connectionPoolTimeout="600s">
+    <jdbcDriver libraryRef="derbyJDBCLib" />
+    <properties.derby.embedded databaseName="ProductDB" createDatabase="create" />
+    <connectionManager maxPoolSize="10" minPoolSize="1" />
+</dataSource>
+----
+
+=== JPA Optimization
+
+To optimize JPA performance:
+
+* Use fetch type LAZY for collections and relationships
+* Enable second-level caching when appropriate
+* Use named queries for frequently used operations
+* Consider pagination for large result sets
+
+== Development Workflow
+
+=== Hot Reload with Liberty Dev Mode
+
+Liberty dev mode provides hot reloading capabilities. When you make changes to your code, they are automatically detected and applied without restarting the server.
+
+[source,bash]
+----
+mvn liberty:dev
+----
+
+While in dev mode, you can:
+
+* Press Enter to see available commands
+* Type `r` to manually trigger a reload
+* Type `h` to see a list of available commands

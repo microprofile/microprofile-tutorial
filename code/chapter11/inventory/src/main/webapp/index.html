@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #444;
+            margin-top: 30px;
+        }
+        .endpoint {
+            background: #f8f8f8;
+            border-left: 4px solid #4CAF50;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .rest-client {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .advanced-feature {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .feature-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        .config-section {
+            background: #f3e5f5;
+            border: 1px solid #9c27b0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .test-section {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .timeout-section {
+            background: #fce4ec;
+            border: 1px solid #e91e63;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .timeout-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .timeout-table th, .timeout-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .timeout-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .timeout-comparison {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        .timeout-box {
+            flex: 1;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inventory Management Service</h1>
+    <p>Welcome to the Inventory Management API, a <strong>Jakarta EE and MicroProfile</strong> demo featuring comprehensive <strong>MicroProfile Rest Client</strong> integration.</p>
+    
+    <div class="config-section">
+        <h2>🔌 MicroProfile Rest Client Integration</h2>
+        <p>This service demonstrates three different approaches to using MicroProfile Rest Client:</p>
+        <ul>
+            <li><strong>CDI Injection (@RestClient)</strong> - For standard product validation</li>
+            <li><strong>RestClientBuilder (5s/10s timeout)</strong> - For lightweight availability checks</li>
+            <li><strong>Advanced RestClientBuilder (3s/8s timeout)</strong> - For detailed product information</li>
+        </ul>
+        <p><strong>Catalog Service Integration:</strong> <code>http://localhost:5050/catalog/api</code></p>
+    </div>
+
+    <div class="timeout-section">
+        <h2>⏱️ Timeout Configuration Details</h2>
+        <p>Our implementation demonstrates different timeout strategies for various use cases:</p>
+        
+        <div class="timeout-comparison">
+            <div class="timeout-box">
+                <h4>🔌 CDI Injection (@RestClient)</h4>
+                <p><strong>Configuration:</strong> Via microprofile-config.properties</p>
+                <p><strong>Connect Timeout:</strong> Default (30s)</p>
+                <p><strong>Read Timeout:</strong> Default (30s)</p>
+                <p><strong>Use Case:</strong> Standard operations with reliable timeouts</p>
+            </div>
+            
+            <div class="timeout-box">
+                <h4>⚡ RestClientBuilder (5s/10s)</h4>
+                <p><strong>Configuration:</strong> Programmatic</p>
+                <p><strong>Connect Timeout:</strong> 5 seconds</p>
+                <p><strong>Read Timeout:</strong> 10 seconds</p>
+                <p><strong>Use Case:</strong> Quick availability checks</p>
+            </div>
+            
+            <div class="timeout-box">
+                <h4>🚀 Advanced RestClientBuilder (3s/8s)</h4>
+                <p><strong>Configuration:</strong> Programmatic</p>
+                <p><strong>Connect Timeout:</strong> 3 seconds</p>
+                <p><strong>Read Timeout:</strong> 8 seconds</p>
+                <p><strong>Use Case:</strong> Fast product info retrieval</p>
+            </div>
+        </div>
+        
+        <h3>📊 Timeout Configuration Comparison</h3>
+        <table class="timeout-table">
+            <thead>
+                <tr>
+                    <th>Client Type</th>
+                    <th>Connect Timeout</th>
+                    <th>Read Timeout</th>
+                    <th>Configuration Method</th>
+                    <th>Endpoints Using It</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>@RestClient Injection</strong></td>
+                    <td>30s (default)</td>
+                    <td>30s (default)</td>
+                    <td>microprofile-config.properties</td>
+                    <td>POST/PUT inventories, bulk operations</td>
+                    <td>Reliable product validation</td>
+                </tr>
+                <tr>
+                    <td><strong>RestClientBuilder (Standard)</strong></td>
+                    <td>5 seconds</td>
+                    <td>10 seconds</td>
+                    <td>RestClientBuilder.connectTimeout()</td>
+                    <td>PATCH /reserve/{quantity}</td>
+                    <td>Quick availability checks</td>
+                </tr>
+                <tr>
+                    <td><strong>RestClientBuilder (Advanced)</strong></td>
+                    <td>3 seconds</td>
+                    <td>8 seconds</td>
+                    <td>RestClientBuilder.readTimeout()</td>
+                    <td>GET /product-info/{productId}</td>
+                    <td>Fast product information</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3>🔧 Timeout Configuration Code Examples</h3>
+        <h4>1. CDI Injection Configuration (microprofile-config.properties):</h4>
+        <pre><code># Default timeouts - can be customized via properties
+io.microprofile.tutorial.store.inventory.client.ProductServiceClient/mp-rest/url=http://localhost:5050/catalog/api
+io.microprofile.tutorial.store.inventory.client.ProductServiceClient/mp-rest/scope=javax.inject.Singleton
+
+# Optional custom timeouts (if needed):
+# io.microprofile.tutorial.store.inventory.client.ProductServiceClient/mp-rest/connectTimeout=30000
+# io.microprofile.tutorial.store.inventory.client.ProductServiceClient/mp-rest/readTimeout=30000</code></pre>
+
+        <h4>2. RestClientBuilder with 5s/10s Timeouts (Availability Check):</h4>
+        <pre><code>ProductServiceClient dynamicClient = RestClientBuilder.newBuilder()
+    .baseUri(URI.create("http://localhost:5050/catalog/api"))
+    .connectTimeout(5, TimeUnit.SECONDS)    // 5 seconds to establish connection
+    .readTimeout(10, TimeUnit.SECONDS)      // 10 seconds to read response
+    .build(ProductServiceClient.class);</code></pre>
+
+        <h4>3. Advanced RestClientBuilder with 3s/8s Timeouts (Product Info):</h4>
+        <pre><code>ProductServiceClient customClient = RestClientBuilder.newBuilder()
+    .baseUri(URI.create("http://localhost:5050/catalog/api"))
+    .connectTimeout(3, TimeUnit.SECONDS)    // 3 seconds to establish connection
+    .readTimeout(8, TimeUnit.SECONDS)       // 8 seconds to read response
+    .build(ProductServiceClient.class);</code></pre>
+        
+        <h3>📈 Timeout Strategy Benefits</h3>
+        <ul>
+            <li><strong>Connect Timeout:</strong> Prevents hanging when catalog service is unreachable</li>
+            <li><strong>Read Timeout:</strong> Ensures timely response even if catalog service is slow</li>
+            <li><strong>Different Strategies:</strong> Optimized timeouts for different operation types</li>
+            <li><strong>Fail-Fast Behavior:</strong> Quick error detection and graceful degradation</li>
+            <li><strong>Performance Optimization:</strong> Shorter timeouts for non-critical operations</li>
+        </ul>
+    </div>
+    
+    <h2>Available Endpoints:</h2>
+    
+    <div class="endpoint">
+        <h3>OpenAPI Documentation <span class="feature-badge">API Docs</span></h3>
+        <p><code>GET /openapi</code> - Access OpenAPI documentation</p>
+        <a href="/openapi">View API Documentation</a>
+    </div>
+    
+    <div class="endpoint">
+        <h3>Basic Inventory Operations</h3>
+        <p><code>GET /api/inventories</code> - Get all inventory items</p>
+        <p><code>GET /api/inventories/{id}</code> - Get inventory by ID</p>
+        <p><code>GET /api/inventories/product/{productId}</code> - Get inventory by product ID</p>
+        <p><code>POST /api/inventories</code> - Create new inventory <span class="feature-badge">@RestClient Validation</span></p>
+        <p><code>PUT /api/inventories/{id}</code> - Update inventory <span class="feature-badge">@RestClient Validation</span></p>
+        <p><code>DELETE /api/inventories/{id}</code> - Delete inventory</p>
+        <p><code>PATCH /api/inventories/product/{productId}/quantity/{quantity}</code> - Update product quantity</p>
+    </div>
+
+    <div class="rest-client">
+        <h3>🔌 MicroProfile Rest Client Features</h3>
+        
+        <h4>1. Injected REST Client (@RestClient)</h4>
+        <p><code>POST /api/inventories</code> - Product validation during inventory creation</p>
+        <p><code>PUT /api/inventories/{id}</code> - Product validation during inventory updates</p>
+        <p><code>POST /api/inventories/bulk</code> - Bulk inventory creation with validation</p>
+        <p><code>GET /api/inventories/{id}/with-product-info</code> - Enriched inventory with product details</p>
+        <p><code>GET /api/inventories/category/{category}</code> - Inventories filtered by product category</p>
+        
+        <h4>2. RestClientBuilder (5s connect / 10s read timeout)</h4>
+        <p><code>PATCH /api/inventories/product/{productId}/reserve/{quantity}</code> - Reserve inventory with availability check</p>
+        
+        <h4>3. Advanced RestClientBuilder (3s connect / 8s read timeout)</h4>
+        <p><code>GET /api/inventories/product-info/{productId}</code> - Get detailed product information</p>
+    </div>
+
+    <div class="advanced-feature">
+        <h3>🚀 Advanced Features</h3>
+        <p><code>GET /api/inventories?page={page}&size={size}</code> - Pagination support</p>
+        <p><code>GET /api/inventories?minQuantity={min}&maxQuantity={max}</code> - Quantity filtering</p>
+        <p><code>GET /api/inventories/count?minQuantity={min}&maxQuantity={max}</code> - Count with filters</p>
+        <p><code>POST /api/inventories/bulk</code> - Bulk inventory operations</p>
+    </div>
+
+    <h2>Example Requests</h2>
+    
+    <div class="test-section">
+        <h3>💡 Quick Start Examples</h3>
+        
+        <h4>1. Basic Operations</h4>
+        <pre><code># Get all inventories
+curl -X GET http://localhost:7050/inventory/api/inventories
+
+# Create inventory (with automatic product validation)
+curl -X POST http://localhost:7050/inventory/api/inventories \
+  -H "Content-Type: application/json" \
+  -d '{"productId": 1, "quantity": 100, "reservedQuantity": 0}'</code></pre>
+
+        <h4>2. MicroProfile Rest Client Features</h4>
+        <pre><code># Reserve inventory (uses RestClientBuilder for availability check)
+curl -X PATCH http://localhost:7050/inventory/api/inventories/product/1/reserve/10
+
+# Get product info (uses Advanced RestClientBuilder)
+curl -X GET http://localhost:7050/inventory/api/inventories/product-info/1
+
+# Get enriched inventory with product details
+curl -X GET http://localhost:7050/inventory/api/inventories/1/with-product-info</code></pre>
+
+        <h4>3. Advanced Features</h4>
+        <pre><code># Pagination and filtering
+curl -X GET "http://localhost:7050/inventory/api/inventories?page=0&size=5&minQuantity=50"
+
+# Bulk operations
+curl -X POST http://localhost:7050/inventory/api/inventories/bulk \
+  -H "Content-Type: application/json" \
+  -d '[{"productId": 1, "quantity": 100}, {"productId": 2, "quantity": 50}]'</code></pre>
+    </div>
+
+    <div class="config-section">
+        <h3>⚙️ Configuration & Testing</h3>
+        <p><strong>Test Scripts Available:</strong></p>
+        <ul>
+            <li><code>./test-inventory-endpoints.sh</code> - Comprehensive test suite</li>
+            <li><code>./test-inventory-endpoints.sh --restclient</code> - RestClient features only</li>
+            <li><code>./quick-test-commands.sh</code> - Command reference</li>
+        </ul>
+        
+        <p><strong>Service Dependencies:</strong></p>
+        <ul>
+            <li>Catalog Service: <code>http://localhost:5050</code></li>
+            <li>Inventory Service: <code>http://localhost:7050</code></li>
+        </ul>
+        
+        <p><strong>MicroProfile Config:</strong></p>
+        <pre><code>io.microprofile.tutorial.store.inventory.client.ProductServiceClient/mp-rest/url=http://localhost:5050/catalog/api
+io.microprofile.tutorial.store.inventory.client.ProductServiceClient/mp-rest/scope=javax.inject.Singleton</code></pre>
+    </div>
+
+    <h2>🏗️ Architecture</h2>
+    <div class="endpoint">
+        <h3>MicroProfile Rest Client Integration Patterns</h3>
+        <p><strong>Pattern 1 - CDI Injection:</strong> Automatic client injection with configuration-driven setup</p>
+        <p><strong>Pattern 2 - Programmatic Creation:</strong> Dynamic client building with custom timeouts and error handling</p>
+        <p><strong>Pattern 3 - Advanced Configuration:</strong> Per-use-case client optimization</p>
+        
+        <h4>Technologies Used:</h4>
+        <ul>
+            <li>Jakarta EE 10</li>
+            <li>MicroProfile 6.1 (Rest Client, OpenAPI, Config)</li>
+            <li>Open Liberty 24.0.0.x</li>
+            <li>Jackson for JSON processing</li>
+            <li>Lombok for reduced boilerplate</li>
+        </ul>
+    </div>
+    
+    <footer>
+        <p><strong>MicroProfile REST Client Tutorial - Inventory Service</strong></p>
+        <p>Demonstrates comprehensive MicroProfile Rest Client integration with Jakarta EE</p>
+        <p>&copy; 2025 - Updated June 7, 2025</p>
+    </footer>
+</body>
+</html>
