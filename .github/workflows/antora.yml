@@ -8,27 +8,36 @@ on:
 jobs: 
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for authentication
+      contents: read   # Required to read repository contents
+      pages: write     # Required to deploy to GitHub Pages
     steps: 
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'  # Use the Node.js version that matches your development environment
+          node-version: '18'  # Use a compatible Node.js version
 
-      - name: Install Antora
-        run: npm install -g @antora/cli @antora/site-generator-default
+      - name: Install Antora Locally
+        run: npm install @antora/cli @antora/site-generator-default
       
       - name: Verify Antora Installation
-        run: npm list -g @antora/cli @antora/site-generator-default || echo "Antora packages are not installed."
+        run: npm list @antora/cli @antora/site-generator-default || echo "Antora packages are not installed."
       
       - name: Generate Site with Antora
-        run: antora --fetch --stacktrace playbook.yml
+        run: npx antora --fetch --stacktrace playbook.yml
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Antora Site to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/site  # The default output directory for Antora
-          publish_branch: gh-pages  # The target branch for GitHub Pages
+          path: ./build/site  # The output directory for Antora
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

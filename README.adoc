@@ -694,7 +694,7 @@ site:
   title: MicroProfile Tutorial
   url: https://microprofile.io
   keys:
-    seo_description: Comprehensive tutorial for learning Eclipse MicroProfile
+    seo_description: Comprehensive tutorial for learning MicroProfile
     seo_keywords: microprofile, java, cloud-native, microservices
 ----
 
@@ -709,7 +709,9 @@ ui:
     url: ./path/to/local/ui-bundle.zip
     snapshot: true
 ----
+
 Replease _./path/to/local/ui-bundle.zip_ with actual path to your local UI bundle under development.
+
 This approach is useful when developing your own UI bundle or testing modifications.
 
 ### UI Bundle Development
@@ -743,3 +745,65 @@ When troubleshooting UI problems:
 2. Check the browser console for JavaScript errors
 3. Verify that all required resources are loading correctly
 4. Test with different browsers to identify browser-specific issues
+
+## GitHub Actions Workflow for Deployment
+
+The documentation site is automatically built and deployed using GitHub Actions. Below is an overview of the workflow:
+
+### Workflow Configuration
+
+The workflow is defined in `.github/workflows/antora.yml` and includes the following steps:
+
+1. **Checkout Repository**:
+   Uses the `actions/checkout@v3` action to fetch the repository.
+
+2. **Set up Node.js**:
+   Configures Node.js version `18` using `actions/setup-node@v3`.
+
+3. **Install Antora Locally**:
+   Installs Antora CLI and site generator locally:
+   ```bash
+   npm install @antora/cli @antora/site-generator-default
+   ```
+
+4. **Verify Antora Installation**:
+   Ensures the required packages are installed:
+   ```bash
+   npm list @antora/cli @antora/site-generator-default || echo "Antora packages are not installed."
+   ```
+
+5. **Generate Site with Antora**:
+   Builds the site using the playbook:
+   ```bash
+   npx antora --fetch --stacktrace playbook.yml
+   ```
+
+6. **Setup Pages**:
+   Configures GitHub Pages using `actions/configure-pages@v4`.
+
+7. **Upload Site to GitHub Pages**:
+   Uploads the generated site artifact using `actions/upload-pages-artifact@v3`.
+
+8. **Deploy to GitHub Pages**:
+   Deploys the site using `actions/deploy-pages@v4`.
+
+### Permissions
+
+The workflow requires the following permissions:
+- `id-token: write` for authentication.
+- `contents: read` to access repository contents.
+- `pages: write` to deploy the site to GitHub Pages.
+
+### Deployment URL
+
+After a successful deployment, the site is available at:
+```
+https://<username>.github.io/<repository-name>/
+```
+Replace `<username>` (for e.g. microprofile) with your GitHub username and `<repository-name>` (for e.g. microprofile-tutorial) with the name of your repository.
+
+The production branch url for the MicroProfile Tutorial documentation would be:
+
+```
+https://microprofile.github.io/microprofile-tutorial/
+```

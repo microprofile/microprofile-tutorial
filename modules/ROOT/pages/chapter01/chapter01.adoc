@@ -76,7 +76,7 @@ MicroProfile specifications are divided into two main categories: Platform and S
 
 :figure-caption: Figure 
 .MicroProfile Specifications
-image::http://microprofile.io/wp-content/uploads/2023/10/microprofile_release_6.1.png[MicroProfile 6.1]
+image::https://microprofile.io/wp-content/uploads/2023/10/microprofile_release_6.1.png[MicroProfile 6.1]
 
 === MicroProfile Platform Component Specifications
 

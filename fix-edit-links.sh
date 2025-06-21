@@ -14,7 +14,7 @@ SITE_DIR="/workspaces/microprofile-tutorial/build/site"
 
 # GitHub repository information
 REPO_URL="https://github.com/microprofile/microprofile-tutorial"
-BRANCH="patch-15"
+BRANCH="main"
 PATH_PREFIX="modules/ROOT/pages/"
 
 # Check if the site directory exists
