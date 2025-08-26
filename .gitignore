@@ -71,3 +71,6 @@ liberty-rest-app/target/
 mp-ecomm-store/target/
 
 /node_modules/
+
+# Antora build output
+/build/

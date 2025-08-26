@@ -1,0 +1,259 @@
+# GitHub Actions workflow for building and deploying MicroProfile Tutorial documentation
+# This workflow uses Antora to generate a static documentation site from AsciiDoc sources
+# and deploys it to GitHub Pages
+name: Generate MicroProfile Tutorial
+
+on:
+  # Allows manual triggering of the workflow from the GitHub Actions tab
+  workflow_dispatch:
+  
+  # Automatically runs when code is pushed to the main branch
+  push:
+    branches:
+      - main
+      
+  # Runs on pull requests to validate the build (but doesn't deploy)
+  pull_request: 
+    branches: 
+      - main
+
+# Prevent concurrent deployments to avoid conflicts and race conditions
+# Only allow one deployment at a time, but don't cancel in-progress runs
+# as we want to allow production deployments to complete
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Validation job for pull requests - builds but doesn't deploy
+  validate-build:
+    # Only run this job on pull requests
+    if: github.event_name == 'pull_request'
+    
+    runs-on: ubuntu-latest
+    
+    # Minimal permissions needed for PR validation
+    permissions:
+      contents: read   # Required to read repository contents
+      
+    steps:
+      # Checkout the repository source code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Set up Node.js runtime environment for Antora
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # LTS version compatible with Antora
+          cache: 'npm'        # Cache npm dependencies for faster builds
+
+      # Set up Ruby for AsciiDoc extensions
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: false
+
+      # Install Antora CLI, site generator, and advanced extensions
+      - name: Install Antora and Extensions
+        run: |
+          npm install @antora/cli @antora/site-generator-default
+          npm install @antora/lunr-extension @antora/pdf-extension @asciidoctor/tabs
+          gem install asciidoctor-pdf asciidoctor-kroki asciidoctor-plantuml
+      
+      # Generate the documentation site to validate it builds correctly
+      - name: Validate Site Generation
+        run: npx antora --fetch --stacktrace antora-assembler.yml
+        
+      # Verify the build output exists
+      - name: Verify Build Output
+        run: |
+          if [ -d "./build/site" ]; then
+            echo "✅ Site generated successfully"
+            ls -la ./build/site
+            # Check if PDF was generated (it's actually generated as index.pdf in _exports)
+            echo "🔍 Looking for generated PDF files..."
+            find . -name "*.pdf" -type f
+            
+            if [ -f "./build/assembler/microprofile-tutorial/6.1/_exports/index.pdf" ] || [ -f "./build/site/microprofile-tutorial/6.1/_exports/index.pdf" ]; then
+              echo "✅ PDF generated successfully (found as index.pdf in _exports)"
+            else
+              echo "⚠️ PDF not generated in expected location"
+              find . -name "*.pdf" -type f
+            fi
+          else
+            echo "❌ Site generation failed - output directory not found"
+            exit 1
+          fi
+
+  # Main job that builds the Antora documentation and deploys to GitHub Pages
+  build-and-deploy:
+    # Only deploy to Pages on pushes to main branch, not on PRs
+    # This prevents deploying from pull request builds
+    if: github.event_name != 'pull_request'
+    
+    # Use GitHub Pages environment for deployment tracking and protection
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    runs-on: ubuntu-latest
+    
+    # GitHub token permissions required for this workflow
+    permissions:
+      id-token: write  # Required for OIDC authentication to GitHub Pages
+      contents: read   # Required to read repository contents and checkout code
+      pages: write     # Required to deploy artifacts to GitHub Pages
+      
+    steps: 
+      # Checkout the repository source code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Set up Node.js runtime environment for Antora
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # LTS version compatible with Antora
+          cache: 'npm'        # Cache npm dependencies for faster builds
+
+      # Set up Ruby for AsciiDoc extensions  
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: false
+
+      # Install Antora CLI, site generator, and advanced extensions
+      - name: Install Antora and Extensions
+        run: |
+          npm install @antora/cli @antora/site-generator-default
+          npm install @antora/lunr-extension @antora/pdf-extension @asciidoctor/tabs
+          gem install asciidoctor-pdf asciidoctor-kroki asciidoctor-plantuml
+      
+      # Verify that Antora was installed correctly (useful for debugging)
+      - name: Verify Antora Installation
+        run: npm list @antora/cli @antora/site-generator-default || echo "Antora packages are not installed."
+      
+      # Clean previous build directory to ensure fresh generation
+      - name: Clean previous build directory
+        run: |
+          if [ -d "./build" ]; then
+            rm -rf ./build
+            echo "✅ Previous build directory cleaned for fresh generation"
+          else
+            echo "ℹ️ No previous build directory found"
+          fi
+      
+      # Generate the documentation site using Antora playbook configuration
+      # --fetch: Downloads remote content sources defined in playbook
+      # --stacktrace: Shows detailed error information for troubleshooting
+      - name: Generate Site with Antora
+        run: npx antora --fetch --stacktrace antora-assembler.yml
+
+      # Ensure GitHub Pages is enabled and configure deployment settings
+      # This will enable Pages if it's not already enabled and set the source to GitHub Actions
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with: 
+          # Automatically enable Pages if not already enabled
+          enablement: true
+          # Set the publishing source to GitHub Actions (vs. legacy branch-based)
+          # This ensures the repository is configured to accept deployments from Actions
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Verify Pages configuration and provide helpful debugging info
+      - name: Verify Pages Configuration
+        run: |
+          echo "🔧 GitHub Pages Configuration Check:"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Actor: ${{ github.actor }}"
+          echo ""
+          echo "✅ Pages setup completed successfully"
+          echo "📄 Site will be deployed from ./build/site directory"
+
+      # Verify PDF generation and copy to correct location for download
+      - name: Verify PDF generation and copy to correct location for download
+        run: |
+          echo "🔍 Looking for generated PDF files..."
+          find . -name "*.pdf" -type f
+          
+          # The PDF is actually generated as index.pdf in _exports subdirectory
+          PDF_SOURCE=""
+          if [ -f "./build/assembler/microprofile-tutorial/6.1/_exports/index.pdf" ]; then
+            PDF_SOURCE="./build/assembler/microprofile-tutorial/6.1/_exports/index.pdf"
+            echo "✅ PDF found in assembler/_exports location"
+          elif [ -f "./build/site/microprofile-tutorial/6.1/_exports/index.pdf" ]; then
+            PDF_SOURCE="./build/site/microprofile-tutorial/6.1/_exports/index.pdf"
+            echo "✅ PDF found in site/_exports location"
+          else
+            echo "❌ PDF not found in expected locations"
+            echo "Available PDF files:"
+            find . -name "*.pdf" -type f
+            exit 1
+          fi
+          
+          if [ -n "$PDF_SOURCE" ]; then
+            PDF_SIZE=$(stat -f%z "$PDF_SOURCE" 2>/dev/null || stat -c%s "$PDF_SOURCE")
+            echo "PDF Size: ${PDF_SIZE} bytes"
+            
+            # Copy PDF to the exact location the download link expects
+            # The download link is ../../microprofile-tutorial/6.1/microprofile-tutorial.pdf
+            # From /microprofile-tutorial/6.1/index.html, this resolves to /microprofile-tutorial/6.1/microprofile-tutorial.pdf
+            mkdir -p "./build/site/microprofile-tutorial/6.1/"
+            cp "$PDF_SOURCE" "./build/site/microprofile-tutorial/6.1/microprofile-tutorial.pdf"
+            echo "✅ PDF copied to download location: /microprofile-tutorial/6.1/microprofile-tutorial.pdf"
+            
+            # Verify the copy was successful
+            if [ -f "./build/site/microprofile-tutorial/6.1/microprofile-tutorial.pdf" ]; then
+              echo "✅ PDF verification successful"
+              ls -la ./build/site/microprofile-tutorial/6.1/microprofile-tutorial.pdf
+            else
+              echo "❌ PDF copy failed"
+              exit 1
+            fi
+            
+            # Create .htaccess for GitHub Pages to ensure proper PDF serving
+            cat > ./build/site/.htaccess << 'EOF'
+          # Set proper MIME type for PDF files
+          <Files "*.pdf">
+              AddType application/pdf .pdf
+              Header set Content-Type "application/pdf"
+              Header set Content-Disposition "attachment; filename=\"microprofile-tutorial.pdf\""
+              Header set Cache-Control "no-cache, no-store, must-revalidate"
+              Header set Pragma "no-cache"
+              Header set Expires "0"
+          </Files>
+          EOF
+            
+            # Also create PDF-specific .htaccess in the PDF directory
+            cp supplemental-ui/pdf-htaccess "./build/site/microprofile-tutorial/6.1/.htaccess"
+            echo "✅ PDF-specific .htaccess created"
+            
+            echo "✅ PDF download headers configured"
+          fi
+
+      # Copy assembler directory to site for PDF access via UI bundle
+      - name: Copy assembler directory to site for PDF access
+        run: |
+          if [ -d "./build/assembler" ]; then
+            cp -r ./build/assembler ./build/site/
+            echo "✅ Assembler directory copied to site for web access"
+            ls -la ./build/site/assembler/microprofile-tutorial/6.1/
+          else
+            echo "⚠️ Assembler directory not found"
+          fi
+
+      # Upload the generated Antora site as a GitHub Pages artifact
+      - name: Upload Antora Site to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./build/site  # Antora's default output directory
+          
+      # Deploy the uploaded artifact to GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -3,15 +3,38 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MicroProfile Metrics :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/microprofile-tutorial/6.1/chapter07/chapter07.html">
+<title>MicroProfile Metrics :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/tutorial/microprofile-tutorial/6.1/chapter07/chapter07.html">
     <link rel="prev" href="../chapter06/chapter06.html">
     <link rel="next" href="../chapter08/chapter08.html">
     <meta name="generator" content="Antora 3.1.10">
     <link rel="stylesheet" href="../../../_/css/site.css">
-    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" /><link rel="icon" href="../../../_/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" /><script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all PDF download links and ensure they download instead of opening
+    const pdfLinks = document.querySelectorAll('a[href$=".pdf"]');
+    pdfLinks.forEach(link => {
+      // Only modify links that contain 'microprofile-tutorial.pdf'
+      if (link.href.includes('microprofile-tutorial.pdf')) {
+        // Ensure the link points to the correct absolute path
+        const baseUrl = window.location.origin;
+        const correctPath = baseUrl + '/microprofile-tutorial/6.1/microprofile-tutorial.pdf';
+        link.href = correctPath;
+        // Set a proper download filename
+        link.setAttribute('download', 'microprofile-tutorial.pdf');
+        // Add click handler for additional debugging
+        link.addEventListener('click', function(e) {
+          console.log('PDF download clicked. URL:', this.href);
+          // Let the default download behavior proceed
+        });
+        console.log('PDF download link configured:', link.href);
+      }
+    });
+  });
+</script>
+
+<link rel="icon" href="../../../_/img/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="../../../_/img/favicon.png" type="image/png">
-<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png">
-      <!-- Google Tag Manager -->
+<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png";      <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -25,12 +48,13 @@
     </script>
     <!-- Add Eclipse Foundation cookie consent to site for GA -->
     <script src="//www.eclipse.org/eclipse.org-common/themes/solstice/public/javascript/vendor/cookieconsent/default.min.js"></script>
-      </head>
+        <link rel="icon" href="../../../_/img/favicon.ico" type="image/x-icon">
+  </head>
   <body class="article">
 <header class="header">
   <nav class="navbar">
     <div class="navbar-brand">
-      <a id="site-title" class="navbar-item" href="https://microprofile.io">MicroProfile Tutorial</a>
+      <a id="site-title" class="navbar-item" href="https://microprofile.io/tutorial">MicroProfile Tutorial</a>
       <div class="navbar-item search hide-for-print">
         <div id="search-field" class="field">
           <input id="search-input" type="text" placeholder="Search the docs">
@@ -140,8 +164,8 @@
     <li><a href="chapter07.html">MicroProfile Metrics</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/ttelang/microprofile-tutorial/edit/patch-15/modules/ROOT/pages/chapter07/chapter07.adoc">Edit this Page</a></div>
-</div>
+  <div class="edit-this-page"><a href="https://github.com/microprofile/microprofile-tutorial/edit/main/modules/ROOT/pages/chapter07/chapter07.adoc">Edit this Page</a></div>
+  </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
@@ -298,7 +322,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">dependencies {
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">dependencies {
     providedCompile 'org.eclipse.microprofile.metrics:microprofile-metrics-api:5.1.1'
 }</code></pre>
 </div>
@@ -413,7 +437,7 @@ Application metrics are exposed under the path <code>/metrics?scope=vendor</code
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">import org.eclipse.microprofile.metrics.annotation.Timed;
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.metrics.annotation.Timed;
 // …
 
 public class ProductResource {
@@ -424,7 +448,7 @@ public class ProductResource {
             tags = {"method=getProduct"},
             absolute = true,
             description = "Time spent looking up products")
-    public Product getProduct(@PathParam("id") Long productId) {
+    public Response getProductById(@PathParam("id") Long id) {
         return productService.getProduct(productId);
     }
 
@@ -433,7 +457,7 @@ public class ProductResource {
 </div>
 <div class="paragraph">
 <p>It will expose a metric called <code>productLookupTime</code>, which will track the amount of time spent in the <code>getProduct()</code> method in seconds.
-You can visit the following URL <code>https://localhost:&lt;port&gt;/metrics?scope=application</code> (Replace <code>&lt;port&gt;</code> with the actual port where the server is running) to see the response time of this method as below:</p>
+You can visit the following URL <code><a href="https://&lt;hostname&gt;:&lt;port&gt;/metrics?scope=application" class="bare">https://&lt;hostname&gt;:&lt;port&gt;/metrics?scope=application</a></code> (Replace <code>&lt;hostname&gt;</code> and <code>&lt;port&gt;</code> with the actual hostname and port where the server is running) to see the response time of this method as below:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -460,7 +484,7 @@ public class ProductResource {
     @Counted(name = "productAccessCount",
         absolute = true,
         description = "Number of times the list of products is requested")
-    public Response getProducts() {
+    public Response getAllProducts() {
        // Method implementation
        // ....
     }
@@ -469,7 +493,7 @@ public class ProductResource {
 </div>
 <div class="paragraph">
 <p>In the example above, the <code>@Counted</code> annotation tells MicroProfile Metrics to track the number of invocations of the <code>getProducts()</code> method and expose this metric as a counter. The name, and description of the metric can also be specified.
-You can visit the following URL <code>https://localhost:&lt;port&gt;/metrics?scope=application</code> (Replace <code>&lt;port&gt;</code> with the actual port where the server is running) to see the number of times this method is called as below:</p>
+You can visit the following URL <code><a href="https://localhost:&lt;port&gt;/metrics?scope=application" class="bare">https://localhost:&lt;port&gt;/metrics?scope=application</a></code> (Replace <code>&lt;port&gt;</code> with the actual port where the server is running) to see the number of times this method is called as below:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -519,6 +543,13 @@ public class ProductResource {
 </div>
 <div class="paragraph">
 <p>This custom metric implementation provides a real-time insight into the size of your product catalog, which can be invaluable for monitoring the scale of your service&#8217;s data and understanding its behavior over time.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc"># HELP io_microprofile_tutorial_store_product_resource_ProductResource_productCatalogSize Current number of products in the catalog
+# TYPE io_microprofile_tutorial_store_product_resource_ProductResource_productCatalogSize gauge
+io_microprofile_tutorial_store_product_resource_ProductResource_productCatalogSize{mp_scope="application",} 8.0</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p>Vendors may, by their own implementation, support <code>/metrics?name=&lt;name&gt;</code> to directly retrieve that metric from all scopes. However, the specification itself only illustrates <code>/metrics?scope=&lt;scope&gt;&amp;name=&lt;name&gt;</code>.</p>
