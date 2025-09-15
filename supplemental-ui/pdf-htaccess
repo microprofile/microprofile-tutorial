@@ -1,0 +1,12 @@
+# PDF-specific .htaccess configuration
+AddType application/pdf .pdf
+Header set Content-Type "application/pdf"
+Header set Content-Disposition "attachment; filename=\"microprofile-tutorial.pdf\""
+Header set Cache-Control "no-cache, no-store, must-revalidate"
+Header set Pragma "no-cache"
+Header set Expires "0"
+
+# Allow access to PDF files
+<Files "*.pdf">
+    Require all granted
+</Files>

@@ -1,8 +1,10 @@
 {
   "dependencies": {
+    "@antora/cli": "^3.1.10",
     "@antora/collector-extension": "^1.0.1",
     "@antora/lunr-extension": "^1.0.0-alpha.10",
     "@antora/pdf-extension": "^1.0.0-alpha.11",
+    "@antora/site-generator-default": "^3.1.10",
     "@asciidoctor/tabs": "^1.0.0-beta.6",
     "asciidoctor-kroki": "^0.18.1",
     "asciidoctor-plantuml": "^1.5.0"

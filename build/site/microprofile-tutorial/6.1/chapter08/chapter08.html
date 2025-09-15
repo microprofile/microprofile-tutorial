@@ -3,15 +3,38 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MicroProfile Fault Tolerance :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/microprofile-tutorial/6.1/chapter08/chapter08.html">
+<title>MicroProfile Fault Tolerance :: MicroProfile Tutorial :: MicroProfile Tutorial</title>    <link rel="canonical" href="https://microprofile.io/tutorial/microprofile-tutorial/6.1/chapter08/chapter08.html">
     <link rel="prev" href="../chapter07/chapter07.html">
     <link rel="next" href="../chapter09/index.html">
     <meta name="generator" content="Antora 3.1.10">
     <link rel="stylesheet" href="../../../_/css/site.css">
-    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" /><link rel="icon" href="../../../_/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" type="text/css" href="//www.eclipse.org/eclipse.org-common/themes/solstice/public/stylesheets/vendor/cookieconsent/cookieconsent.min.css" /><script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all PDF download links and ensure they download instead of opening
+    const pdfLinks = document.querySelectorAll('a[href$=".pdf"]');
+    pdfLinks.forEach(link => {
+      // Only modify links that contain 'microprofile-tutorial.pdf'
+      if (link.href.includes('microprofile-tutorial.pdf')) {
+        // Ensure the link points to the correct absolute path
+        const baseUrl = window.location.origin;
+        const correctPath = baseUrl + '/microprofile-tutorial/6.1/microprofile-tutorial.pdf';
+        link.href = correctPath;
+        // Set a proper download filename
+        link.setAttribute('download', 'microprofile-tutorial.pdf');
+        // Add click handler for additional debugging
+        link.addEventListener('click', function(e) {
+          console.log('PDF download clicked. URL:', this.href);
+          // Let the default download behavior proceed
+        });
+        console.log('PDF download link configured:', link.href);
+      }
+    });
+  });
+</script>
+
+<link rel="icon" href="../../../_/img/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="../../../_/img/favicon.png" type="image/png">
-<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png">
-      <!-- Google Tag Manager -->
+<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png";      <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -25,12 +48,13 @@
     </script>
     <!-- Add Eclipse Foundation cookie consent to site for GA -->
     <script src="//www.eclipse.org/eclipse.org-common/themes/solstice/public/javascript/vendor/cookieconsent/default.min.js"></script>
-      </head>
+        <link rel="icon" href="../../../_/img/favicon.ico" type="image/x-icon">
+  </head>
   <body class="article">
 <header class="header">
   <nav class="navbar">
     <div class="navbar-brand">
-      <a id="site-title" class="navbar-item" href="https://microprofile.io">MicroProfile Tutorial</a>
+      <a id="site-title" class="navbar-item" href="https://microprofile.io/tutorial">MicroProfile Tutorial</a>
       <div class="navbar-item search hide-for-print">
         <div id="search-field" class="field">
           <input id="search-input" type="text" placeholder="Search the docs">
@@ -140,8 +164,8 @@
     <li><a href="chapter08.html">MicroProfile Fault Tolerance</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/ttelang/microprofile-tutorial/edit/patch-15/modules/ROOT/pages/chapter08/chapter08.adoc">Edit this Page</a></div>
-</div>
+  <div class="edit-this-page"><a href="https://github.com/microprofile/microprofile-tutorial/edit/main/modules/ROOT/pages/chapter08/chapter08.adoc">Edit this Page</a></div>
+  </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
@@ -386,7 +410,7 @@ public class PaymentService {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class PaymentDetails {
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class PaymentDetails {
     private double amount;
 
     public double getAmount() {
@@ -423,7 +447,7 @@ public class PaymentProcessingException extends Exception {
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.payment.exception;
 
-class CriticalPaymentException extends Exception {
+public class CriticalPaymentException extends Exception {
     public CriticalPaymentException(String message) {
         super(message);
     }
@@ -657,7 +681,7 @@ public String getProduct(Long id) {
     if (Math.random() &gt; 0.7) {
         throw new RuntimeException("Simulated service failure");
     }
-    return productRepository.findProductById(id);
+    return repository.findProductById(id);
 }</code></pre>
 </div>
 </div>

@@ -1,12 +1,12 @@
-name: microprofile-tutorial
-title: MicroProfile Tutorial
-version: 6.1
-edit_url: https://github.com/microprofile/microprofile-tutorial/tree/main/modules/ROOT/pages/{path}
-asciidoc:
-  attributes:
+name: microprofile-tutorial          # Component name/identifier
+title: MicroProfile Tutorial         # Display title for the component
+version: 6.1                        # Version of this component
+edit_url: https://github.com/microprofile/microprofile-tutorial/tree/main/modules/ROOT/pages/{path} 
+asciidoc:                           # AsciiDoc processing settings
+  attributes:                       # Document attributes
     source-language: asciidoc@
     table-caption: false
     xrefstyle: full
-nav:
-  - modules/ROOT/pages/nav.adoc
-start_page: index.adoc
+nav:                               # Navigation menu definition
+  - modules/ROOT/pages/nav.adoc    # Points to navigation file
+start_page: index.adoc             # Default landing page

@@ -1,15 +1,15 @@
 site:
-  title: MicroProfile Tutorial
-  url: https://microprofile.io
-  start_page: microprofile-tutorial::index.adoc
+  title: MicroProfile Tutorial           # Overall site title
+  url: https://microprofile.io/tutorial  # Base URL for the site
+  start_page: microprofile-tutorial::index.adoc  # Homepage
   keys:
-    show_edit_page_link: true
+    show_edit_page_link: true            # Enable "Edit this page" links
 
 content:
   sources:
-    - url: .
-      start_path: .
-      branches: HEAD
+    - url: "https://github.com/microprofile/microprofile-tutorial.git"          # Current directory (local content)
+      branches: main  # Use current branch
+      start_path: /   # Root of the content
 
 ui:
   bundle:
@@ -35,12 +35,12 @@ asciidoc:
 
 antora:
   extensions:
-    - require: '@antora/lunr-extension'
+    - require: '@antora/lunr-extension'    # Search functionality
       index_latest_only: true
-    - require: '@antora/pdf-extension'
-      generate_index: true
-      index_filename: microprofile-tutorial
-      output_format: pdf
+    - require: '@antora/pdf-extension'     # PDF generation
+      as_attachment: true
+      filename: microprofile-tutorial.pdf
+      output_dir: ./build/assembler
 
 output:
   dir: ./build/site

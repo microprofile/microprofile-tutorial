@@ -1,3 +1,21 @@
+{{!-- Force PDF downloads instead of opening in browser --}}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all PDF download links and ensure they download instead of opening
+    const pdfLinks = document.querySelectorAll('a[href$=".pdf"]');
+    pdfLinks.forEach(link => {
+      // Only modify links that contain 'microprofile-tutorial.pdf'
+      if (link.href.includes('microprofile-tutorial.pdf')) {
+        // Don't modify the href - let it use the original relative path
+        // Just ensure it has the download attribute with proper filename
+        link.setAttribute('download', 'microprofile-tutorial.pdf');
+        console.log('PDF download link configured:', link.href);
+      }
+    });
+  });
+</script>
+
+{{!-- Favicons --}}
 <link rel="icon" href="{{{uiRootPath}}}/img/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="{{{uiRootPath}}}/img/favicon.png" type="image/png">
 <link rel="shortcut icon" href="{{{uiRootPath}}}/img/favicon.png" type="image/png">
