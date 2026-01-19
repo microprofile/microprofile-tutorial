@@ -10,22 +10,7 @@
 			"installMaven": true,
 			"version": "17",
 			"jdkDistro": "ms",
-			"gradleVersion": "latest",
-			"mavenVersion": "latest",
-			"antVersion": "latest",
-			"groovyVersion": "latest"
-		},
-		"ghcr.io/ebaskoro/devcontainer-features/sdkman:1": {
-			"candidate": "java",
-			"version": "latest"
-		},
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {
-			"moby": true,
-			"azureDnsAutoDetection": true,
-			"installDockerBuildx": true,
-			"installDockerComposeSwitch": true,
-			"version": "latest",
-			"dockerDashComposeVersion": "none"
+			"mavenVersion": "latest"
 		}
 	},
 
@@ -33,7 +18,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "java -version",
+	// "postCreateCommand": "java -version && mvn -v",
 
 	// Configure tool-specific properties.
 	"customizations": {
