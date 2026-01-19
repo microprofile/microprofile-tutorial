@@ -49,24 +49,18 @@ First, an overview of the MicroProfile project is presented, followed by detaile
 
 === Project
 
-In this tutorial, you will learn to build a microservices-based e-commerce application called "MicroProfile e-Commerce". The app will demonstrate the use of MicroProfile APIs for developing an application based on microservices and cloud-native architecture.
+In this tutorial, you will learn to build a microservices-based e-commerce application called "MicroProfile e-Commerce". The app will demonstrate the use of MicroProfile APIs for developing an application based on microservices and cloud-native architecture. 
 
-It would include multiple microservices, each serving a different purpose and highlighting different aspects of MicroProfile. Java developers can use this adaptation as a practical case study to implement MicroProfile APIs in real-world applications.
+It would include multiple microservices, each serving a different purpose and highlighting different aspects of MicroProfile. You can use this adaptation as a practical case study to implement MicroProfile APIs in real-world applications.
 
-The MicroProfile e-Commerce application compirses of multiple microservices, among the key ones are as below:
+The MicroProfile e-Commerce application comprises multiple microservices; among the key ones are the following:
 
-- **Product Catalog**: This service acts as the central repository for all product-related information, including detailed descriptions, and pricing, and inventory levels. It provides APIs for fetching product details efficiently for the other microservices, such as the Shopping Cart. This microservice is vital for updating product data, ensuring data consistency and accuracy across the e-Commerce platform.
-
-- **The Shopping Cart**: This service allows users to add or remove products from their shopping cart. It communicates with the Product Catalog Microservice to access up-to-date product information. It handles the storage and management of cart items for each user, including the calculation of cart totals with applicable discounts or promotions. This microservice plays interfaces with the Checkout microservice to initiate the order processing.
-
-- **User Management**: This service is responsible for user account management, handles registration, login, and account updates securely using JWT tokens. It is essential for personalizing the user experience and safeguarding user information.
-
+- **Product Catalog**: This service acts as the central repository for all product-related information, including detailed descriptions, pricing, and inventory levels. It provides APIs for fetching product details efficiently for the other microservices, such as the Shopping Cart. This microservice is vital for updating product data, ensuring data consistency and accuracy across the e-commerce platform.
+- **The Shopping Cart** : This service allows users to add or remove products from their shopping cart. It communicates with the Product Catalog Microservice to access up-to-date product information. It handles the storage and management of cart items for each user, including the calculation of cart totals with applicable discounts or promotions. This microservice interfaces with the Checkout microservice to initiate the order processing.
+- **User Management**: This service is responsible for user account management and handles registration, login, and account updates securely using JWT tokens. It is essential for personalizing the user experience and safeguarding user information.
 - **Order Processing**: This service manages the entire order process, from collecting shipping information and confirming order details to initiating payment processing. This microservice ensures a seamless transition from shopping to order completion.
-
-- **Payment**: Dedicated to processing payments, this microservice interacts with external payment gateways to securely handle transactions. It receives payment instructions from the Checkout microservice, executes the payment process, and confirms transaction outcomes. This microservice is crucial for ensuring financial transactions are conducted securely and efficiently, maintaining the integrity of the payment process.
-
-- **Inventory**: This service is dedicated to monitoring and managing inventory levels. It tracks product availability, updates inventory in real-time as sales occu, and provides restocking alerts. By integrating with the Product Catalog and Checkout microservices, it ensures that product availability is accurately reflected on the platform and that orders are only placed for in-stock items. This microservice is crucial for maintaining optimal inventory levels and preventing stockouts, thereby enhancing the customer shopping experience.
-
+- **Payment**: Dedicated to processing payments, this microservice interacts with external payment gateways to securely handle transactions. It receives payment instructions from the Checkout microservice, executes the payment process, and confirms transaction outcomes. This microservice ensures financial transactions are processed securely and efficiently and maintains the integrity of the payment process.
+- **Inventory**: This service is dedicated to monitoring and managing inventory levels. It tracks product availability, updates inventory in real-time as sales occur, and provides restocking alerts. By integrating with the Product Catalog and Checkout microservices, it ensures that product availability is accurately reflected on the platform and that orders are only placed for in-stock items. This microservice is crucial for maintaining optimal inventory levels and preventing stockouts, thereby enhancing the customer shopping experience.
 - **Shipping**: This microservice is responsible for managing the logistics of order delivery. It receives order details and shipping information from the Order Processing Microservice, ensuring that orders are shipped to customers in a timely and efficient manner. The Shipping Microservice plays a critical role in the post-purchase customer experience, managing expectations and communication regarding order delivery.
 
 :imagesdir: ../assets/images
@@ -92,44 +86,35 @@ we assume you have a basic understanding of RESTful Web Services.
 === Learning Objectives
 
 * Understanding MicroProfile and Its Ecosystem: 
-
 ** Gain a solid understanding of what MicroProfile is and its role in modern cloud-native application development.
-
 ** Learn about the evolution of MicroProfile and its relationship with Jakarta EE.
-
-** Understand how MicroProfile facilitates building microservices.
-
+** Understand how MicroProfile facilitates the development of lightweight, portable, and independently deployable microservices.
 * Hands-On Experience with Key MicroProfile APIs:
-
-** Learn to implement Config, Health, Metrics, JWT Authentication, Fault Tolerance, Rest Client, and other MicroProfile APIs.
-
-** Understand how to apply these APIs in practical scenarios through the Duke's Forest application case study.
-
+** Learn to implement core MicroProfile APIs including Config, Health, Metrics, JWT Authentication, Fault Tolerance, REST Client, OpenAPI and Telemetry.
+** Gain practical experience applying these APIs in the MicroProfile e-commerce application case study.
+* Event-Driven and Reactive Microservice
+** Understand the principles of event-driven architecture in microservices.
+** Learn to build asynchronous, message-driven services using MicroProfile Reactive Messaging.
+** Explore integration with messaging systems such as Kafka or other brokers for scalable, decoupled communication.
+* API Design and Data Querying with GraphQL
+** Understand the fundamentals of GraphQL and its advantages over traditional REST APIs
+** Learn to design flexible, client-driven APIs using MicroProfile GraphQL.
+** Implement GraphQL endpoints within MicroProfile-based microservices.
 * Building Resilient and Scalable Services:
-
-** Master techniques for developing resilient services using fault tolerance and health checks.
-
+** Master techniques for developing resilient services using fault tolerance patterns such as retries, timeouts, circuit breakers and bulkhead.
+** Implement health checks to ensure service readiness and liveness in cloud environments.
 * Securing Microservices:
-
 ** Learn the intricacies of securing microservices using MicroProfile JWT and Security API.
-
 * Effective Data Management in Microservices:
-
 ** Understand the role of JPA and JSON-B in MicroProfile for handling data operations in microservices.
-
-* Monitoring and Tracing:
-
+* Monitoring, Observability and Tracing:
 ** Implement monitoring strategies using MicroProfile Metrics.
-
-** Learn to trace microservice interactions with OpenTracing for enhanced observability.
-
+** Learn distributed tracing concepts and trace microservice interactions using OpenTracing and MicroProfile Telemetry for enhanced observability.
 * Collaborative Learning and Community Engagement:
-
 ** Participate in Q&A sessions, forums, and interactive discussions.
+** Engage with the MicroProfile community to stay current with evolving specifications and best practices.
 
-** Engage with the MicroProfile community for continuous learning and staying updated with the latest trends.
-
-By the end of this tutorial readers will gain the knowledge and skills necessary to design, develop, and deploy robust microservices using MicroProfile, preparing them for advanced roles in software development and architecture in cloud-native environments.
+By the end of this tutorial, readers will have the knowledge and hands-on experience required to design, develop, secure, and observe robust, event-driven microservices using MicroProfile. They will be well prepared for advanced roles in cloud-native software development and microservices architecture.
 
 == Conventions
 [width="99%",cols="20%,38%,37%"]
