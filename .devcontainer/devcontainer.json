@@ -1,17 +1,40 @@
 {
+	"name": "MicroProfile Tutorial",
 	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	
 	"features": {
-		"ghcr.io/devcontainers-extra/features/node-asdf:0": {}
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "20"
+		},
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "21",
+			"installMaven": "true",
+			"mavenVersion": "3.9"
+		},
+		"ghcr.io/devcontainers/features/ruby:1": {
+			"version": "3.2"
+		},
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.11"
+		}
 	},
+
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"GitHub.copilot",
 				"asciidoctor.asciidoctor-vscode",
+				"matt-rudge.auto-open-preview-panel",
 				"microprofile-community.vscode-microprofile-pack",
 				"vscjava.vscode-java-pack",
+				"vscjava.vscode-maven",
 				"Open-Liberty.liberty-tools-vscode"
-			]
+			],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "bash"
+			}
 		}
-	}
+	},
+
+	"postCreateCommand": "npm install && gem install asciidoctor-pdf"
 }
