@@ -1102,4 +1102,4 @@ To continue your journey with MicroProfile Reactive Messaging, explore the compl
 
 By mastering these concepts and patterns, you can build modern, reactive microservices that handle high-volume data streams efficiently and reliably in production environments, taking full advantage of the reactive programming model to create responsive, resilient, and scalable distributed systems.
 
-This concludes the MicroProfile tutorial. You are now equipped with the foundational knowledge to build robust, cloud-native microservices using the MicroProfile specification. Thank you for following along, and happy coding!
+This concludes the chapter on MicroProfile Reactive Messaging. You are now equipped with the foundational knowledge to build robust, cloud-native microservices using the MicroProfile specification. Thank you for following along, and happy coding!
