@@ -489,7 +489,7 @@ This code snippet above splits one incoming purchase order into multiple line-it
 
 *3. Many-to-One Transformation (Aggregation)*:
 
-Multiple incoming messages are collected and combined into a single outgoing message, useful for batching, summarising, or reducing a stream of items into a consolidated result.
+Multiple incoming messages are collected and combined into a single outgoing message, useful for batching, summarizing, or reducing a stream of items into a consolidated result.
 
 [source,java]
 ----
