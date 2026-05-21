@@ -25,7 +25,7 @@ Using this model, developers can build scalable and resilient microservices that
 * Managing backpressure in reactive messaging
 * Integration with other MicroProfile specifications
 * Reactive stream operations
-* Best practices and production patterns
+* Graph Validation and Deployment Checks
 
 == Event-Driven Architecture (EDA) Overview
 
@@ -101,7 +101,7 @@ Add the following dependency to your `build.gradle`:
 [source,groovy]
 ----
 dependencies {
-    compileOnly "org.eclipse.microprofile.reactive.messaging:microprofile-reactive-messaging-api:3.0.1"
+    compileOnly "org.eclipse.microprofile.reactive.messaging:microprofile-reactive-messaging-api:{reactive-messaging-spec-version}"
 }
 ----
 
@@ -115,7 +115,7 @@ The exact connector dependency depends on the runtime you are using. The connect
 
 Depending on your runtime and packaging model, you may also need to make the Kafka client libraries available to the server or application classloader.
 
-Refer to your runtime's documentation for the correct connector artifact coordinates, supported brokers, and configuration details. For a complete channel configuration example, see the <<_named_channels_for_message_flow>> section.
+Refer to your runtime's documentation for the correct connector artifact coordinates, supported brokers, and configuration details. For a complete channel configuration example, see the <<named-channels-for-message-flow>> section.
 
 == Defining Messaging Logic with CDI Beans
 
@@ -185,10 +185,16 @@ public class OrderStatusEventHandler {
     @Inject
     NotificationService notificationService;
 
+    @Inject
+    ManagedExecutor executor;
+
     @Incoming("payment-authorized")
-    public void onPaymentAuthorized(Long orderId) {
-        Order updatedOrder = orderService.updateOrderStatus(orderId, OrderStatus.PAID);
-        notificationService.notifyOrderStatusChanged(updatedOrder);
+    public CompletionStage<Void> onPaymentAuthorized(Order order) {
+        return CompletableFuture.runAsync(() -> {
+            // Update status on the incoming Order entity
+            Order updatedOrder = orderService.updateOrderStatus(order.getId(), OrderStatus.PAID);
+            notificationService.notifyOrderStatusChanged(updatedOrder);
+        }, executor);
     }
 }
 ----
@@ -196,7 +202,8 @@ public class OrderStatusEventHandler {
 In this example:
 
 * The `OrderStatusEventHandler` bean injects an `OrderService` for updating the persisted order and a `NotificationService` for sending payment confirmations.
-* The `onPaymentAuthorized` method reacts to the `payment-authorized` channel, showing how the fulfillment workflow continues asynchronously after the initial REST checkout has completed.
+* The `onPaymentAuthorized` method consumes the `Order` payload directly from the `payment-authorized` channel, matching the output type of the checkout producer pipeline.
+* The method returns a `CompletionStage<Void>` and offloads the blocking database and notification work to a managed thread pool via `ManagedExecutor`. The underlying message broker will only acknowledge the message *after* this asynchronous processing successfully completes.
 * This separation keeps the user-facing request/response path simple while moving cross-service processing into dedicated messaging handlers.
 
 === Scope Management in Messaging Beans
@@ -365,6 +372,10 @@ public CompletionStage<Void> process(Message<String> message) {
 Use `Message<T>` when you need explicit acknowledgment control, access to metadata, or custom error handling beyond what automatic acknowledgment provides.
 
 *4. Reactive Streams Processing*:
+
+The MicroProfile Reactive Messaging specification is built on the *MicroProfile Reactive Streams Operators* specification and heavily utilizes `CompletionStage` for asynchronous operations. The core reactive types defined by the MicroProfile Reactive Messaging specification are the standard Reactive Streams interfaces: `Publisher<T>`, `Subscriber<T>`, and `Processor<T,R>`, along with their builder counterparts (`PublisherBuilder<T>`, `SubscriberBuilder<T>`, `ProcessorBuilder<T,R>`) from MicroProfile Reactive Streams Operators.
+
+NOTE: Mutiny (`io.smallrye.mutiny`) is *not* part of the MicroProfile Reactive Messaging specification. It is the reactive library chosen by SmallRye Reactive Messaging (the reference implementation used by Quarkus). Because `Multi<T>` and `Uni<T>` implements the Reactive Streams `Publisher<T>` contract, it integrates seamlessly. However, you are free to use other reactive libraries. The examples in this chapter use Mutiny, but the patterns apply to any Reactive Streams-compatible type.
 
 `Multi<T>` is a reactive type from the Mutiny library (`io.smallrye.mutiny.Multi`) that represents an asynchronous stream of zero or more items. It implements the Reactive Streams `Publisher<T>` contract and provides a rich set of operators for transforming, filtering, merging, and grouping streams in a composable, non-blocking way. Common operators include:
 
@@ -858,21 +869,30 @@ Process multiple messages concurrently while maintaining overall backpressure co
 ----
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.concurrent.ManagedExecutorService;
+import jakarta.inject.Inject;
+
+// ... 
+
+@Inject
+ManagedExecutorService executor;
 
 @Incoming("tasks")
 @Outgoing("results")
 public Multi<Result> processConcurrent(Multi<Task> tasks) {
     return tasks
-        .onItem().transformToUniAndMerge(task ->
-            Uni.createFrom().completionStage(() ->
-                CompletableFuture.supplyAsync(() -> process(task))
-            ),
-            3  // Process up to 3 messages concurrently
-        );
+        .onItem().transformToUni(task ->
+            Uni.createFrom().item(() -> process(task))
+                .runSubscriptionOn(executor)
+        )
+        // Explicitly merge the Unis back into a Multi with a concurrency limit of 3
+        .merge(3); 
 }
 ----
 
-The concurrency limit (3 in this example) ensures that no more than 3 messages are processed simultaneously. This provides controlled parallelism for I/O-bound operations while preventing resource exhaustion.
+WARNING: Do not call `CompletableFuture.supplyAsync(() -> ...)` without an explicit executor. The no-argument overload submits work to the JVM-wide common `ForkJoinPool`, which is shared across the entire application, is sized for CPU-bound work, and carries no Jakarta EE context (security, transactions, `@RequestScoped` beans). In a MicroProfile application, always inject a `ManagedExecutorService` (from Jakarta Concurrency) and pass it as the second argument, or use Mutiny's `runSubscriptionOn(executor)` as shown above. Both approaches ensure proper container-managed thread execution and context propagation.
+
+The concurrency limit (`3` in this example) ensures that no more than 3 messages are processed simultaneously. This provides controlled parallelism for I/O-bound operations while preventing resource exhaustion.
 
 *Batching for Throughput*:
 
@@ -911,12 +931,12 @@ import java.time.Duration;
 @Outgoing("rate-limited")
 public Multi<Data> rateLimit(Multi<Data> stream) {
     return stream
-        .group().intoLists().of(10)                    // Batch 10 items
-        .onItem().call(batch ->                         // Pause between batches
+        .group().intoLists().of(10)     // Batch 10 items
+        .onItem().call(batch ->         // Pause between batches
             Uni.createFrom().nullItem()
                 .onItem().delayIt().by(Duration.ofMillis(100))
         )
-        .onItem().transformToMultiAndConcatenate(Multi::createFrom().iterable);
+        .onItem().transformToMultiAndConcatenate(Multi.createFrom()::iterable);
 }
 ----
 
@@ -1021,7 +1041,7 @@ MicroProfile Fault Tolerance complements reactive messaging by adding `@Retry`, 
 
 === MicroProfile Metrics Integration
 
-When MicroProfile Reactive Messaging 3.0.1 is used in an environment where MicroProfile Metrics is available, implementations automatically produce the following metrics in the `base` scope:
+When MicroProfile Reactive Messaging {reactive-messaging-spec-version} is used in an environment where MicroProfile Metrics is available, implementations automatically produce the following metrics in the `base` scope:
 
 [cols="2,1,1,2"]
 |===
@@ -1098,7 +1118,7 @@ Reliable message processing is ensured through multiple acknowledgment strategie
 
 The specification's seamless integration with other MicroProfile specifications enhances the overall capabilities of reactive messaging applications. MicroProfile Fault Tolerance provides retry, circuit breaker, and timeout patterns for resilience; Config enables externalized configuration for different environments; Metrics supports both automatic and custom observability; Health integrates with Kubernetes for readiness probes; and OpenAPI documents REST endpoints that bridge to messaging systems. The connector ecosystem, supporting Kafka, AMQP, JMS, and other brokers, handles protocol-specific details, serialization, and connection management, freeing applications to focus purely on message processing logic.
 
-To continue your journey with MicroProfile Reactive Messaging, explore the complete https://download.eclipse.org/microprofile/microprofile-reactive-messaging-3.0.1/microprofile-reactive-messaging-spec-3.0.1.html[MicroProfile Reactive Messaging 3.0.1 Specification] for detailed API documentation and conformance requirements. Study connector-specific features for your chosen message broker in your runtime's documentation. Leverage the integration points with other MicroProfile specifications such as Fault Tolerance for resilience, Config for externalization, Metrics for observability, and Health for container orchestration.
+To continue your journey with MicroProfile Reactive Messaging, explore the complete https://download.eclipse.org/microprofile/microprofile-reactive-messaging-{reactive-messaging-spec-version}/microprofile-reactive-messaging-spec-{reactive-messaging-spec-version}.html[MicroProfile Reactive Messaging {reactive-messaging-spec-version} Specification] for detailed API documentation and conformance requirements. Study connector-specific features for your chosen message broker in your runtime's documentation. Leverage the integration points with other MicroProfile specifications such as Fault Tolerance for resilience, Config for externalization, Metrics for observability, and Health for container orchestration.
 
 By mastering these concepts and patterns, you can build modern, reactive microservices that handle high-volume data streams efficiently and reliably in production environments, taking full advantage of the reactive programming model to create responsive, resilient, and scalable distributed systems.
 
