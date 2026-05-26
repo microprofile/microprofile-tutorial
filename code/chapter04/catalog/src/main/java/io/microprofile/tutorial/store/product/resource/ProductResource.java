@@ -5,8 +5,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.callbacks.Callback;
+import org.eclipse.microprofile.openapi.annotations.callbacks.CallbackOperation;
+import org.eclipse.microprofile.openapi.annotations.extensions.Extension;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
@@ -158,5 +162,116 @@ public class ProductResource {
         LOGGER.info("REST: Searching products with criteria");
         List<Product> results = productService.searchProducts(name, description, minPrice, maxPrice);
         return Response.ok(results).build();
+    }
+    
+    // ===== New MicroProfile OpenAPI 4.1 Features Examples =====
+    
+    @GET
+    @Path("/record/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+        summary = "Get product as Java Record", 
+        description = "Returns product data using Java Record (MicroProfile OpenAPI 4.1 feature)",
+        extensions = {
+            @Extension(name = "x-custom-timeout", value = "60"),
+            @Extension(name = "x-rate-limit", value = "100")
+        }
+    )
+    @APIResponse(
+        responseCode = "200", 
+        description = "Product found",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = io.microprofile.tutorial.store.product.entity.ProductRecord.class)
+        )
+    )
+    @APIResponse(responseCode = "404", description = "Product not found")
+    public Response getProductRecord(@PathParam("id") Long id) {
+        LOGGER.info("REST: Fetching product record with id: " + id);
+        Product product = productService.findProductById(id);
+        if (product != null) {
+            var record = io.microprofile.tutorial.store.product.entity.ProductRecord.fromProduct(product);
+            return Response.ok(record).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+    }
+    
+    @GET
+    @Path("/optional/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+        summary = "Get product with Optional fields", 
+        description = "Returns product with Optional<T> fields (MicroProfile OpenAPI 4.1 feature)"
+    )
+    @APIResponse(
+        responseCode = "200", 
+        description = "Product found",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = io.microprofile.tutorial.store.product.entity.ProductWithOptional.class)
+        )
+    )
+    public Response getProductWithOptional(@PathParam("id") Long id) {
+        LOGGER.info("REST: Fetching product with optional fields, id: " + id);
+        Product product = productService.findProductById(id);
+        if (product != null) {
+            var productOptional = io.microprofile.tutorial.store.product.entity.ProductWithOptional.fromProduct(product);
+            return Response.ok(productOptional).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+    }
+    
+    @POST
+    @Path("/async-process")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+        summary = "Process product asynchronously",
+        description = "Initiates async product processing and calls back when complete (MicroProfile OpenAPI 4.1 async feature)"
+    )
+    @Callback(
+        name = "productProcessed",
+        callbackUrlExpression = "{$request.body#/callbackUrl}",
+        operations = {
+            @CallbackOperation(
+                method = "post",
+                summary = "Product processing completed",
+                requestBody = @RequestBody(
+                    description = "Processing result",
+                    content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = io.microprofile.tutorial.store.product.entity.ProcessResult.class)
+                    )
+                )
+            )
+        }
+    )
+    @APIResponse(
+        responseCode = "202",
+        description = "Processing initiated"
+    )
+    @APIResponse(
+        responseCode = "400",
+        description = "Invalid request"
+    )
+    public Response processProductAsync(
+        @RequestBody(
+            description = "Product and callback URL",
+            required = true,
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = io.microprofile.tutorial.store.product.entity.AsyncRequest.class)
+            )
+        ) io.microprofile.tutorial.store.product.entity.AsyncRequest request
+    ) {
+        LOGGER.info("REST: Initiating async product processing");
+        // In a real application, this would trigger async processing
+        // For demo purposes, we'll just return accepted
+        return Response.accepted()
+            .entity("{\"message\": \"Processing initiated\", \"requestId\": \"" + 
+                   java.util.UUID.randomUUID() + "\"}")
+            .build();
     }
 }
