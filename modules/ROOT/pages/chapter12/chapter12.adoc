@@ -339,7 +339,7 @@ Response:
 }
 ----
 
-Most MicroProfile implementations also provide a GraphiQL or GraphQL Playground interface for interactive exploration, typically accessible at `/graphql-ui` or `/graphiql`.
+Most MicroProfile implementations also provide a GraphiQL or GraphQL Playground interface for interactive exploration (think Swagger), typically accessible at `/graphql-ui` or `/graphiql`. You can also use external tools to interactively explore a GraphQL API.
 
 == Annotations for Defining GraphQL Operations and Adding Metadata
 
@@ -585,7 +585,7 @@ public class OrderItem {
 
 === Defining GraphQL Interfaces with @Interface
 
-Use the `@Interface` annotation on a Java interface to define a GraphQL interface type. The MicroProfile GraphQL implementation generates a GraphQL interface in the schema for every class in the application that implements the annotated Java interface:
+Use the `@Interface` annotation on a Java interface to define a GraphQL interface type. The MicroProfile GraphQL implementation generates a GraphQL interface in the schema and a GraphQL type for every class in the application that implements the annotated Java interface:
 
 [source, java]
 ----
@@ -1213,7 +1213,7 @@ NOTE: GraphQL UI should typically be disabled in production environments. Set `i
 
 == Integration with MicroProfile Config
 
-MicroProfile GraphQL integrates with MicroProfile Config, allowing you to externalize configuration for your GraphQL services. This is particularly useful for controlling error message visibility across environmentsfor example, exposing detailed messages in development while suppressing them in production.
+MicroProfile GraphQL integrates with MicroProfile Config, allowing you to externalize configuration for your GraphQL services. This is particularly useful for controlling error message visibility across environments, for example, exposing detailed messages in development while suppressing them in production.
 
 === Configuring Error Message Visibility
 
