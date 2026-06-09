@@ -123,8 +123,16 @@ GET /api/users/123/preferences
 
 Each response returns the fields that the server decided to include, regardless of what the client actually needs. A mobile client paying for bandwidth receives the same bloated payload as a desktop browser, and a dashboard widget that needs only a username and order count still waits for the full user object.
 
-Each request carries its own network overhead, and because they are often sequential. The second request requires the user ID returned by the first, which compounds latency. A slow mobile connection turns three fast server operations into a
-noticeably sluggish screen load. Attempts to fix this by adding bespoke "composite" endpoints (`/api/users/123/full-profile`) reduce round-trips but push the problem elsewhere: the endpoint now over-fetches for clients that need only a subset, and it must be versioned or extended every time a new client has different requirements.
+Each request carries its own network overhead, and because these requests are often sequential, the user ID returned by the first call is needed to construct the second. A slow mobile connection turns three fast server operations into a noticeably sluggish screen load.
+
+The instinctive fix is a composite endpoint:
+
+[source]
+----
+GET /api/users/123/full-profile
+----
+
+This reduces round-trips but relocates the problem elsewhere. The composite endpoint now overfetches for clients that need only a subset of its payload, and it must be versioned, duplicated, or extended every time a new client has different requirements. This quietly accumulates into a collection of purpose-built endpoints that each team is reluctant to remove.
 
 GraphQL resolves both problems by inverting control. The client sends a single query to one endpoint, naming exactly the fields and nested relationships it needs, and the server returns precisely that structure, nothing more or nothing less:
 
@@ -156,7 +164,7 @@ field that no client has queried in months can be deprecated and eventually remo
 [[source-resolver]]
 ==== The `@Source` Resolver: Composing Graphs Across Services
 
-One of the most powerful and often overlooked features of MicroProfile GraphQL is the `@Source` annotation. It allows a field on an existing type to be resolved by a *different* CDI bean than the one that produced the parent object, without the caller being aware of the split.
+The `@Source` annotation allows a field on an existing type to be resolved by a *different* CDI bean than the one that produced the parent object, without the caller being aware of the split.
 
 Consider a `User` type returned by `UserService`. Fetching orders for that user is the responsibility of `OrderService`. Without `@Source`, you would either merge both concerns into a single class or perform a join on the client. With
 `@Source`, you declare a resolver in `OrderService` that accepts a `User` as its source:
