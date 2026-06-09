@@ -36,7 +36,7 @@ GraphQL is a query language for APIs and a runtime for executing those queries a
 
 GraphQL is self-describing: the schema that powers an API also serves as its documentation, enabling powerful developer tooling and making APIs easier to evolve without versioning.
 
-A GraphQL service exposes a strongly typed schema that declares all available types, fields, and operations. Clients construct queries that mirror the shape of the data they need, and the server responds with exactly that structure. This schema-first contract gives both client and server teams a shared, unambiguous definition of the API surface.
+A GraphQL service exposes a strongly typed schema that declares all available types, fields, and operations. Clients construct queries that mirror the shape of the data they need, and the server responds with exactly that structure. This contract gives both client and server teams a shared, unambiguous definition of the API surface.
 
 == MicroProfile GraphQL 2.0
 
