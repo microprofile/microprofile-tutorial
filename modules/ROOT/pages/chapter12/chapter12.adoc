@@ -34,7 +34,7 @@ By the end of this chapter, you will understand how to build a MicroProfile Grap
 
 GraphQL is a query language for APIs and a runtime for executing those queries against a type system you define for your data. It was developed by Facebook in 2012 and open-sourced in 2015. Although it is often perceived as a technology for frontend clients, it is equally well-suited to machine-to-machine communication.  Any consumer who benefits from retrieving exactly the data they need, and nothing more, is a natural fit.
 
-GraphQL is self-describing: the schema that powers an API also serves as its documentation, enabling powerful developer tooling and making APIs easier to evolve without versioning.
+GraphQL is self-describing: the schema that powers an API also serves as its documentation. Similar to OpenAPI and Swagger UI, GraphQL introspection is enabled by default for every endpoint, requiring no additional configuration or annotations.
 
 A GraphQL service exposes a strongly typed schema that declares all available types, fields, and operations. Clients construct queries that mirror the shape of the data they need, and the server responds with exactly that structure. This contract gives both client and server teams a shared, unambiguous definition of the API surface.
 
