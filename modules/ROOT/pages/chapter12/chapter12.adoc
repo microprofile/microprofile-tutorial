@@ -4,7 +4,8 @@
 
 == Introduction
 
-APIs serve diverse clients, including mobile applications, single-page web apps, and third-party services, each with different data requirements. REST APIs either return more data than the client needs (over-fetching) or too little, forcing multiple round-trips to assemble a complete response (under-fetching). GraphQL eliminates both problems by shifting query control to the client, allowing callers to declare exactly the fields and relationships they need in a single request. The service can also see what clients actually use down to the field level, making it safe to remove unused fields or endpoints without guesswork. See <<data-fetching>> for a side-by-side comparison with REST.
+APIs serve diverse clients with unforeseen and evolving use cases, including mobile applications, single-page web apps, and third-party services, each with different data requirements. REST APIs struggle
+to serve this reality: they either return more data than the client needs (over-fetching) or too little, forcing multiple round-trips to assemble a complete response (under-fetching). GraphQL eliminates both problems by shifting query control to the client, allowing callers to declare exactly the fields and relationships they need in a single request. The service can also see what clients actually use down to the field level, making it safe to remove unused fields or endpoints without guesswork. See <<data-fetching>> for a side-by-side comparison with REST.
 
 This chapter explores MicroProfile GraphQL 2.0, a specification that brings GraphQL capabilities to Jakarta EE and MicroProfile applications. MicroProfile GraphQL complements REST by offering a strongly typed, schema-driven alternative that is particularly well suited to complex, relationship-rich domains. It uses an annotation-driven programming model that maps Java classes and methods directly to GraphQL types, queries, and mutations with minimal boilerplate.
 
