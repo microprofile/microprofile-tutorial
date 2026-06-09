@@ -4,9 +4,9 @@
 
 == Introduction
 
-APIs serve diverse clients including mobile applications,single-page web apps, and third-party services, each with different data requirements. REST APIs either return more data than the client needs (over-fetching) or too little, forcing multiple round trips to assemble a complete response (under-fetching). GraphQL eliminates both problems by shifting query control to the client, allowing callers to declare exactly the fields and relationships they need in a single request.
+APIs serve diverse clients, including mobile applications, single-page web apps, and third-party services, each with different data requirements. REST APIs either return more data than the client needs (over-fetching) or too little, forcing multiple round-trips to assemble a complete response (under-fetching). GraphQL eliminates both problems by shifting query control to the client, allowing callers to declare exactly the fields and relationships they need in a single request. The service can also see what clients actually use down to the field level, making it safe to remove unused fields or endpoints without guesswork. See <<data-fetching>> for a side-by-side comparison with REST.
 
-This chapter explores MicroProfile GraphQL 2.0, a specification that brings GraphQL capabilities to Jakarta EE and MicroProfile applications. MicroProfile GraphQL complements REST by offering a strongly typed, schema-driven alternative that is particularly well suited to complex, relationship-rich domains. It uses an annotation-driven programming model, mapping Java classes and methods directly to GraphQL types, queries, and mutations with minimal boilerplate.
+This chapter explores MicroProfile GraphQL 2.0, a specification that brings GraphQL capabilities to Jakarta EE and MicroProfile applications. MicroProfile GraphQL complements REST by offering a strongly typed, schema-driven alternative that is particularly well suited to complex, relationship-rich domains. It uses an annotation-driven programming model that maps Java classes and methods directly to GraphQL types, queries, and mutations with minimal boilerplate.
 
 This chapter extends the Catalog service to manage product reviews. You will implement the following features:
 
@@ -19,7 +19,7 @@ By the end of this chapter, you will understand how to build a MicroProfile Grap
 
 == Topics Covered
 
-- What is GraphQL and key differences from REST
+- What is GraphQL, and the key differences from REST
 - Schema-first and Code-first approaches
 - Project Dependencies (Maven and Gradle)
 - Defining GraphQL service endpoints
@@ -35,7 +35,7 @@ GraphQL is a query language for APIs and a runtime for executing those queries a
 
 GraphQL is self-describing: the schema that powers an API also serves as its documentation, enabling powerful developer tooling and making APIs easier to evolve without versioning.
 
-A GraphQL service exposes a strongly typed schema that declares every type, field, and operation available. Clients construct queries that mirror the shape of the data they need, and the server responds with exactly that structure. This schema-first contract gives both client and server teams a shared, unambiguous definition of the API surface.
+A GraphQL service exposes a strongly typed schema that declares all available types, fields, and operations. Clients construct queries that mirror the shape of the data they need, and the server responds with exactly that structure. This schema-first contract gives both client and server teams a shared, unambiguous definition of the API surface.
 
 == MicroProfile GraphQL 2.0
 
@@ -43,7 +43,7 @@ MicroProfile GraphQL 2.0 is the latest version of the GraphQL specification for 
 
 === Key Components of GraphQL
 
-The GraphQL consists of the following key components:
+GraphQL consists of the following key components:
 
 * *Schema*: Defines the structure of your API, including types, queries, mutations, and subscriptions
 * *Queries*: Read operations that fetch data from the server
@@ -59,7 +59,8 @@ MicroProfile GraphQL 2.0 builds on Jakarta EE 10 to deliver the following capabi
 
 * *Code-First Development*: Define GraphQL schemas using Java annotations on POJOs and methods, eliminating the need to author or maintain a separate schema file
 * *CDI Integration*: Seamless integration with Jakarta Contexts and Dependency Injection for lifecycle management and service injection
-* *Type Safety*: Java's type system drives schema generation, catching structural errors at compile time rather than at runtime
+* *Type Safety*: Java's type system drives schema generation, catching structural errors at compile time rather than at runtime; at the same time, resolvers allow on-demand extension of the schema without modifying the original type
+(see <<source-resolver>>)
 * *Jakarta EE Alignment*: Built on Jakarta EE 10, including CDI 4.0, Bean Validation 3.0, and JSON-B 3.0
 * *Extensibility*: Support for custom scalar types, partial error results, and context propagation across resolver chains
 
@@ -103,10 +104,14 @@ generates the schema automatically. This approach offers several advantages:
 
 Here are some of the key differences between REST and GraphQL:
 
+[[data-fetching]]
 === Data Fetching
 
-*REST*: Multiple endpoints expose fixed data structures, typically requiring separate 
-requests to gather related resources:
+REST APIs expose fixed data structures at discrete endpoints. The server decides what each response contains, and every client receives the same payload regardless of what it actually needs. This rigidity produces two chronic problems.
+
+*Over-fetching* occurs when the server returns more data than the client requires. A mobile screen displaying only a user's name and avatar receives the full user object, including address, account metadata, internal flags, and audit timestamps. As a result, most of these fields are serialized and transmitted in vain, only to be discarded. On constrained networks or battery-limited devices, that waste increases latency, inflates bandwidth costs, and slows rendering.
+
+*Under-fetching* is the exact opposite of the above problem. If a single endpoint does not return sufficient data to satisfy a view, the client must make additional requests to assemble a complete picture. Rendering a user profile with order history and notification preferences would require three separate round-trips:
 
 [source]
 ----
@@ -115,8 +120,12 @@ GET /api/users/123/orders
 GET /api/users/123/preferences
 ----
 
-*GraphQL*: Single endpoint with flexible queries. Clients retrieve all related 
-data in one request by specifying exactly the fields they need:
+Each response returns the fields that the server decided to include, regardless of what the client actually needs. A mobile client paying for bandwidth receives the same bloated payload as a desktop browser, and a dashboard widget that needs only a username and order count still waits for the full user object.
+
+Each request carries its own network overhead, and because they are often sequential. The second request requires the user ID returned by the first, which compounds latency. A slow mobile connection turns three fast server operations into a
+noticeably sluggish screen load. Attempts to fix this by adding bespoke "composite" endpoints (`/api/users/123/full-profile`) reduce round-trips but push the problem elsewhere: the endpoint now over-fetches for clients that need only a subset, and it must be versioned or extended every time a new client has different requirements.
+
+GraphQL resolves both problems by inverting control. The client sends a single query to one endpoint, naming exactly the fields and nested relationships it needs, and the server returns precisely that structure, nothing more or nothing less:
 
 [source, graphql]
 ----
@@ -136,15 +145,47 @@ query {
 }
 ----
 
+A mobile client that needs only `name` and `email` omits the rest. An analytics dashboard that needs `orders { lineItems { sku quantity } }` adds those fields without any server change. Over-fetching and under-fetching can now be prevented on the client side rather than relying solely on rigid server-side constraints.
+
+==== Field-Level Observability
+
+Because every client query passes through the same schema, the GraphQL runtime can record which fields are actually requested in production. This field-level usage data gives the development team concrete evidence for API evolution: a 
+field that no client has queried in months can be deprecated and eventually removed with confidence, replacing the guesswork that typically surrounds REST endpoint cleanup.
+
+[[source-resolver]]
+==== The `@Source` Resolver: Composing Graphs Across Services
+
+One of the most powerful and often overlooked features of MicroProfile GraphQL is the `@Source` annotation. It allows a field on an existing type to be resolved by a *different* CDI bean than the one that produced the parent object, without the caller being aware of the split.
+
+Consider a `User` type returned by `UserService`. Fetching orders for that user is the responsibility of `OrderService`. Without `@Source`, you would either merge both concerns into a single class or perform a join on the client. With
+`@Source`, you declare a resolver in `OrderService` that accepts a `User` as its source:
+
+[source, java]
+----
+@GraphQLApi
+public class OrderService {
+
+    @Query
+    public List<Order> orders(@Source User user) {   // <1>
+        return orderRepository.findByUserId(user.getId());
+    }
+}
+----
+<1> The `@Source` parameter tells MicroProfile GraphQL to invoke this method automatically whenever the `orders` field is requested on a `User`, passing in the parent `User` object already resolved by `UserService`.
+
+From the client's perspective, `orders` is simply a field on `User`. The federation of two independent services is entirely invisible in the schema. This is what makes GraphQL in Java qualitatively different from assembling a REST facade: the graph is composed at the resolver level, server-side, with each service owning the fields it knows about.
+
+When multiple users are queried in a list, MicroProfile GraphQL batches the `@Source` calls, passing a `List<User>` to avoid the N+1 query problem that plagues naïve resolver implementations.
+
 === Versioning
 
 *REST*: API changes typically require new versioned endpoints (for example, `/api/v1/users` and `/api/v2/users`), which can result in maintaining multiple versions simultaneously.
 
-*GraphQL*: The schema evolves without breaking existing queries. New fields and types can be added freely, and deprecated fields can be marked and phased out gradually.
+*GraphQL*: The schema evolves without breaking existing queries. New fields and types can be added freely, and deprecated fields can be marked and gradually phased out.
 
 === Network Efficiency
 
-*REST*: Related resources often require multiple round trips to the server, increasing network overhead.
+*REST*: Related resources often require multiple round-trips to the server, increasing network overhead.
 
 *GraphQL*: All required data is retrieved in a single request, reducing latency and network overhead, a meaningful advantage on constrained mobile networks.
 
@@ -158,7 +199,7 @@ query {
 
 *REST*: HTTP caching is well-established and straightforward to implement at the transport level using standard cache headers.
 
-*GraphQL*: Caching is more complex due to the flexible nature of queries. It is typically implemented at the application level using techniques such as persisted queries or client-side tools such as 
+*GraphQL*: Caching is more complex due to the flexible nature of queries. It is typically implemented at the application level using techniques such as persisted queries or client-side tools, such as 
 link:https://www.apollographql.com/docs/react/caching/overview[Apollo Client's InMemoryCache].
 
 == Project Dependencies
@@ -303,7 +344,7 @@ public class ProductGraphQLApi {
 
 === Publishing APIs Under /graphql Endpoint
 
-All GraphQL operations are automatically published under a single `/graphql` endpoint by the MicroProfile GraphQL implementation. Clients interact with this endpoint using HTTP POST requests containing GraphQL queries.
+All GraphQL operations are automatically published under a single `/graphql` endpoint by the MicroProfile GraphQL implementation. Clients interact with this endpoint via HTTP POST requests that contain GraphQL queries.
 
 Example GraphQL query request:
 
@@ -488,7 +529,7 @@ query {
 }
 ----
 
-=== Returning POJOs, Primitives, Collections and Type Safety with POJOs
+=== Returning POJOs, Primitives, Collections, and Type Safety with POJOs
 
 MicroProfile GraphQL supports returning various types:
 
@@ -547,7 +588,7 @@ public class Product {
 }
 ----
 
-The `@NonNull` annotation indicates that a field cannot be null, which translates to the `!` operator in GraphQL schema:
+The `@NonNull` annotation indicates that a field cannot be null, which translates to the `!` operator in the GraphQL schema:
 
 [source, graphql]
 ----
@@ -884,7 +925,7 @@ public class ProductGraphQLApi {
 
 == Error Handling and Partial Results
 
-GraphQL provides sophisticated error handling capabilities that allow returning partial results even when errors occur.
+GraphQL provides sophisticated error-handling capabilities that allow returning partial results even when errors occur.
 
 === Client Errors
 
