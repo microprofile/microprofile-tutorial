@@ -447,23 +447,51 @@ public class ProductGraphQLApi {
 }
 ----
 
-=== Query Naming and Descriptions - @Name, @Description, @DefaultValue
+=== Query Naming and Descriptions — @Name, @Description, @DefaultValue
 
 Use `@Name` to specify the name of a field or parameter in the GraphQL schema:
 
-[source, java]
+[source,java]
 ----
 import org.eclipse.microprofile.graphql.Name;
 
 @GraphQLApi
 public class ProductGraphQLApi {
-    
+
     @Query("product")
     public Product getProduct(@Name("productId") Long id) {
         return productService.findById(id);
     }
 }
 ----
+
+Without `@Name`, MicroProfile GraphQL falls back to the parameter name as it appears in the compiled bytecode, so `Long id` would surface as `id` in the schema. By default, the compiler does not preserve parameter names in the bytecode.
+To preserve parameter names, you need to pass `-parameters` to the compiler.
+
+** Maven**: 
+[source, xml]
+----
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <configuration>
+        <compilerArgs>
+            <arg>-parameters</arg>
+        </compilerArgs>
+    </configuration>
+</plugin>
+----
+
+*Gradle*:
+
+[source, groovy]
+----
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << '-parameters'
+}
+----
+
+Without the `-parameter` flag, the bytecode retains only positional names (`arg0`, `arg1`, and so on), and every parameter will appear in the schema under those meaningless names. Using `@Name` explicitly is therefore is encouraged for any project where the compiler configuration is not under your direct control, for instance, if you are distributed this code as a library to other teams.
 
 Use `@Description` to add documentation to your schema:
 
@@ -576,6 +604,11 @@ public Set<Long> getProductIds() {
 
 [source, java]
 ----
+// ... 
+import org.eclipse.microprofile.graphql.NonNull;
+import org.eclipse.microprofile.graphql.Type;
+import org.eclipse.microprofile.graphql.Description;
+
 @Type("Product")
 @Description("A product in the catalog")
 public class Product {
