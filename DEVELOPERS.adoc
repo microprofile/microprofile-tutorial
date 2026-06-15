@@ -280,7 +280,7 @@ The MicroProfile Tutorial applications use the following technology stack:
 * **MicroProfile Fault Tolerance** - Resilience patterns
 * **MicroProfile REST Client** - Type-safe REST clients
 * **MicroProfile GraphQL** - GraphQL based calls
-* * **MicroProfile Reactive Messaging** - Event Driven Architecture and Reactive Messaging using Asynchronous calls
+* **MicroProfile Reactive Messaging** - Event Driven Architecture and Reactive Messaging using Asynchronous calls
 
 ### Additional Libraries
 
@@ -312,7 +312,7 @@ When working with the tutorial code, consider these best practices:
 
 ### Configuration
 
-1. **Externalize Configuration**: Use MicroProfile Config for values that might change between environments.
+1. **Externalize Configuration**: Use MicroProfile Config for values that may vary across environments.
 2. **Use Profiles**: Configure different settings for development, testing, and production.
 3. **Document Configuration**: Keep track of required configuration properties.
 
