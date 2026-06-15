@@ -144,7 +144,7 @@ The overall goal of MicroProfile architecture is to provide a lightweight enterp
 
 :figure-caption: Figure 
 .Architecture Philosophy of MicroProfile
-image::figure1-2.png[MicroProfile Architecture Philosophy]
+image::figure1-2-main.png[MicroProfile Architecture Philosophy]
 
 === Benefits of MicroProfile
 MicroProfile offers several benefits, making it a compelling choice for developing microservices, especially in Java-centric environments. These benefits include:
