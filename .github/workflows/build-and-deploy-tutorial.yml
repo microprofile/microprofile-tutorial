@@ -55,20 +55,20 @@ jobs:
       contents: read   # Required to read repository contents
 
     steps:
-      # Checkout the repository source code
+      # Check out the repository source code
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.3
 
       # Set up Node.js runtime environment for Antora
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6.4.0
         with:
-          node-version: '20'  # LTS version compatible with Antora
+          node-version: '24'  # LTS version compatible with Antora
           cache: 'npm'        # Cache npm dependencies for faster builds
 
       # Set up Ruby for AsciiDoc extensions
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.33.5
         with:
           ruby-version: '3.2'
           bundler-cache: false
@@ -152,7 +152,7 @@ jobs:
           fi
   # Main job that builds the Antora documentation and deploys to GitHub Pages
   build-and-deploy:
-    # Only deploy to Pages on pushes to main branch, not on PRs
+    # Only deploy to Pages on pushes to the main branch, not on PRs
     # This prevents deploying from pull request builds
     if: github.event_name != 'pull_request'
 
@@ -177,7 +177,7 @@ jobs:
       pages: write     # Required to deploy artifacts to GitHub Pages
 
     steps: 
-      # Checkout the repository source code
+      # Check out the repository source code
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -277,7 +277,7 @@ jobs:
             echo "⚠️ WARNING: Some configured versions are missing:"
             printf '%s\n' "${MISSING_VERSIONS[@]}"
             echo ""
-            echo "Ensure antora-assembler.yml specifies all versions in branches array:"
+            echo "Ensure antora-assembler.yml specifies all versions in the branches array:"
             echo "  branches: [6.1, v7.1]"
             exit 1
           fi
@@ -307,8 +307,8 @@ jobs:
           echo ""
           echo "✅ Pages setup completed successfully"
           echo "📄 Site will be deployed from ./build/site directory"
-      # Verify PDF generation and copy to correct location for download
-      - name: Verify PDF generation and copy to correct location for download
+      # Verify PDF generation and copy to the correct location for download
+      - name: Verify PDF generation and copy to the correct location for download
         continue-on-error: true
         run: |
           echo "🔍 Looking for generated PDF files..."
@@ -479,12 +479,12 @@ jobs:
 #   Solution: Ensure antora-assembler.yml has correct branches on all branches
 #   
 # Issue: Old version still appears after removal
-#   Solution: Remove from branches array on ALL branches and rebuild
+#   Solution: Remove from the branches array on ALL branches and rebuild
 #   
 # Issue: New version not appearing
 #   Solution: 
 #     1. Add branch name to antora-assembler.yml on all branches
-#     2. Ensure antora.yml on new branch has correct version: X.X
+#     2. Ensure antora.yml on the new branch has the correct version: X.X
 #     3. Create a release or push to trigger the workflow
 #
 # For more information, see CONTRIBUTORS.adoc "Multi-Version Documentation Consistency"
