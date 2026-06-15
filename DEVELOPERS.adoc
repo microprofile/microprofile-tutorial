@@ -10,7 +10,7 @@ toc::[]
 
 ## Overview
 
-The MicroProfile Tutorial includes a comprehensive e-commerce application built with Jakarta EE 10 and MicroProfile 7.1. The application demonstrates real-world usage of MicroProfile features through a multi-service architecture including catalog, inventory, user, payment, and order services.
+The MicroProfile Tutorial includes a comprehensive e-commerce application built with Jakarta EE 10 and MicroProfile 7.1. The application demonstrates real-world use of MicroProfile features through a multi-service architecture that includes catalog, inventory, user, payment, and order services.
 
 ## Code Organization
 
@@ -83,17 +83,17 @@ source "$HOME/.sdkman/bin/sdkman-init.sh"
 # List available Java versions
 sdk list java
 
-# Install JDK 17 (Microsoft build)
-sdk install java 17.0.15-ms
+# Install JDK 21 (Microsoft build)
+sdk install java 21.0.11-ms
 
 # List installed Java versions
 sdk list java | grep -E ".*\s+installed"
 
-# Switch to JDK 17 for the current shell session
-sdk use java 17.0.15-ms
+# Switch to JDK 21 for the current shell session
+sdk use java 21.0.11-ms
 
-# Make JDK 17 the default for all sessions
-sdk default java 17.0.15-ms
+# Make JDK 21 the default for all sessions
+sdk default java 21.0.11-ms
 
 # Verify the current Java version
 java -version
@@ -141,7 +141,7 @@ cd code/chapter03/catalog
 
 ## Building and Running the Code
 
-The tutorial applications use Maven and the Open Liberty Maven plugin for building and running.
+The tutorial uses Maven and the Open Liberty Maven plugin to build and run the application.
 
 ### Building an Application
 
@@ -223,7 +223,7 @@ Edit `src/main/liberty/config/server.xml`:
 
 ### Configuring the Database
 
-Most chapters use Derby embedded database for simplicity. The database configuration is in `src/main/resources/META-INF/persistence.xml`:
+Most chapters use the Derby embedded database for simplicity. The database configuration is in `src/main/resources/META-INF/persistence.xml`:
 
 [source,xml]
 ----
