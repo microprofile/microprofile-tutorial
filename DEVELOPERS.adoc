@@ -167,6 +167,7 @@ mvn liberty:dev
 ----
 
 **Development mode features:**
+
 - Automatically rebuilds and redeploys on code changes
 - Runs tests on demand by pressing Enter
 - Supports hot reload for faster development
@@ -355,6 +356,7 @@ mvn -version
 **Problem**: Application cannot connect to the database.
 
 **Solution**:
+
 - Verify the database configuration in `persistence.xml`
 - Check that Derby is included in dependencies
 - Look for database lock files that might need deletion
