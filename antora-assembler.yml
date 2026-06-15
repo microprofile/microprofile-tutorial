@@ -8,8 +8,9 @@ site:
 content:
   sources:
     - url: https://github.com/microprofile/microprofile-tutorial.git           # Current directory (local content)
-      branches: [6.1, main]                                                   # Pull 6.1 and main (main = 7.1 version)
+      branches: [6.1, main]                                                    # Pull 6.1 and main (main = 7.1 version)
       start_path: /                                                            # Root of the content
+      duplicate-content-in-branches: warn                                      # Allow duplicates across branches with a warning
 
 ui:
   bundle:
