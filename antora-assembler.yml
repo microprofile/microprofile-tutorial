@@ -7,13 +7,13 @@ site:
 
 content:
   sources:
-    - url: https://github.com/ttelang/microprofile-tutorial.git           # Current directory (local content)
+    - url: https://github.com/microprofile/microprofile-tutorial.git           # Current directory (local content)
       branches: [6.1, main]                                                   # Pull 6.1 and main (main = 7.1 version)
       start_path: /                                                            # Root of the content
 
 ui:
   bundle:
-    url: https://github.com/ttelang/microprofile-tutorial-ui/releases/download/latest/ui-bundle.zip
+    url: https://github.com/microprofile/microprofile-tutorial-ui/releases/download/latest/ui-bundle.zip
     snapshot: true
   supplemental_files: ./supplemental-ui
 
