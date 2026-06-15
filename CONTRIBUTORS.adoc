@@ -224,7 +224,7 @@ The `antora.yml` file defines the documentation component:
 ----
 name: microprofile-tutorial
 title: MicroProfile Tutorial
-version: 6.1
+version: 7.1
 edit_url: https://github.com/microprofile/microprofile-tutorial/tree/main/modules/ROOT/pages/{path}
 asciidoc:
   attributes:
