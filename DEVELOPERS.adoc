@@ -258,7 +258,7 @@ The MicroProfile Tutorial applications use the following technology stack:
 ### Core Technologies
 
 * **Jakarta EE 10** - Enterprise Java specifications
-* **MicroProfile 6.1** - Cloud-native microservices specifications
+* **MicroProfile 7.1** - Cloud-native microservices specifications
 * **Maven** - Build and dependency management
 
 ### Jakarta EE APIs Used
