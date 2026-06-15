@@ -179,11 +179,11 @@ To exit development mode, press `Ctrl+C` or type `q` and press Enter.
 Once the server is running, you can access the application endpoints. The default configuration typically uses:
 
 * **Host**: localhost (or your system hostname)
-* **Port**: Varies by service (commonly 5050, 5051, 5052, etc.)
+* **Port**: Varies by service (commonly 9080)
 
 For example, for the catalog service in Chapter 3:
 ```
-http://localhost:5050/catalog/api/products
+http://localhost:9080/catalog/api/products
 ```
 
 Replace `localhost` with your system hostname if accessing from a different machine.
@@ -217,7 +217,7 @@ Edit `src/main/liberty/config/server.xml`:
 ----
 <httpEndpoint id="defaultHttpEndpoint"
               host="*"
-              httpPort="5050"  <!-- Change this port -->
+              httpPort="9080"  <!-- Change this port -->
               httpsPort="9443" />
 ----
 
@@ -326,8 +326,8 @@ When working with the tutorial code, consider these best practices:
 
 **Solution**:
 ```bash
-# Find process using the port (e.g., 5050)
-lsof -i :5050
+# Find process using the port (e.g., 9080)
+lsof -i :9080
 
 # Kill the process
 kill <PID>
@@ -367,7 +367,7 @@ After setting up your development environment and exploring the code:
 1. **Run the Examples**: Start with Chapter 2 and work through each chapter sequentially
 2. **Modify the Code**: Try adding new features or changing existing functionality
 3. **Build Your Own Service**: Create a new microservice using the patterns learned
-4. **Integrate Services**: Practice calling one service from another using REST Client
+4. **Integrate Services**: Practice calling one service from another using the REST Client
 5. **Deploy to Production**: Learn about deploying MicroProfile applications to cloud platforms
 
 ## Additional Resources
