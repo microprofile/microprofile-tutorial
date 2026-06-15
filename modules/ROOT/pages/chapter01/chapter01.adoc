@@ -2,7 +2,7 @@
 
 == Introduction 
 
-This introductory chapter provides a comprehensive overview of the MicroProfile platform, setting the stage for subsequent chapters in this tutorial. It aims to familiarize you with the fundamentals of the MicroProfile platform, its need, and benefits. Finally, we will discuss its place in the broader context of enterprise Java development.
+This introductory chapter provides a comprehensive overview of the MicroProfile platform, setting the stage for subsequent chapters in this tutorial. It aims to familiarize you with the fundamentals of the MicroProfile platform, its need, and its benefits. Finally, we will discuss its place in the broader context of enterprise Java development.
 
 == Topics to be covered:
 - What is MicroProfile
@@ -15,11 +15,11 @@ This introductory chapter provides a comprehensive overview of the MicroProfile 
 
 == What is MicroProfile
 
-link:https://microprofile.io/[MicroProfile] is an open-source specification that enhances enterprise Java technologies for microservices development. It provides a set of APIs and specifications for building modern, scalable, resilient, and efficient microservices-based applications. The primary goal of MicroProfile is to simplify the development for Java developers, enabling them to create applications optimized for cloud-native-development.
+link:https://microprofile.io/[MicroProfile] is an open-source specification that enhances enterprise Java technologies for microservices development. It provides a set of APIs and specifications for building modern, scalable, resilient, and efficient microservices-based applications. The primary goal of MicroProfile is to simplify the development for Java developers, enabling them to create applications optimized for cloud-native development.
 
 MicroProfile was initiated in June 2016 by a collaboration of industry leaders, Java community members, and individual contributors. In the following year, the project was transitioned to the link:https://www.eclipse.org/[Eclipse Foundation] to enhance the project's openness and vendor-neutral stance. Now, MicroProfile has become a key framework for extending Java in the cloud-computing domain, offering a comprehensive suite of APIs tailored for developing microservices in a cloud-native ecosystem.
 
-The *MicroProfile Working Group* currently comprises of the following members: 
+The *MicroProfile Working Group* currently comprises the following members: 
 
 Committer Representative (Year 2024)
 
@@ -47,17 +47,17 @@ This collective effort demonstrates MicroProfile's commitment to evolving Java e
 
 The MicroProfile Specification was developed to address the following requirements:
 
-- *Microservices Architecture Adoption*: The industry shift towards microservices architecture has brought several advantages, including improved flexibility, scalability, and speed of deployment. However, it also introduced several new challenges for developers due to the added complexities. These include ensuring seamless integration between microservices, securing each microservice individually as well as interactions between them, managing performance and efficiency, designing microservices to be fault-tolerant and resilient to failures, ensuring data consistency across services, managing configurations across multiple environments and managing various independently deployable components. To address these challenges, MicroProfile provides a simplified and optimized set of APIs designed to build and deploy Java-based microservices applications.
+- *Microservices Architecture Adoption*: The industry shift towards microservices architecture has brought several advantages, including improved flexibility, scalability, and speed of deployment. However, it also introduced several new challenges for developers due to the added complexities. These include ensuring seamless integration between microservices; securing each microservice and its interactions; managing performance and efficiency; designing microservices to be fault-tolerant and resilient to failures; ensuring data consistency across services; managing configurations across multiple environments; and managing various independently deployable components. To address these challenges, MicroProfile provides a simplified, optimized set of APIs for building and deploying Java-based microservice applications.
 
-- *Limitations of Traditional Enterprise Java*: Traditional enterprise Java frameworks, like Java EE (now Jakarta EE), were often seen as too monolithic and heavyweight for microservices while evolving too slowly. It led to a demand for a more streamlined and microservices-focused framework. MicroProfile fills this gap by providing a lightweight alternative optimized for microservices development.
+- *Limitations of Traditional Enterprise Java*: Traditional enterprise Java frameworks, like Java EE (now Jakarta EE), were often seen as too monolithic and heavyweight for microservices, while evolving too slowly. It led to demand for a more streamlined, microservices-focused framework. MicroProfile fills this gap by providing a lightweight alternative optimized for microservices development.
 
-- *Cloud-Native Application Development*: The rise of cloud-native applications necessitated new features such as external configuration, health checks, and fault tolerance, which existing Java standards did not adequately address. MicroProfile bridges these gaps left, making it easier for developers to create resilient, scalable, and manageable microservices for cloud-native application development using Java.
+- *Cloud-Native Application Development*: The rise of cloud-native applications necessitated new features such as external configuration, health checks, and fault tolerance, which existing Java standards did not adequately address. MicroProfile bridges these gaps, making it easier for developers to create resilient, scalable, and manageable microservices for cloud-native applications.
 
 - *Community-Driven Innovation*: The rapid pace of technological change in microservices necessitated a collaborative platform for innovation. MicroProfile, backed by community and vendor support, promotes rapid evolution to meet these demands.
 
 - *Vendor Neutrality and Interoperability*: There was a need for a framework that could provide standardization across different implementations and environments, ensuring compatibility and avoiding vendor lock-in.
 
-- *Focus on Simplicity and Productivity*: Developers needed a simple, easy-to-understand framework that increased productivity by reducing boilerplate code and focusing on essential microservice functionalities. Well-defined standards and patterns eliminate the need to reinvent the wheel, allowing developers to focus on microservices logic.
+- *Focus on Simplicity and Productivity*: Developers needed a simple, easy-to-understand framework that increased productivity by reducing boilerplate code and focusing on essential microservice functionalities. Well-defined standards and patterns eliminate the need to reinvent the wheel, allowing developers to focus on microservice logic.
 
 - *Support for familiar programming model*: MicroProfile was founded with support for Jakarta JSON Processing, Jakarta JSON Binding, Jakarta RESTful Web Services, and Jakarta Contexts and Dependency Injection (CDI) to define the core programming model and accelerate adoption.
 
@@ -80,7 +80,7 @@ image::https://microprofile.io/wp-content/uploads/2023/10/microprofile_release_6
 
 === MicroProfile Platform Component Specifications
 
-The MicroProfile Platform Specification is the core set of MicroProfile specifications designed to provide the foundational functionalities needed for microservices development. These specifications solve specific microservices challenges, including configuration, fault tolerance, health checks, metrics, and security. The table below provides a list of platform specifications of MicroProfile along with their descriptions:
+The MicroProfile Platform Specification is the core set of MicroProfile specifications that provide the foundational functionality needed for microservices development. These specifications address microservice-specific challenges, including configuration, fault tolerance, health checks, metrics, and security. The table below provides a list of platform specifications of MicroProfile, along with their descriptions:
 
 [options="header"]
 |=======================
@@ -98,12 +98,12 @@ The MicroProfile Platform Specification is the core set of MicroProfile specific
 
 === Standalone (Outside Umbrella) Specifications 
 
-Standalone specifications address more advanced needs that every microservices application may not require. They allow for innovation and experimentation in areas that are evolving or where there’s a need to address niche concerns without burdening the core platform with additional complexity. The table below provides a list of standalone specifications of MicroProfile along with their descriptions:
+Standalone specifications address more advanced needs that every microservices application may not require. They allow for innovation and experimentation in evolving areas or where there’s a need to address niche concerns without burdening the core platform with additional complexity. The table below provides a list of standalone specifications of MicroProfile along with their descriptions:
 
 [options="header"]
 |=======================
 |Specification          |Description
-| link:https://microprofile.io/specifications/microprofile-context-propagation/[Context Propagation] | Defines a way to propagate context between threads and managed executor services. Ensure that the context is consistent during executing asynchronous tasks or across different services.
+| link:https://microprofile.io/specifications/microprofile-context-propagation/[Context Propagation] | Defines a way to propagate context between threads and managed executor services. Ensure that the context is consistent during the execution of asynchronous tasks or across different services.
 | link:https://microprofile.io/specifications/microprofile-graphql/[GraphQL] | Provides a layer on top of Jakarta EE that allows the creation of GraphQL services. This specification makes it easier to build APIs, enabling clients to request exactly the data they need and nothing more.
 | link:https://microprofile.io/specifications/microprofile-lra/[Long Running Actions (LRA)]| Focuses on providing a model for developing services that participate in long-running processes, ensuring consistency and reliability without necessarily locking data.
 | link:https://microprofile.io/specifications/microprofile-reactive-messaging/[Reactive Messaging]| Aims to facilitate building applications that communicate via reactive streams, enabling the development of event-driven, responsive, and resilient microservices.
@@ -128,7 +128,7 @@ Below is the list of MicroProfile Implementations, each offering a platform for 
 
 The overall goal of MicroProfile architecture is to provide a lightweight enterprise-grade framework tailored for building cloud-native applications and enabling developers to build and deploy microservices with Java easily:
 
-- *Simplicity*: MicroProfile APIs are designed to be simple and easy to use. They avoid unnecessary complexity and focus on providing the essential functionality for building microservices.
+- *Simplicity*: MicroProfile APIs are designed to be simple and easy to use. They avoid unnecessary complexity and focus on providing the essential functionality needed to build microservices.
 
 - *Modularity*: Its modular approach allows developers to use only what they need, reducing the overhead typically associated with enterprise frameworks.
 
@@ -155,7 +155,7 @@ MicroProfile offers several benefits, making it a compelling choice for developi
 
 - *Open Source and Standards-Based*: As an open-source framework based on open standards, MicroProfile facilitates interoperability and reduces the risk of vendor lock-in.
 
-- *Enhanced Productivity, Rapid Development and Deployment*: MicroProfile simplifies microservices development with a set of standard APIs. With its focus on simplicity and productivity, MicroProfile helps speed up the development and deployment of microservices by providing essential functionalities and reducing boilerplate code.
+- *Enhanced Productivity, Rapid Development and Deployment*: MicroProfile simplifies microservices development with a set of standard APIs. With its focus on simplicity and productivity, MicroProfile helps accelerate the development and deployment of microservices by providing essential functionality and reducing boilerplate code.
 
 - *Community-Driven Innovation*: Being community-driven, MicroProfile evolves quickly, incorporating new trends and best practices in microservices development. MicroProfile is backed by a strong Java community, ensuring continuous improvement and support.
 
@@ -175,13 +175,13 @@ MicroProfile offers several benefits, making it a compelling choice for developi
 
 == Relationship with Jakarta EE specification
 
-Jakarta EE is an open specification with more than 40 component specifications to address a wide array of needs of enterprise Java development. MicroProfile complements this by providing a baseline platform definition that optimizes enterprise Java for microservices architecture and delivers application portability across multiple compatible runtimes. Many Jakarta EE implementations that target a broad array of applications supplement Jakarta EE with MicroProfile to better support microservices. Their coexistence allows developers to harness the strength of both platforms, thereby facilitating a more versatile and adaptive approach to modern enterprise and cloud-native application development. MicroProfile strategically leverages Java EE developers' existing skill sets, enabling them to transition and adapt to microservices development with minimal learning curve. This ensures that developers can easily design and implement microservices architecture, enhancing productivity and facilitating the creation of cloud-native applications. Later in this tutorial, we will explore how MicroProfile API extends Jakarta EE’s capability to address microservices-specific challenges.
+Jakarta EE is an open specification with more than 40 component specifications to address a wide array of needs of enterprise Java development. MicroProfile complements this by providing a baseline platform definition that optimizes enterprise Java for microservices architecture and delivers application portability across multiple compatible runtimes. Many Jakarta EE implementations that target a broad array of applications supplement Jakarta EE with MicroProfile to better support microservices. Their coexistence allows developers to harness the strength of both platforms, thereby facilitating a more versatile and adaptive approach to modern enterprise and cloud-native application development. MicroProfile strategically leverages Java EE developers' existing skill sets, enabling them to transition to and adapt to microservices development with minimal learning. This ensures that developers can easily design and implement microservices architecture, enhancing productivity and facilitating the creation of cloud-native applications. Later in this tutorial, we will explore how MicroProfile API extends Jakarta EE’s capability to address microservices-specific challenges.
 
 NOTE: MicroProfile and Jakarta EE are complementary technologies. Both platforms enable developers to stay at the forefront of cloud-native application development.
 
 == Conclusion
 
-In this section, we explored the MicroProfile platform in detail, laying the foundation for understanding how it revolutionizes the development of microservices using Java. We started by defining MicroProfile, emphasizing its role as an open-source specification tailored for microservices development. Key contributions from industry leaders and community members have positioned MicroProfile as a pivotal technology in the Java ecosystem, especially for cloud-native application development. We delved into the essential specifications of MicroProfile, each playing a critical role in addressing specific challenges in microservices development, from configuration management to service resilience. As we move forward in this tutorial, we will delve deeper into each specification and discover how to implement MicroProfile in real-world Java applications effectively.
+In this section, we explored the MicroProfile platform in detail, laying the foundation for understanding how it revolutionizes Java-based microservice development. We started by defining MicroProfile, emphasizing its role as an open-source specification tailored for microservices development. Key contributions from industry leaders and community members have positioned MicroProfile as a pivotal technology in the Java ecosystem, especially for cloud-native application development. We delved into the essential specifications of MicroProfile, each playing a critical role in addressing specific challenges in microservices development, from configuration management to service resilience. As we move forward in this tutorial, we will delve deeper into each specification and discover how to effectively implement MicroProfile in real-world Java applications.
 
 [[glossary]]
 == Glossary
@@ -214,13 +214,13 @@ Fault Tolerance:: The ability of a system to continue operating in the event of 
 Vendor Neutrality:: The principle of designing software products and standards not controlled by any single vendor, promoting user interoperability and choice.
 
 [[interoperability]]
-Interoperability:: The ability of a software to exchange and make use of information across different platforms and services.
+Interoperability: The ability of software to exchange and make use of information across different platforms and services.
 
 [[json-p]]
-JSON-P (JSON Processing):: A Jakarta EE (formerly Java EE) API that enables parsing, generating, transforming, and querying JSON data. It facilitates the processing of JSON data within the Java programming environment. Currently it is known as Jakarta JSON Processing.
+JSON-P (JSON Processing):: A Jakarta EE (formerly Java EE) API that enables parsing, generating, transforming, and querying JSON data. It facilitates processing JSON data in the Java programming environment. It is currently known as Jakarta JSON Processing.
 
 [[json-b]]
-JSON-B (JSON Binding):: A Jakarta EE (formerly Java EE) API for binding Java objects to JSON messages and vice versa, streamlining the serialization and deserialization process. It allows custom mappings to handle complex conversion scenarios efficiently. Currently it is known as Jakarta JSON Binding.
+JSON-B (JSON Binding):: A Jakarta EE (formerly Java EE) API for binding Java objects to JSON messages and vice versa, streamlining the serialization and deserialization process. It allows custom mappings to handle complex conversion scenarios efficiently. It is currently known as Jakarta JSON Binding.
 
 [[jax-rs]]
 JAX-RS (Java API for RESTful Web Services):: A Jakarta EE API for creating web services according to the REST architectural pattern in Java, using annotations to simplify development. It enables the easy creation and management of resources via standard HTTP methods. It is currently known as Jakarta RESTful Web Services.
