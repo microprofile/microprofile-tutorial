@@ -12,17 +12,9 @@
     pdfLinks.forEach(link => {
       // Only modify links that contain 'microprofile-tutorial.pdf'
       if (link.href.includes('microprofile-tutorial.pdf')) {
-        // Ensure the link points to the correct absolute path
-        const baseUrl = window.location.origin;
-        const correctPath = baseUrl + '/microprofile-tutorial/6.1/microprofile-tutorial.pdf';
-        link.href = correctPath;
-        // Set a proper download filename
+        // Don't modify the href - let it use the original relative path
+        // Just ensure it has the download attribute with proper filename
         link.setAttribute('download', 'microprofile-tutorial.pdf');
-        // Add click handler for additional debugging
-        link.addEventListener('click', function(e) {
-          console.log('PDF download clicked. URL:', this.href);
-          // Let the default download behavior proceed
-        });
         console.log('PDF download link configured:', link.href);
       }
     });
@@ -31,7 +23,7 @@
 
 <link rel="icon" href="/tutorial/_/img/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="/tutorial/_/img/favicon.png" type="image/png">
-<link rel="shortcut icon" href="/tutorial/_/img/favicon.png" type="image/png";      <!-- Google Tag Manager -->
+<link rel="shortcut icon" href="/tutorial/_/img/favicon.png" type="image/png">      <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
