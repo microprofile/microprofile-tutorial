@@ -124,7 +124,7 @@ Below is the list of MicroProfile Implementations, each offering a platform for 
 
 == Architecture Philosophy 
 
-:imagesdir: ../assets/images
+:imagesdir: ../../images
 
 The overall goal of MicroProfile architecture is to provide a lightweight enterprise-grade framework tailored for building cloud-native applications and enabling developers to build and deploy microservices with Java easily:
 
