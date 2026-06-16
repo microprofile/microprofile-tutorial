@@ -40,10 +40,10 @@ echo "  • Processing delay: 1500ms per attempt"
 echo ""
 
 echo -e  "${CYAN}🔍 How to identify retry behavior:${NC}"
-echo "  • ⚡ Fast (~1.5s) = Success on 1st attempt"
-echo "  • 🔄 Medium (~4s) = Succeeded after 1 retry"
-echo "  • 🔄🔄 Slow (~6.5s) = Succeeded after 2 retries"
-echo "  • 🔄🔄🔄 Very slow (~9-12s) = Needed all 3 retries or fallback"
+echo "  • ⚡ Fast   (~1.5s)    = Success on 1st attempt (1500ms processing)"
+echo "  • 🔄 Medium (~5s)      = Succeeded after 1 retry (1500ms + 1500-2500ms delay + 1500ms)"
+echo "  • 🔄🔄 Slow  (~8.5s)   = Succeeded after 2 retries"
+echo "  • 🔄🔄🔄 Very slow (~12s) = Needed all 3 retries or fallback activated"
 echo ""
 
 # Function to make HTTP requests and display results
@@ -70,19 +70,20 @@ make_request() {
     if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
         if [ "$duration_int" -lt 20 ]; then
             echo -e "${GREEN}✓ Success (HTTP $http_code) - First attempt! ⚡${NC}"
-        elif [ "$duration_int" -lt 55 ]; then
+        elif [ "$duration_int" -lt 65 ]; then
             echo -e "${GREEN}✓ Success (HTTP $http_code) - After 1 retry 🔄${NC}"
-        elif [ "$duration_int" -lt 80 ]; then
+        elif [ "$duration_int" -lt 105 ]; then
             echo -e "${GREEN}✓ Success (HTTP $http_code) - After 2 retries 🔄🔄${NC}"
         else
             echo -e "${GREEN}✓ Success (HTTP $http_code) - After 3 retries or fallback 🔄🔄🔄${NC}"
         fi
         echo -e "${GREEN}Response: $body${NC}"
-    elif [ "$http_code" -eq 400 ]; then
-        echo -e "${YELLOW}⚠ Client Error (HTTP $http_code) - No retries (abort condition)${NC}"
+    elif [ "$http_code" -ge 400 ]; then
+        echo -e "${YELLOW}⚠ Error (HTTP $http_code) - Aborted immediately, no retries fired${NC}"
+        echo -e "${YELLOW}  (CriticalPaymentException aborts the retry chain)${NC}"
         echo -e "${YELLOW}Response: $body${NC}"
     else
-        echo -e "${RED}✗ Server Error (HTTP $http_code)${NC}"
+        echo -e "${RED}✗ Unexpected response (HTTP $http_code)${NC}"
         echo -e "${RED}Response: $body${NC}"
     fi
     
@@ -121,6 +122,28 @@ done
 
 echo -e "${GREEN}=== Retry Test Complete ===${NC}"
 echo ""
-echo -e "${CYAN}Check fault tolerance metrics:${NC}"
-echo -e "${BLUE}curl http://localhost:9080/metrics?scope=base | grep retry${NC}"
+
+# Show MicroProfile Fault Tolerance retry metrics
+echo -e "${BLUE}=== MicroProfile Fault Tolerance Retry Metrics ===${NC}"
+echo -e "${CYAN}Command: curl http://localhost:9080/metrics?scope=base | grep retry${NC}"
+echo ""
+
+metrics=$(curl -s "http://localhost:9080/metrics?scope=base" | grep retry)
+
+if [ -n "$metrics" ]; then
+    echo -e "${GREEN}Retry metrics collected during this test run:${NC}"
+    echo ""
+    echo "$metrics" | while IFS= read -r line; do
+        echo -e "  ${YELLOW}$line${NC}"
+    done
+    echo ""
+    echo -e "${CYAN}Metric key:${NC}"
+    echo "  • ft_retry_calls_total{retried=\"true\"}   — calls that triggered at least one retry"
+    echo "  • ft_retry_calls_total{retried=\"false\"}  — calls that succeeded on the first attempt"
+    echo "  • ft_retry_retries_total                  — total individual retry attempts fired"
+else
+    echo -e "${YELLOW}No retry metrics returned. The server may not have started yet, or no${NC}"
+    echo -e "${YELLOW}requests completed. Try re-running the script after the server is ready.${NC}"
+fi
+
 echo ""

@@ -56,7 +56,7 @@ echo ""
 echo -e "${CYAN}Expected Behavior:${NC}"
 echo -e "${CYAN}  Phase 1 (Retry): Some failures will be retried and eventually succeed${NC}"
 echo -e "${CYAN}  Phase 2 (Circuit Breaker): Circuit will OPEN after 50% failures, then recover${NC}"
-echo -e "${CYAN}  Phase 3 (Bulkhead): Requests queued up to limit, excess rejected${NC}"
+echo -e "${CYAN}  Phase 3 (Bulkhead): Up to 30 concurrent requests accepted, excess triggers @Fallback${NC}"
 echo ""
 
 read -p "Press Enter to start the load test..."
@@ -139,19 +139,15 @@ send_notify_request() {
     body=$(echo "$response" | sed '/HTTP_STATUS:/d')
     
     if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
-        if echo "$body" | grep -q "fallback"; then
-            echo -e "${YELLOW}[NOTIFY-$id] ⚡ Fallback${NC}"
+        if echo "$body" | grep -q "queued for retry"; then
+            echo -e "${YELLOW}[NOTIFY-$id] ⚡ Fallback (bulkhead or timeout)${NC}"
             echo "fallback" > /tmp/notify_result_$id.txt
         else
-            echo -e "${GREEN}[NOTIFY-$id] ✓ Queued${NC}"
+            echo -e "${GREEN}[NOTIFY-$id] ✓ Sent${NC}"
             echo "success" > /tmp/notify_result_$id.txt
         fi
     else
-        if echo "$body" | grep -q "Bulkhead"; then
-            echo -e "${RED}[NOTIFY-$id] ✗ Rejected (Bulkhead)${NC}"
-        else
-            echo -e "${RED}[NOTIFY-$id] ✗ Failed${NC}"
-        fi
+        echo -e "${RED}[NOTIFY-$id] ✗ Failed (HTTP $http_code)${NC}"
         echo "failed" > /tmp/notify_result_$id.txt
     fi
 }

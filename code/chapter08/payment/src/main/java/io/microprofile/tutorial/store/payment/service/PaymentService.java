@@ -153,34 +153,24 @@ public class PaymentService {
     @Timeout(5000)
     @Fallback(fallbackMethod = "fallbackSendNotification")
     public CompletionStage<String> sendPaymentNotification(
-        String paymentId, 
+        String paymentId,
         String recipient
     ) {
-        logger.info("Notification queued for payment: " + paymentId + " to " + recipient);
-        
-        // Schedule actual notification work in background (fire-and-forget)
-        // This allows the HTTP response to return immediately
-        CompletableFuture.runAsync(() -> {
-            try {
-                // Simulate notification sending delay (e.g., calling external SMS/email service)
-                simulateDelay(2000);
-                
-                // Simulate notification failures (80% success rate)
-                if (Math.random() > 0.8) {
-                    logger.warning("Notification service unavailable for payment: " + paymentId);
-                    throw new RuntimeException("Notification service unavailable");
-                }
-                
-                logger.info("Notification sent successfully for payment: " + paymentId);
-            } catch (Exception e) {
-                logger.severe("Failed to send notification for payment: " + paymentId + " - " + e.getMessage());
-            }
-        });
-        
-        // Return immediately - client gets instant response
-        // @Asynchronous annotation ensures this executes on a background thread,
-        // but the CompletionStage itself completes immediately
-        return CompletableFuture.completedFuture("Notification queued for processing");
+        logger.info("Sending notification for payment: " + paymentId + " to " + recipient);
+
+        // Simulate calling an external notification service (SMS/email gateway).
+        // The delay keeps the bulkhead slot occupied so concurrent-load tests
+        // can observe rejection when value + waitingTaskQueue is exceeded.
+        simulateDelay(2000);
+
+        // Simulate notification failures (80% success rate)
+        if (Math.random() > 0.8) {
+            logger.warning("Notification service unavailable for payment: " + paymentId);
+            throw new RuntimeException("Notification service unavailable");
+        }
+
+        logger.info("Notification sent successfully for payment: " + paymentId);
+        return CompletableFuture.completedFuture("Notification sent successfully");
     }
 
     /**

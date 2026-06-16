@@ -37,9 +37,10 @@ echo ""
 echo -e "${YELLOW}Circuit Breaker Configuration:${NC}"
 echo "  • Request Volume Threshold: 4"
 echo "  • Failure Ratio: 0.5 (50%)"
-echo "  • Delay: 5000ms"
-echo "  • Success Threshold: 2"
-echo "  • Simulated failure rate: 50%"
+echo "  • Delay: 5000ms (OPEN → HALF_OPEN wait)"
+echo "  • Success Threshold: 2 (consecutive successes to CLOSE from HALF_OPEN)"
+echo "  • Timeout: 2000ms per health check attempt"
+echo "  • Simulated failure rate: 40% (Math.random() > 0.6, 60% success rate)"
 echo ""
 
 echo -e "${CYAN}🔍 Circuit Breaker States:${NC}"
@@ -60,44 +61,33 @@ read -p "Press Enter to start the circuit breaker test..."
 echo ""
 
 # Function to check circuit breaker state from metrics
+# Shows the raw ft_circuitbreaker_state_total cumulative nanosecond counters.
+# These are cumulative — the counter that is currently growing indicates the active state.
+# Compare values across calls: the one increasing between two readings is the current state.
 check_circuit_state() {
-    # Fetch all metrics
     metrics=$(curl -s "$METRICS_URL" 2>/dev/null)
-    
-    # Try to find circuit breaker state metric (MicroProfile FT uses labels for method name)
-    # Look for ft_circuitbreaker_state_total_nanoseconds with checkGatewayHealth in method label
     state_metrics=$(echo "$metrics" | grep "ft_circuitbreaker_state_total" | grep "checkGatewayHealth")
-    
+
     if [ -z "$state_metrics" ]; then
-        # Check if we can reach the metrics endpoint at all
         if [ -z "$metrics" ]; then
             echo -e "${RED}✗ Unable to reach metrics endpoint${NC}"
             echo -e "${YELLOW}  Make sure the payment service is running on port 9080${NC}"
         else
-            # Metrics endpoint works, but circuit breaker metrics not found
             echo -e "${YELLOW}⚠ Circuit breaker metrics not yet available${NC}"
-            echo -e "${CYAN}  (This is normal if no health check requests have been made yet)${NC}"
+            echo -e "${CYAN}  (Normal before any health check requests have been made)${NC}"
         fi
         return
     fi
-    
-    # Determine current state by checking which state has recent activity
-    # The state with the highest time value is likely the current state
-    closed_time=$(echo "$state_metrics" | grep 'state="closed"' | grep -o '[0-9.E+]*$' || echo "0")
-    open_time=$(echo "$state_metrics" | grep 'state="open"' | grep -o '[0-9.E+]*$' || echo "0")
-    halfopen_time=$(echo "$state_metrics" | grep 'state="halfOpen"' | grep -o '[0-9.E+]*$' || echo "0")
-    
-    # Simple heuristic: Check if open or halfOpen have recent values
-    if echo "$state_metrics" | grep -q 'state="open"' && [ "$open_time" != "0" ]; then
-        # Check if we're in half-open by looking at recent halfOpen time
-        if echo "$state_metrics" | grep -q 'state="halfOpen"' && [ "$halfopen_time" != "0" ]; then
-            echo -e "${YELLOW}Circuit Breaker State: HALF_OPEN (2) - Testing recovery${NC}"
-        else
-            echo -e "${RED}Circuit Breaker State: OPEN (1) - Blocking requests${NC}"
-        fi
-    else
-        echo -e "${GREEN}Circuit Breaker State: CLOSED (0) - Normal operation${NC}"
-    fi
+
+    closed_ns=$(echo "$state_metrics" | grep 'state="closed"'   | grep -o '[0-9.E+]*$' || echo "0")
+    open_ns=$(echo "$state_metrics"   | grep 'state="open"'     | grep -o '[0-9.E+]*$' || echo "0")
+    halfopen_ns=$(echo "$state_metrics" | grep 'state="halfOpen"' | grep -o '[0-9.E+]*$' || echo "0")
+
+    echo -e "${CYAN}  ft_circuitbreaker_state_total (cumulative nanoseconds):${NC}"
+    echo -e "    ${GREEN}CLOSED:    ${closed_ns} ns${NC}"
+    echo -e "    ${RED}OPEN:      ${open_ns} ns${NC}"
+    echo -e "    ${YELLOW}HALF_OPEN: ${halfopen_ns} ns${NC}"
+    echo -e "${CYAN}  The counter currently increasing = the active state${NC}"
 }
 
 # Function to make health check request
@@ -204,11 +194,11 @@ echo ""
 
 # Phase 2: Trigger failures to OPEN the circuit
 echo -e "${BLUE}=== Phase 2: Triggering Circuit Breaker (CLOSED → OPEN) ===${NC}"
-echo -e "${CYAN}Sending requests to trigger failures...${NC}"
-echo -e "${YELLOW}Given 50% failure rate, we expect some failures${NC}"
+echo -e "${CYAN}Sending 10 requests to trigger failures...${NC}"
+echo -e "${YELLOW}Need ≥2 failures in any 4-request sliding window (40% failure rate)${NC}"
 echo ""
 
-for i in {4..10}; do
+for i in {4..13}; do
     make_health_request $i
     sleep 0.3
 done
@@ -221,10 +211,10 @@ echo ""
 
 # Phase 3: Circuit should be OPEN, requests should fail immediately
 echo -e "${BLUE}=== Phase 3: Verify Circuit OPEN (Blocking Requests) ===${NC}"
-echo -e "${CYAN}These requests should fail immediately without hitting the service...${NC}"
+echo -e "${CYAN}These requests should return circuit_open (503) instantly — no 500ms gateway delay${NC}"
 echo ""
 
-for i in {11..13}; do
+for i in {14..16}; do
     make_health_request $i
     sleep 0.5
 done
@@ -259,7 +249,7 @@ echo -e "${CYAN}Circuit should allow probe requests to test recovery...${NC}"
 echo -e "${YELLOW}Need 2 consecutive successes to return to CLOSED${NC}"
 echo ""
 
-for i in {14..18}; do
+for i in {17..21}; do
     make_health_request $i
     sleep 1
     check_circuit_state
