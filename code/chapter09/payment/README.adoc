@@ -607,7 +607,7 @@ or filter by service:
 
 The following screenshot shows the `payment_attempts_total` counter plotted over time, broken down by `result` label (`failed` and `success`):
 
-image::..../images/grafana-prometheus-payment-attempts-metric.png[Grafana Prometheus — payment_attempts_total metric time series by result label,role="related thumb right"]
+image::../images/grafana-prometheus-payment-attempts-metric.png[Grafana Prometheus — payment_attempts_total metric time series by result label,role="related thumb right"]
 
 1. Open Grafana → *Explore* → select *Prometheus* (or use http://localhost:19090 directly)
 2. Query the custom payment counter:
