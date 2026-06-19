@@ -1,0 +1,1386 @@
+= MicroProfile GraphQL
+
+:imagesdir: ../../assets/images
+
+== Introduction
+
+APIs serve diverse clients with unforeseen and evolving use cases, including mobile applications, single-page web apps, and third-party services, each with different data requirements. REST APIs struggle
+to serve this reality: they either return more data than the client needs (over-fetching) or too little, forcing multiple round-trips to assemble a complete response (under-fetching). GraphQL eliminates both problems by shifting query control to the client, allowing callers to declare exactly the fields and relationships they need in a single request. The service can also see what clients actually use down to the field level, making it safe to remove unused fields or endpoints without guesswork. See <<data-fetching>> for a side-by-side comparison with REST.
+
+This chapter explores MicroProfile GraphQL 2.0, a specification that brings GraphQL capabilities to Jakarta EE and MicroProfile applications. MicroProfile GraphQL complements REST by offering a strongly typed, schema-driven alternative that is particularly well suited to complex, relationship-rich domains. It uses an annotation-driven programming model that maps Java classes and methods directly to GraphQL types, queries, and mutations with minimal boilerplate.
+
+This chapter extends the Catalog service to manage product reviews. You will implement the following features:
+
+* Queries that retrieve nested data in a single call
+* Mutations that create and update resources
+* Field resolvers that compute derived values on demand
+* Error handling strategies that surface meaningful feedback to API consumers
+
+By the end of this chapter, you will understand how to build a MicroProfile GraphQL API, when GraphQL is the right choice, and how it differs from REST.
+
+== Topics Covered
+
+- What is GraphQL, and the key differences from REST
+- Schema-first and Code-first approaches
+- Project Dependencies (Maven and Gradle)
+- Defining GraphQL service endpoints
+- Annotations for defining GraphQL operations and metadata
+- Scalar types, enumerations, and GraphQL interfaces
+- Custom Object Mapping and Field Resolution
+- Error Handling and Partial Results
+- Integration with MicroProfile Config
+
+== What is GraphQL?
+
+GraphQL is a query language for APIs and a runtime for executing those queries against a type system you define for your data. It was developed by Facebook in 2012 and open-sourced in 2015. Although it is often perceived as a technology for frontend clients, it is equally well-suited to machine-to-machine communication.  Any consumer who benefits from retrieving exactly the data they need, and nothing more, is a natural fit.
+
+GraphQL is self-describing: the schema that powers an API also serves as its documentation. Similar to OpenAPI and Swagger UI, GraphQL introspection is enabled by default for every endpoint, requiring no additional configuration or annotations.
+
+A GraphQL service exposes a strongly typed schema that declares all available types, fields, and operations. Clients construct queries that mirror the shape of the data they need, and the server responds with exactly that structure. This contract gives both client and server teams a shared, unambiguous definition of the API surface.
+
+== MicroProfile GraphQL 2.0
+
+MicroProfile GraphQL 2.0 is the latest version of the GraphQL specification for Jakarta EE and MicroProfile applications. It builds on the foundation of GraphQL 15 and adds features that enhance developer productivity, schema flexibility, and runtime performance.
+
+=== Key Components of GraphQL
+
+GraphQL consists of the following key components:
+
+* *Schema*: Defines the structure of your API, including types, queries, mutations, and subscriptions
+* *Queries*: Read operations that fetch data from the server
+* *Mutations*: Write operations that modify data on the server
+* *Subscriptions*: Long-lived operations that push real-time updates from server to client
+* *Types*: Define the shape of data objects in your API
+* *Resolvers*: Functions that fetch or compute the value for a specific field in the schema
+* *Introspection*: A built-in mechanism that allows clients to query the schema itself for documentation and tooling purposes
+
+=== Key Features of MicroProfile GraphQL 2.0
+
+MicroProfile GraphQL 2.0 builds on Jakarta EE 10 to deliver the following capabilities for code-first GraphQL development:
+
+* *Code-First Development*: Define GraphQL schemas using Java annotations on POJOs and methods, eliminating the need to author or maintain a separate schema file
+* *CDI Integration*: Seamless integration with Jakarta Contexts and Dependency Injection for lifecycle management and service injection
+* *Type Safety*: Java's type system drives schema generation, catching structural errors at compile time rather than at runtime; at the same time, resolvers allow on-demand extension of the schema without modifying the original type
+(see <<source-resolver>>)
+* *Jakarta EE Alignment*: Built on Jakarta EE 10, including CDI 4.0, Bean Validation 3.0, and JSON-B 3.0
+* *Extensibility*: Support for custom scalar types, partial error results, and context propagation across resolver chains
+
+=== Schema-First Approach
+
+In a schema-first approach, you define your GraphQL schema using the GraphQL Schema Definition Language (SDL) before writing any implementation code. Resolvers are then written to match the agreed schema. This approach works well when:
+
+* Multiple teams need to agree on the API contract before implementation begins
+* The API must be designed independently of any specific backend technology
+
+While MicroProfile GraphQL 2.0 primarily supports code-first development, you can manually create SDL files and ensure your Java implementation matches them.
+
+Although MicroProfile GraphQL 2.0 is oriented toward code-first development, you can adopt a schema-first workflow by authoring SDL files and verifying that your Java implementation matches them. The following example shows a minimal SDL definition for a product catalog:
+
+[source,graphql]
+----
+type Product {
+  id: ID!
+  name: String!
+  price: Float!
+  description: String
+}
+
+type Query {
+  products: [Product]
+  product(id: ID!): Product
+}
+----
+
+=== Code-First Approach
+
+The code-first approach is the primary model of MicroProfile GraphQL 2.0. You define 
+your GraphQL API through annotated Java classes and methods, and the runtime 
+generates the schema automatically. This approach offers several advantages:
+
+* *Less Boilerplate*: No separate schema file to author or keep in sync with implementation
+* *Refactoring Support*: IDE refactoring tools apply uniformly across the API definition and its implementation
+* *Single Source of Truth*: Your annotated Java code defines both the schema structure and the resolver logic.
+
+== Key Differences Between REST and GraphQL
+
+Here are some of the key differences between REST and GraphQL:
+
+[[data-fetching]]
+=== Data Fetching
+
+REST APIs expose fixed data structures at discrete endpoints. The server decides what each response contains, and every client receives the same payload regardless of what it actually needs. This rigidity produces two chronic problems.
+
+*Over-fetching* occurs when the server returns more data than the client requires. A mobile screen displaying only a user's name and avatar receives the full user object, including address, account metadata, internal flags, and audit timestamps. As a result, most of these fields are serialized and transmitted in vain, only to be discarded. On constrained networks or battery-limited devices, that waste increases latency, inflates bandwidth costs, and slows rendering.
+
+*Under-fetching* is the exact opposite of the above problem. If a single endpoint does not return sufficient data to satisfy a view, the client must make additional requests to assemble a complete picture. Rendering a user profile with order history and notification preferences would require three separate round-trips:
+
+[source]
+----
+GET /api/users/123
+GET /api/users/123/orders
+GET /api/users/123/preferences
+----
+
+Each response returns the fields that the server decided to include, regardless of what the client actually needs. A mobile client paying for bandwidth receives the same bloated payload as a desktop browser, and a dashboard widget that needs only a username and order count still waits for the full user object.
+
+Each request carries its own network overhead, and because these requests are often sequential, the user ID returned by the first call is needed to construct the second. A slow mobile connection turns three fast server operations into a noticeably sluggish screen load.
+
+The instinctive fix is a composite endpoint:
+
+[source]
+----
+GET /api/users/123/full-profile
+----
+
+This reduces round-trips but relocates the problem elsewhere. The composite endpoint now overfetches for clients that need only a subset of its payload, and it must be versioned, duplicated, or extended every time a new client has different requirements. This quietly accumulates into a collection of purpose-built endpoints that each team is reluctant to remove.
+
+GraphQL resolves both problems by inverting control. The client sends a single query to one endpoint, naming exactly the fields and nested relationships it needs, and the server returns precisely that structure, nothing more or nothing less:
+
+[source, graphql]
+----
+query {
+  user(id: 123) {
+    name
+    email
+    orders {
+      id
+      total
+    }
+    preferences {
+      theme
+      notifications
+    }
+  }
+}
+----
+
+A mobile client that needs only `name` and `email` omits the rest. An analytics dashboard that needs `orders { lineItems { sku quantity } }` adds those fields without any server change. Over-fetching and under-fetching can now be prevented on the client side rather than relying solely on rigid server-side constraints.
+
+==== Field-Level Observability
+
+Because every client query passes through the same schema, the GraphQL runtime can record which fields are actually requested in production. This field-level usage data gives the development team concrete evidence for API evolution: a 
+field that no client has queried in months can be deprecated and eventually removed with confidence, replacing the guesswork that typically surrounds REST endpoint cleanup.
+
+[[source-resolver]]
+==== The `@Source` Resolver: Composing Graphs Across Services
+
+The `@Source` annotation allows a field on an existing type to be resolved by a *different* CDI bean than the one that produced the parent object, without the caller being aware of the split.
+
+Consider a `User` type returned by `UserService`. Fetching orders for that user is the responsibility of `OrderService`. Without `@Source`, you would either merge both concerns into a single class or perform a join on the client. With
+`@Source`, you declare a resolver in `OrderService` that accepts a `User` as its source:
+
+[source, java]
+----
+@GraphQLApi
+public class OrderService {
+
+    @Query
+    public List<Order> orders(@Source User user) {   // <1>
+        return orderRepository.findByUserId(user.getId());
+    }
+}
+----
+<1> The `@Source` parameter tells MicroProfile GraphQL to invoke this method automatically whenever the `orders` field is requested on a `User`, passing in the parent `User` object already resolved by `UserService`.
+
+From the client's perspective, `orders` is simply a field on `User`. The federation of two independent services is entirely invisible in the schema. This is what makes GraphQL in Java qualitatively different from assembling a REST facade: the graph is composed at the resolver level, server-side, with each service owning the fields it knows about.
+
+When multiple users are queried in a list, MicroProfile GraphQL batches the `@Source` calls, passing a `List<User>` to avoid the N+1 query problem that plagues naïve resolver implementations.
+
+=== Versioning
+
+*REST*: API changes typically require new versioned endpoints (for example, `/api/v1/users` and `/api/v2/users`), which can result in maintaining multiple versions simultaneously.
+
+*GraphQL*: The schema evolves without breaking existing queries. New fields and types can be added freely, and deprecated fields can be marked and gradually phased out.
+
+=== Network Efficiency
+
+*REST*: Related resources often require multiple round-trips to the server, increasing network overhead.
+
+*GraphQL*: All required data is retrieved in a single request, reducing latency and network overhead, a meaningful advantage on constrained mobile networks.
+
+=== Type Safety
+
+*REST*: Type safety depends on documentation and client-side validation. OpenAPI improves this but remains external to the protocol itself.
+
+*GraphQL*: Strong typing is intrinsic to the schema, enabling compile-time validation, auto-completion, and consistent tooling across client and server.
+
+=== Caching
+
+*REST*: HTTP caching is well-established and straightforward to implement at the transport level using standard cache headers.
+
+*GraphQL*: Caching is more complex due to the flexible nature of queries. It is typically implemented at the application level using techniques such as persisted queries or client-side tools, such as 
+link:https://www.apollographql.com/docs/react/caching/overview[Apollo Client's InMemoryCache].
+
+== Project Dependencies
+
+To use MicroProfile GraphQL in your project, you need to add the appropriate dependencies based on your build tool.
+
+=== Maven
+
+Add the following dependency to your `pom.xml`:
+
+[source, xml]
+----
+<dependency>
+    <groupId>org.eclipse.microprofile.graphql</groupId>
+    <artifactId>microprofile-graphql-api</artifactId>
+    <version>2.0</version>
+    <scope>provided</scope>
+</dependency>
+----
+
+The `provided` scope indicates that the implementation is provided by your MicroProfile runtime (such as Open Liberty, Quarkus, or Helidon).
+
+=== Gradle
+
+Add the following dependency to your `build.gradle`:
+
+[source, groovy]
+----
+dependencies {
+    providedCompile 'org.eclipse.microprofile.graphql:microprofile-graphql-api:2.0'
+}
+----
+
+== Defining GraphQL Service Endpoint
+
+MicroProfile GraphQL uses CDI beans marked with the `@GraphQLApi` annotation to expose GraphQL endpoints. All operations are automatically published under the `/graphql` endpoint.
+
+=== Marking CDI Bean as GraphQL Endpoint Using @GraphQLApi
+
+The `@GraphQLApi` annotation marks a CDI bean as a GraphQL endpoint, making its methods available as GraphQL operations:
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.GraphQLApi;
+import org.eclipse.microprofile.graphql.Query;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@GraphQLApi
+@ApplicationScoped
+public class ProductGraphQLApi {
+    
+    @Query("products")
+    public List<Product> getAllProducts() {
+        // Implementation
+        return productService.findAll();
+    }
+}
+----
+
+Key points about `@GraphQLApi`:
+
+* It should be placed on a CDI bean (typically `@ApplicationScoped` or `@RequestScoped`)
+* All public methods become potential GraphQL operations
+* Methods must be annotated with `@Query` or `@Mutation` to be exposed
+* The bean can inject other CDI beans and services
+
+=== GraphQL Entities and API Class
+
+GraphQL entities are typically represented as POJOs (Plain Old Java Objects). The structure of these POJOs defines the GraphQL types in your schema:
+
+[source, java]
+----
+//..
+
+import org.eclipse.microprofile.graphql.Type;
+
+@Type("Product")
+public class Product {
+    private Long id;
+    private String name;
+    private String description;
+    private Double price;
+    private String category;
+    
+    // Constructors
+    public Product() {}
+    
+    public Product(Long id, String name, Double price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+    }
+    
+    // Getters and Setters
+    // ...
+
+}
+----
+
+A complete API class with entity management:
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.GraphQLApi;
+import org.eclipse.microprofile.graphql.Query;
+import org.eclipse.microprofile.graphql.Mutation;
+import org.eclipse.microprofile.graphql.Name;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.util.List;
+
+@GraphQLApi
+@ApplicationScoped
+public class ProductGraphQLApi {
+    
+    @Inject
+    ProductService productService;
+    
+    @Query("products")
+    public List<Product> getAllProducts() {
+        return productService.findAll();
+    }
+    
+    @Query("product")
+    public Product getProduct(@Name("id") Long id) {
+        return productService.findById(id);
+    }
+    
+    @Mutation("createProduct")
+    public Product createProduct(@Name("input") ProductInput input) {
+        return productService.create(input);
+    }
+    
+    @Mutation("updateProduct")
+    public Product updateProduct(@Name("id") Long id, 
+                                @Name("input") ProductInput input) {
+        return productService.update(id, input);
+    }
+}
+----
+
+=== Publishing APIs Under /graphql Endpoint
+
+All GraphQL operations are automatically published under a single `/graphql` endpoint by the MicroProfile GraphQL implementation. Clients interact with this endpoint via HTTP POST requests that contain GraphQL queries.
+
+Example GraphQL query request:
+
+[source, json]
+----
+POST /graphql
+Content-Type: application/json
+
+{
+  "query": "{ products { id name price } }"
+}
+----
+
+Response:
+
+[source, json]
+----
+{
+  "data": {
+    "products": [
+      {
+        "id": "1",
+        "name": "Laptop",
+        "price": 999.99
+      },
+      {
+        "id": "2",
+        "name": "Mouse",
+        "price": 29.99
+      }
+    ]
+  }
+}
+----
+
+Most MicroProfile implementations also provide a GraphiQL or GraphQL Playground interface for interactive exploration (think Swagger), typically accessible at `/graphql-ui` or `/graphiql`. You can also use external tools to interactively explore a GraphQL API.
+
+== Annotations for Defining GraphQL Operations and Adding Metadata
+
+MicroProfile GraphQL provides a rich set of annotations to define operations and add metadata to your GraphQL schema.
+
+=== Defining Read Operations with @Query
+
+The `@Query` annotation marks a method as a GraphQL query operation (read operation):
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.Query;
+
+@GraphQLApi
+public class ProductGraphQLApi {
+    
+    @Query("allProducts")
+    public List<Product> getAllProducts() {
+        return productService.findAll();
+    }
+    
+    @Query("product")
+    public Product getProductById(@Name("id") Long id) {
+        return productService.findById(id);
+    }
+    
+    @Query("searchProducts")
+    public List<Product> searchProducts(@Name("searchTerm") String searchTerm,
+                                       @Name("category") String category) {
+        return productService.search(searchTerm, category);
+    }
+}
+----
+
+=== Defining Write Operations with @Mutation
+
+The `@Mutation` annotation marks a method as a GraphQL mutation operation (write operation):
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.Mutation;
+
+@GraphQLApi
+public class ProductGraphQLApi {
+    
+    @Mutation("createProduct")
+    public Product createProduct(@Name("input") ProductInput input) {
+        return productService.create(input);
+    }
+    
+    @Mutation("deleteProduct")
+    public boolean deleteProduct(@Name("id") Long id) {
+        return productService.delete(id);
+    }
+}
+----
+
+=== Query Naming and Descriptions — @Name, @Description, @DefaultValue
+
+Use `@Name` to specify the name of a field or parameter in the GraphQL schema:
+
+[source,java]
+----
+import org.eclipse.microprofile.graphql.Name;
+
+@GraphQLApi
+public class ProductGraphQLApi {
+
+    @Query("product")
+    public Product getProduct(@Name("productId") Long id) {
+        return productService.findById(id);
+    }
+}
+----
+
+Without `@Name`, MicroProfile GraphQL falls back to the parameter name as it appears in the compiled bytecode, so `Long id` would surface as `id` in the schema. By default, the compiler does not preserve parameter names in the bytecode.
+To preserve parameter names, you need to pass `-parameters` to the compiler.
+
+** Maven**: 
+[source, xml]
+----
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <configuration>
+        <compilerArgs>
+            <arg>-parameters</arg>
+        </compilerArgs>
+    </configuration>
+</plugin>
+----
+
+*Gradle*:
+
+[source, groovy]
+----
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << '-parameters'
+}
+----
+
+Without the `-parameter` flag, the bytecode retains only positional names (`arg0`, `arg1`, and so on), and every parameter will appear in the schema under those meaningless names. Using `@Name` explicitly is therefore is encouraged for any project where the compiler configuration is not under your direct control, for instance, if you are distributed this code as a library to other teams.
+
+Use `@Description` to add documentation to your schema:
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.Description;
+
+@GraphQLApi
+@Description("Product management API")
+public class ProductGraphQLApi {
+    
+    @Query("products")
+    @Description("Retrieves all products from the catalog")
+    public List<Product> getAllProducts() {
+        return productService.findAll();
+    }
+    
+    @Query("product")
+    @Description("Retrieves a single product by its unique identifier")
+    public Product getProduct(
+            @Name("id") 
+            @Description("The unique identifier of the product") 
+            Long id) {
+        return productService.findById(id);
+    }
+}
+----
+
+Use `@DefaultValue` to specify default values for parameters:
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.DefaultValue;
+
+@GraphQLApi
+public class ProductGraphQLApi {
+    
+    @Query("products")
+    public List<Product> getProducts(
+            @Name("limit") 
+            @DefaultValue("10") 
+            int limit,
+            @Name("offset") 
+            @DefaultValue("0") 
+            int offset,
+            @Name("sortBy") 
+            @DefaultValue("name") 
+            String sortBy) {
+        return productService.findAll(limit, offset, sortBy);
+    }
+}
+----
+
+Client query with defaults:
+
+[source, graphql]
+----
+# Uses all default values
+query {
+  products {
+    id
+    name
+  }
+}
+
+# Overrides limit
+query {
+  products(limit: 20) {
+    id
+    name
+  }
+}
+----
+
+=== Returning POJOs, Primitives, Collections, and Type Safety with POJOs
+
+MicroProfile GraphQL supports returning various types:
+
+*Primitives and Wrappers*:
+
+[source, java]
+----
+@Query("productCount")
+public int getProductCount() {
+    return productService.count();
+}
+
+@Query("averagePrice")
+public Double getAveragePrice() {
+    return productService.calculateAveragePrice();
+}
+----
+
+*Collections*:
+
+[source, java]
+----
+@Query("products")
+public List<Product> getProducts() {
+    return productService.findAll();
+}
+
+@Query("productIds")
+public Set<Long> getProductIds() {
+    return productService.getAllIds();
+}
+----
+
+*POJOs with Type Safety*:
+
+[source, java]
+----
+// ... 
+import org.eclipse.microprofile.graphql.NonNull;
+import org.eclipse.microprofile.graphql.Type;
+import org.eclipse.microprofile.graphql.Description;
+
+@Type("Product")
+@Description("A product in the catalog")
+public class Product {
+    
+    @Description("Unique product identifier")
+    private Long id;
+    
+    @Description("Product name")
+    @NonNull
+    private String name;
+    
+    @Description("Product price in USD")
+    private Double price;
+    
+    @Description("Optional product description")
+    private String description;
+    
+    // Getters and setters
+}
+----
+
+The `@NonNull` annotation indicates that a field cannot be null, which translates to the `!` operator in the GraphQL schema:
+
+[source, graphql]
+----
+type Product {
+  id: ID
+  name: String!
+  price: Float
+  description: String
+}
+----
+
+*Complex Nested Types*:
+
+[source, java]
+----
+@Type("Order")
+public class Order {
+    private Long id;
+    private Customer customer;
+    private List<OrderItem> items;
+    private OrderStatus status;
+    
+    // Getters and setters
+}
+
+@Type("OrderItem")
+public class OrderItem {
+    private Product product;
+    private Integer quantity;
+    private Double subtotal;
+    
+    // Getters and setters
+}
+----
+
+=== Defining GraphQL Interfaces with @Interface
+
+Use the `@Interface` annotation on a Java interface to define a GraphQL interface type. The MicroProfile GraphQL implementation generates a GraphQL interface in the schema and a GraphQL type for every class in the application that implements the annotated Java interface:
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.Interface;
+import org.eclipse.microprofile.graphql.Description;
+
+@Interface
+public interface Identifiable {
+    Long getId();
+}
+
+public class Product implements Identifiable {
+    private Long id;
+    private String name;
+
+    @Override
+    @Description("Unique product identifier")
+    public Long getId() { return id; }
+
+    // ...
+}
+
+public class ProductReview implements Identifiable {
+    private Long id;
+    private String comment;
+
+    @Override
+    @Description("Unique review identifier")
+    public Long getId() { return id; }
+
+    // ...
+}
+----
+
+This generates a schema such as:
+
+[source, graphql]
+----
+interface Identifiable {
+  id: BigInteger
+}
+
+type Product implements Identifiable {
+  "Unique product identifier"
+  id: BigInteger
+  # ...
+}
+
+type Review implements Identifiable {
+  "Unique review identifier"
+  id: BigInteger
+  # ...
+}
+----
+
+NOTE: The MicroProfile GraphQL 2.0 specification does not support `@Interface` on input types.
+
+=== Defining Enumerable Types with @Enum
+
+Use the `@Enum` annotation to name an enum type in the generated GraphQL schema. When neither `@Enum` nor `@Name` is present, the implementation uses the Java enum name:
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.Enum;
+import org.eclipse.microprofile.graphql.Type;
+
+@Type("Product")
+public class Product {
+    private String name;
+    private StockStatus stockStatus;
+
+    @Enum("StockStatus")
+    public enum StockStatus {
+        IN_STOCK, LOW_STOCK, OUT_OF_STOCK
+    }
+
+    // getters and setters
+}
+----
+
+This generates the following in the schema:
+
+[source, graphql]
+----
+enum StockStatus {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+}
+
+type Product {
+  name: String
+  stockStatus: StockStatus
+  # ...
+}
+----
+
+The GraphQL runtime returns a validation error when the client sends a value that is not included in the enumerated type.
+
+=== Formatting Scalars with @NumberFormat and @DateFormat
+
+Use the `@NumberFormat` annotation to apply a pattern to number scalar fields. When a format is applied, the formatted result is of type `String` in the GraphQL response:
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.NumberFormat;
+import org.eclipse.microprofile.graphql.DateFormat;
+import org.eclipse.microprofile.graphql.Type;
+
+@Type("Product")
+public class Product {
+
+    @NumberFormat(value = "$ #,##0.00", locale = "en-US")
+    private Double price;
+
+    // getters and setters
+}
+----
+
+Similarly, use `@DateFormat` to control how date scalar fields are serialized:
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.DateFormat;
+import java.time.LocalDate;
+
+@Type("Product")
+public class Product {
+
+    @DateFormat(value = "dd MMM yyyy")
+    private LocalDate releaseDate;
+
+    // getters and setters
+}
+----
+
+Date scalars default to ISO-8601 format when no `@DateFormat` annotation is present. The GraphQL annotation takes precedence over the equivalent JSON-B annotation (`@JsonbNumberFormat` or `@JsonbDateFormat`) when both are present on the same field.
+
+You may also place `@NumberFormat` or `@DateFormat` on a `@Query` or `@Mutation` method to transform the return value:
+
+[source, java]
+----
+@Query
+@DateFormat(value = "dd MMM yyyy")
+public LocalDate getProductReleaseDate(@Name("id") Long id) {
+    return productService.findById(id).getReleaseDate();
+}
+----
+
+=== Excluding Fields with @Ignore
+
+Use the `@Ignore` annotation to prevent a field from appearing in the generated GraphQL schema. The placement of the annotation determines which schema section is affected:
+
+* Placed on the Java field: excludes the field from both the output type and the input type.
+* Placed on the getter method: excludes the field from the output type only.
+* Placed on the setter method: excludes the field from the input type only.
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.Ignore;
+import org.eclipse.microprofile.graphql.Type;
+
+@Type("Product")
+public class Product {
+
+    @Ignore
+    private String internalCode; // excluded from both type and input
+
+    private String name;
+
+    @Ignore
+    public String getAuditLog() { // excluded from output type only
+        return auditLog;
+    }
+
+    // getters and setters
+}
+----
+
+== Custom Object Mapping and Field Resolution
+
+MicroProfile GraphQL provides powerful features for custom field resolution and handling complex data relationships.
+
+=== Using @Source to Resolve Nested Types
+
+The `@Source` annotation allows you to add fields to a type by creating resolver methods. This is particularly useful for fields that require additional processing or data fetching:
+
+[source, java]
+----
+@GraphQLApi
+public class ProductGraphQLApi {
+    
+    @Inject
+    ReviewService reviewService;
+    
+    @Inject
+    InventoryService inventoryService;
+    
+    // Regular query
+    @Query("products")
+    public List<Product> getAllProducts() {
+        return productService.findAll();
+    }
+    
+    // Field resolver - adds 'reviews' field to Product type
+    public List<ProductReview> reviews(@Source Product product) {
+        return reviewService.findByProductId(product.getId());
+    }
+    
+    // Field resolver - adds 'stockLevel' field to Product type
+    public int stockLevel(@Source Product product) {
+        return inventoryService.getStockLevel(product.getId());
+    }
+    
+    // Field resolver with parameters
+    public List<Review> topReviews(@Source Product product,
+                                   @Name("limit") @DefaultValue("5") int limit) {
+        return reviewService.findTopReviewsByProductId(product.getId(), limit);
+    }
+}
+----
+
+This allows clients to query:
+
+[source, graphql]
+----
+{
+  products {
+    id
+    name
+    price
+    reviews { rating comment }
+    topReviews(limit: 2) { rating comment }
+    averageRating
+    priceCategory
+  }
+}
+----
+
+=== Derived/Computed Fields
+
+You can add computed fields directly in your entity classes or through resolver methods:
+
+*In Entity Class*:
+
+[source, java]
+----
+@Type("Product")
+public class Product {
+    private Long id;
+    private String name;
+    private Double price;
+    private Double taxRate;
+    
+    // Regular getters...
+    
+    // Computed field
+    public Double getPriceWithTax() {
+        return price * (1 + taxRate);
+    }
+    
+    // Computed field with logic
+    public String getDisplayName() {
+        return name != null ? name.toUpperCase() : "UNKNOWN";
+    }
+}
+----
+
+*Using Resolver Methods*:
+
+[source, java]
+----
+@GraphQLApi
+public class ProductGraphQLApi {
+    
+    @Inject
+    PricingService pricingService;
+    
+    // Computed field using external service
+    public Double discountedPrice(@Source Product product,
+                                  @Name("discountCode") String discountCode) {
+        return pricingService.calculateDiscountedPrice(
+            product.getPrice(), discountCode);
+    }
+    
+    // Complex computation
+    public String priceCategory(@Source Product product) {
+        Double price = product.getPrice();
+        if (price < 50) return "BUDGET";
+        if (price < 200) return "STANDARD";
+        if (price < 500) return "PREMIUM";
+        return "LUXURY";
+    }
+}
+----
+
+== Error Handling and Partial Results
+
+GraphQL provides sophisticated error-handling capabilities that allow returning partial results even when errors occur.
+
+=== Client Errors
+
+Client errors occur when the client sends invalid queries or arguments. These are automatically handled by the GraphQL runtime:
+
+* *Syntax Errors*: Invalid GraphQL query syntax
+* *Validation Errors*: Query does not match the schema
+* *Variable Errors*: Invalid or missing variables
+
+Example client error response:
+
+[source, json]
+----
+{
+  "errors": [
+    {
+      "message": "Validation error of type FieldUndefined: Field 'invalidField' is undefined @ 'product/invalidField'",
+      "locations": [
+        {
+          "line": 2,
+          "column": 5
+        }
+      ],
+      "extensions": {
+        "classification": "ValidationError"
+      }
+    }
+  ]
+}
+----
+
+=== Server Errors (Unchecked and Checked Exceptions)
+
+*Unchecked Exceptions*:
+
+Runtime exceptions are caught and converted to GraphQL errors:
+
+[source, java]
+----
+@GraphQLApi
+public class ProductGraphQLApi {
+    
+    @Query("product")
+    public Product getProduct(@Name("id") Long id) {
+        Product product = productService.findById(id);
+        if (product == null) {
+            throw new RuntimeException("Product not found: " + id);
+        }
+        return product;
+    }
+}
+----
+
+Response with error:
+
+[source, json]
+----
+{
+  "data": {
+    "product": null
+  },
+  "errors": [
+    {
+      "message": "Product not found: 123",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["product"],
+      "extensions": {
+        "exception": {
+          "className": "java.lang.RuntimeException"
+        }
+      }
+    }
+  ]
+}
+----
+
+*Checked Exceptions*:
+
+You can throw checked exceptions and handle them appropriately:
+
+[source, java]
+----
+public class ProductNotFoundException extends Exception {
+    public ProductNotFoundException(Long id) {
+        super("Product not found: " + id);
+    }
+}
+
+@GraphQLApi
+public class ProductGraphQLApi {
+    
+    @Query("product")
+    public Product getProduct(@Name("id") Long id) 
+            throws ProductNotFoundException {
+        Product product = productService.findById(id);
+        if (product == null) {
+            throw new ProductNotFoundException(id);
+        }
+        return product;
+    }
+}
+----
+
+=== Custom Error Handling with GraphQLException
+
+Create custom exception handlers for better error messages and control.
+
+NOTE: The MicroProfile GraphQL 2.0 API's `GraphQLException` class does not provide a mutable `getExtensions()` method. To include detailed error information, use descriptive error messages in the constructor and store additional data as instance fields.
+
+[source, java]
+----
+import org.eclipse.microprofile.graphql.GraphQLException;
+
+// Custom exception
+public class ProductNotFoundException extends GraphQLException {
+    private final Long productId;
+    
+    public ProductNotFoundException(Long productId) {
+        super(String.format("Product not found: %d", productId), 
+              GraphQLException.ExceptionType.DataFetchingException);
+        this.productId = productId;
+    }
+    
+    public Long getProductId() { return productId; }
+}
+
+// Custom exception with more details
+public class InsufficientStockException extends GraphQLException {
+    private final Long productId;
+    private final int requestedQuantity;
+    private final int availableQuantity;
+    
+    public InsufficientStockException(Long productId, int requested, int available) {
+        super(String.format("Insufficient stock for product %d: requested %d, available %d",
+                          productId, requested, available),
+              GraphQLException.ExceptionType.DataFetchingException);
+        this.productId = productId;
+        this.requestedQuantity = requested;
+        this.availableQuantity = available;
+    }
+    
+    public Long getProductId() { return productId; }
+    public int getRequestedQuantity() { return requestedQuantity; }
+    public int getAvailableQuantity() { return availableQuantity; }
+}
+----
+
+Using custom exceptions:
+
+[source, java]
+----
+@GraphQLApi
+public class ProductGraphQLApi {
+    
+    @Query("product")
+    public Product getProduct(@Name("id") Long id) 
+            throws ProductNotFoundException {
+        Product product = productService.findById(id);
+        if (product == null) {
+            throw new ProductNotFoundException(id);
+        }
+        return product;
+    }
+    
+    @Mutation("orderProduct")
+    public Order orderProduct(@Name("productId") Long productId,
+                             @Name("quantity") int quantity) 
+            throws InsufficientStockException {
+        int available = inventoryService.getStockLevel(productId);
+        if (available < quantity) {
+            throw new InsufficientStockException(productId, quantity, available);
+        }
+        return orderService.createOrder(productId, quantity);
+    }
+}
+----
+
+Custom error response:
+
+[source, json]
+----
+{
+  "data": {
+    "orderProduct": null
+  },
+  "errors": [
+    {
+      "message": "Insufficient stock for product 123: requested 10, available 5",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["orderProduct"],
+      "extensions": {
+        "exception": "io.microprofile.tutorial.graphql.product.exception.InsufficientStockException",
+        "classification": "DataFetchingException",
+        "code": "insufficient-stock"
+      }
+    }
+  ]
+}
+----
+
+=== Partial Results
+
+GraphQL can return partial results when some fields fail but others succeed:
+
+[source, java]
+----
+@GraphQLApi
+public class ProductGraphQLApi {
+    
+    @Query("products")
+    public List<Product> getProducts() {
+        return productService.findAll(); // Success
+    }
+    
+    // This field might fail for individual products
+    public Double specialPrice(@Source Product product) 
+            throws GraphQLException {
+        try {
+            return pricingService.calculateSpecialPrice(product.getId());
+        } catch (Exception e) {
+            throw new GraphQLException("Failed to calculate special price",
+                                     GraphQLException.ExceptionType.DataFetchingException);
+        }
+    }
+}
+----
+
+Query:
+
+[source, graphql]
+----
+query {
+  products {
+    id
+    name
+    price
+    specialPrice
+  }
+}
+----
+
+Partial result response:
+
+[source, json]
+----
+{
+  "data": {
+    "products": [
+      {
+        "id": "1",
+        "name": "Laptop",
+        "price": 999.99,
+        "specialPrice": 899.99
+      },
+      {
+        "id": "2",
+        "name": "Mouse",
+        "price": 29.99,
+        "specialPrice": null
+      }
+    ]
+  },
+  "errors": [
+    {
+      "message": "Failed to calculate special price",
+      "path": ["products", 1, "specialPrice"]
+    }
+  ]
+}
+----
+== GraphQL UI (GraphiQL)
+
+Most MicroProfile GraphQL implementations provide an interactive GraphQL UI for exploring and testing your API.
+
+=== Enabling GraphQL UI on Open Liberty
+
+Add the following variable to your Liberty `server.xml` configuration:
+
+[source, xml]
+----
+<variable name="io.openliberty.enableGraphQLUI" value="true" />
+----
+
+The GraphQL UI is then accessible at:
+
+----
+http://localhost:<port>/<context-root>/graphql-ui
+----
+
+For example:
+
+----
+http://localhost:5060/graphql-catalog/graphql-ui
+----
+
+=== GraphQL UI Features
+
+* *Interactive Query Editor*: Write and execute queries with syntax highlighting
+* *Schema Explorer*: Browse the complete schema with documentation
+* *Auto-Completion*: Get field and argument suggestions as you type
+* *Query History*: Access previously executed queries
+* *Variable Editor*: Test queries with variables
+* *Documentation Panel*: View inline documentation from `@Description` annotations
+
+=== Using GraphQL UI for Development
+
+The GraphQL UI is invaluable during development:
+
+1. Explore the auto-generated schema documentation
+2. Test queries and mutations interactively
+3. Validate field names and argument types
+4. Experiment with fragments, aliases, and variables
+5. Debug error responses
+
+NOTE: GraphQL UI should typically be disabled in production environments. Set `io.openliberty.enableGraphQLUI` to `false` or remove the variable entirely.
+
+== Integration with MicroProfile Config
+
+MicroProfile GraphQL integrates with MicroProfile Config, allowing you to externalize configuration for your GraphQL services. This is particularly useful for controlling error message visibility across environments, for example, exposing detailed messages in development while suppressing them in production.
+
+=== Configuring Error Message Visibility
+
+The following properties control which exception messages are returned to clients:
+
+[source,properties]
+----
+mp.graphql.defaultErrorMessage=An error occurred processing your request
+mp.graphql.hideErrorMessage=java.lang.NullPointerException
+mp.graphql.showErrorMessage=io.microprofile.tutorial.graphql.product.exception.ProductNotFoundException
+----
+
+- `mp.graphql.defaultErrorMessage` defines the generic message returned to clients whenever an exception message is suppressed.
+- `mp.graphql.hideErrorMessage` accepts a comma-separated list of fully qualified exception class names whose messages are replaced with the default error message. By default, all unchecked exceptions (subclasses of `RuntimeException`) have their messages hidden.
+- `mp.graphql.showErrorMessage` accepts a comma-separated list of exception class names whose messages are forwarded to clients as-is. By default, all checked exceptions have their messages shown.
+
+=== Using Config in GraphQL Services
+
+Inject configuration values into your GraphQL API classes:
+
+[source, java]
+----
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.graphql.GraphQLApi;
+import org.eclipse.microprofile.graphql.Query;
+
+import jakarta.inject.Inject;
+
+@GraphQLApi
+public class ProductGraphQLApi {
+    
+    @Inject
+    @ConfigProperty(name = "product.max.results", defaultValue = "100")
+    private Integer maxResults;
+    
+    @Inject
+    @ConfigProperty(name = "product.currency", defaultValue = "USD")
+    private String currency;
+    
+    @Query("products")
+    public List<Product> getAllProducts() {
+        // Use maxResults to limit query results
+        return productService.getProducts(maxResults);
+    }
+}
+----
+
+=== Dynamic Configuration
+
+You can also use dynamic configuration to adjust behavior at runtime:
+
+[source, java]
+----
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.ConfigProvider;
+
+@GraphQLApi
+public class ConfigurableApi {
+    
+    @Query
+    public String getConfigValue(@Name("key") String key) {
+        Config config = ConfigProvider.getConfig();
+        return config.getOptionalValue(key, String.class)
+                     .orElse("Not configured");
+    }
+}
+----
+
+== Summary
+
+In this chapter, you explored MicroProfile GraphQL 2.0, a specification for building flexible and efficient GraphQL APIs in Jakarta EE and MicroProfile environments. The chapter covered:
+
+* The fundamentals of GraphQL and how it differs from REST
+* Setting up MicroProfile GraphQL in your project with Maven or Gradle
+* Defining GraphQL endpoints using `@GraphQLApi` and exposing operations through the `/graphql` endpoint
+* Using annotations like `@Query`, `@Mutation`, `@Name`, `@Description`, and `@DefaultValue` to define and document your API
+* Defining GraphQL interface types with `@Interface`, enumerable types with `@Enum`, and excluding fields with `@Ignore`
+* Formatting scalar values with `@NumberFormat` and `@DateFormat`
+* Implementing custom field resolvers with `@Source` to handle complex data relationships
+* Handling errors with `GraphQLException` and returning partial results
+* Controlling error message visibility with `mp.graphql.showErrorMessage` and `mp.graphql.hideErrorMessage`
+* Using GraphQL UI (GraphiQL) for interactive API development and testing
+* Integrating with MicroProfile Config for externalized configuration
+
+MicroProfile GraphQL 2.0 provides a strong foundation for building modern APIs that give clients the flexibility to request exactly the data they need while maintaining strong typing and a good developer experience.
+
+For detailed information about MicroProfile GraphQL 2.0, refer to the official specification at https://download.eclipse.org/microprofile/microprofile-graphql-2.0/microprofile-graphql-spec-2.0.html[MicroProfile GraphQL 2.0 Specification].
