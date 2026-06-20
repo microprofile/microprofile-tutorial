@@ -1,12 +1,12 @@
 package io.microprofile.tutorial.store.payment.resource;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 
 import io.microprofile.tutorial.store.payment.entity.PaymentDetails;
-import io.microprofile.tutorial.store.payment.exception.CriticalPaymentException;
 import io.microprofile.tutorial.store.payment.exception.PaymentProcessingException;
 import io.microprofile.tutorial.store.payment.service.PaymentService;
 import jakarta.enterprise.context.RequestScoped;
@@ -25,10 +25,6 @@ import java.util.concurrent.CompletionStage;
 @RequestScoped
 @Path("/")
 public class PaymentResource {
-    
-    @Inject
-    @ConfigProperty(name = "payment.gateway.endpoint")
-    private String endpoint;
 
     @Inject
     private PaymentService paymentService;
@@ -38,43 +34,55 @@ public class PaymentResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Process payment", description = "Process payment using the payment gateway API with fault tolerance")
     @APIResponses(value = {
-        @APIResponse(responseCode = "200", description = "Payment processed successfully"),
-        @APIResponse(responseCode = "400", description = "Invalid input data"),
-        @APIResponse(responseCode = "500", description = "Internal server error")
+        @APIResponse(responseCode = "200", description = "Payment processed successfully",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                schema = @Schema(implementation = String.class))),
+        @APIResponse(responseCode = "400", description = "Invalid input data",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                schema = @Schema(implementation = String.class))),
+        @APIResponse(responseCode = "500", description = "Internal server error",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                schema = @Schema(implementation = String.class)))
     })
-    public Response processPayment(@QueryParam("amount") Double amount) 
-        throws PaymentProcessingException, CriticalPaymentException {
-        
-        // Input validation
+    public CompletionStage<Response> processPayment(@QueryParam("amount") Double amount) {
+
         if (amount == null || amount <= 0) {
-            throw new CriticalPaymentException("Invalid payment amount: " + amount);
+            return CompletableFuture.completedFuture(
+                Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"status\":\"error\", \"message\":\"Invalid payment amount: " + amount + "\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build()
+            );
         }
+
+        PaymentDetails paymentDetails = new PaymentDetails(
+            "****-****-****-1111",
+            "Demo User",
+            "12/25",
+            "***",
+            BigDecimal.valueOf(amount)
+        );
+
+        System.out.println("[" + Thread.currentThread().getName() + "] HTTP request received, handing off to managed executor");
 
         try {
-            // Create PaymentDetails using constructor
-            PaymentDetails paymentDetails = new PaymentDetails(
-                "****-****-****-1111", // cardNumber - placeholder for demo
-                "Demo User", // cardHolderName
-                "12/25", // expiryDate
-                "***", // securityCode
-                BigDecimal.valueOf(amount) // amount
-            );
-
-            // Use PaymentService with full fault tolerance features
-            CompletionStage<String> result = paymentService.processPayment(paymentDetails);
-            
-            // Wait for async result (in production, consider different patterns)
-            String paymentResult = result.toCompletableFuture().get();
-            
-            return Response.ok(paymentResult, MediaType.APPLICATION_JSON).build();
-            
+            return paymentService.processPayment(paymentDetails)
+                .thenApply(result -> {
+                    System.out.println("[" + Thread.currentThread().getName() + "] Sending HTTP response for amount: " + amount);
+                    return Response.ok(result, MediaType.APPLICATION_JSON).build();
+                })
+                .exceptionally(e -> {
+                    Throwable cause = e.getCause() != null ? e.getCause() : e;
+                    System.out.println("[" + Thread.currentThread().getName() + "] Error for amount " + amount + ": " + cause.getMessage());
+                    return Response.ok(cause.getMessage(), MediaType.APPLICATION_JSON).build();
+                });
         } catch (PaymentProcessingException e) {
-            // Re-throw to let fault tolerance handle it
-            throw e;
-        } catch (Exception e) {
-            // Handle other exceptions
-            throw new PaymentProcessingException("Payment processing failed: " + e.getMessage());
+            return CompletableFuture.completedFuture(
+                Response.serverError()
+                    .entity("{\"status\":\"error\", \"message\":\"" + e.getMessage() + "\"}")
+                    .type(MediaType.APPLICATION_JSON)
+                    .build()
+            );
         }
     }
-
 }
