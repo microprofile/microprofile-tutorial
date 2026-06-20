@@ -896,16 +896,21 @@ public class ProductService {
 }
 ----
 
-This example demonstrates the use of MicroProfile Fault Tolerance annotations `@Timeout` and `@Fallback` to enhance the resilience of the `ProductService`. When `getProducts()` method is invoked, the application tries to retrieve product data from the database using `productRepository.findAllProducts()`. The `@Timeout(2000)` annotation ensures that this operation completes within 2 seconds. If the query executes successfully within this time, the method returns the product list as expected. However, if the execution time exceeds the timeout limit, a `TimeoutException` is triggered. Additionally, if an exception occurs within the time limit, the method also fails. To handle such failures gracefully, the `@Fallback` annotation specifies `getProductsFromCache()` as an alternative method. When a timeout or exception occurs, the fallback method is invoked, fetching product data from the cache instead of the database. This approach guarantees service availability and ensures a seamless user experience, even in scenarios where the database is slow or temporarily unavailable. For improved scalability and performance, `@Asynchronous` can be combined with `@Timeout` and `@Fallback`. This allows the method to execute in a non-blocking manner, freeing up system resources and enabling parallel processing of multiple requests. By utilizing asynchronous execution, the application can handle high loads efficiently while maintaining fault tolerance.
+This example demonstrates the use of MicroProfile Fault Tolerance annotations `@Timeout` and `@Fallback` to enhance the resilience of the `ProductService`. When `getProducts()` method is invoked, the application tries to retrieve product data from the database using `productRepository.findAllProducts()`. The `@Timeout(2000)` annotation ensures that this operation completes within 2 seconds. If the query executes successfully within this time, the method returns the product list as expected. However, if the execution time exceeds the timeout limit, a `TimeoutException` is triggered. Additionally, if an exception occurs within the time limit, the method also fails. To handle such failures gracefully, the `@Fallback` annotation specifies `getProductsFromCache()` as an alternative method. When a timeout or exception occurs, the fallback method is invoked, fetching product data from the cache instead of the database. This approach guarantees service availability and ensures a seamless user experience, even in scenarios where the database is slow or temporarily unavailable. For improved scalability and performance, `@Asynchronous` should always be combined with `@Timeout` and `@Fallback`. Without `@Asynchronous`, timeout enforcement relies on thread interruption, which is unreliable for blocking operations such as JDBC calls or network I/O — the `TimeoutException` fires, but the underlying thread may continue running. Using `@Asynchronous` ensures the fault tolerance runtime manages execution on a dedicated thread and can cleanly cancel it on expiry. The method return type must be `CompletionStage<T>` or `Future<T>`, and the fallback method must match that signature.
 
 ==== Externalizing `@Timeout` Configuration using MicroProfile Config
 
 To externalize the `@Timeout` configuration using MicroProfile Config, use the standard MicroProfile Config property naming convention. This allows you to modify the timeout value without changing the source code. Annotation parameters are compile-time constants and cannot reference runtime-injected values directly.
 
-* Annotate the method with `@Timeout` using the default or a baseline value:
+* Annotate the method with `@Asynchronous` and `@Timeout` using the default or a baseline value:
+
+NOTE: Always combine `@Timeout` with `@Asynchronous`. Without `@Asynchronous`, timeout enforcement relies on thread interruption, which is unreliable for blocking operations such as JDBC calls or network I/O. The method return type must be `CompletionStage<T>` or `Future<T>`, and the fallback method must match that signature.
 
 [source, java]
 ----
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import org.eclipse.microprofile.faulttolerance.Asynchronous;
 import org.eclipse.microprofile.faulttolerance.Timeout;
 
 @RequestScoped
@@ -917,16 +922,18 @@ public class ProductService {
     @Inject
     private ProductCache productCache;
 
+    @Asynchronous
     @Timeout(2000)
     @Fallback(fallbackMethod = "getProductsFromCache")
-    public List<Product> getProducts() {
-        return productRepository.findAllProducts();
+    public CompletionStage<List<Product>> getProducts() {
+        return CompletableFuture.completedFuture(productRepository.findAllProducts());
     }
 
-    public List<Product> getProductsFromCache() {
-        return productCache.getAll().stream()
+    public CompletionStage<List<Product>> getProductsFromCache() {
+        return CompletableFuture.completedFuture(
+            productCache.getAll().stream()
                 .map(obj -> (Product) obj)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 }
 ----
