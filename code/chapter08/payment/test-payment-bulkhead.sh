@@ -51,7 +51,7 @@ echo -e "${CYAN}Base URL: $BASE_URL${NC}"
 echo ""
 
 # Set up log monitoring
-LOG_FILE="/workspaces/liberty-rest-app/payment/target/liberty/wlp/usr/servers/mpServer/logs/messages.log"
+LOG_FILE="/workspaces/microprofile-tutorial/code/chapter08/payment/target/liberty/wlp/usr/servers/mpServer/logs/messages.log"
 
 # Get initial log position for later analysis
 if [ -f "$LOG_FILE" ]; then
@@ -71,17 +71,18 @@ echo ""
 # ====================================
 echo -e "${BLUE}=== PaymentService Bulkhead Configuration ===${NC}"
 echo -e "${YELLOW}Your PaymentService has these bulkhead settings:${NC}"
-echo -e "${CYAN}• Maximum Concurrent Requests: 5${NC}"
+echo -e "${CYAN}• Maximum Concurrent Threads: 5${NC}"
+echo -e "${CYAN}• Waiting Task Queue: 2${NC}"
+echo -e "${CYAN}• Effective Capacity: 7 (5 running + 2 queued)${NC}"
 echo -e "${CYAN}• Asynchronous Processing: Yes${NC}"
 echo -e "${CYAN}• Retry on failure: Yes (3 retries)${NC}"
 echo -e "${CYAN}• Processing delay: ~1.5 seconds per attempt${NC}"
 echo ""
 
-echo -e "${YELLOW}🔍 WHAT TO EXPECT WITH BULKHEAD:${NC}"
-echo -e "${CYAN}• Only 5 concurrent requests will be processed at a time${NC}"
-echo -e "${CYAN}• Additional requests beyond the limit will be rejected${NC}"
-echo -e "${CYAN}• Rejected requests will receive a 'Bulkhead full' message${NC}"
-echo -e "${CYAN}• Successfully queued requests complete in ~1.5-10 seconds${NC}"
+echo -e "${YELLOW}WHAT TO EXPECT WITH BULKHEAD (10 concurrent requests):${NC}"
+echo -e "${CYAN}• 5 requests processed immediately, 2 queued — 7 total accepted${NC}"
+echo -e "${CYAN}• 3 requests rejected instantly with 'Bulkhead full' status${NC}"
+echo -e "${CYAN}• Accepted requests complete in ~1.5 seconds${NC}"
 echo ""
 
 echo -e "${YELLOW}Make sure the Payment Service is running on port 9080${NC}"
@@ -114,10 +115,10 @@ send_request() {
         if echo "$response" | grep -q "success"; then
             echo -e "${GREEN}[Request $id] SUCCESS: Payment processed in ${duration}s${NC}"
             echo -e "${GREEN}[Request $id] Response: $response${NC}"
-        elif echo "$response" | grep -q "Bulkhead"; then
+        elif echo "$response" | grep -q "rejected"; then
             echo -e "${YELLOW}[Request $id] REJECTED: Bulkhead full (took ${duration}s)${NC}"
             echo -e "${YELLOW}[Request $id] Response: $response${NC}"
-        elif echo "$response" | grep -q "fallback"; then
+        elif echo "$response" | grep -q "failed"; then
             echo -e "${PURPLE}[Request $id] FALLBACK: Service used fallback (took ${duration}s)${NC}"
             echo -e "${PURPLE}[Request $id] Response: $response${NC}"
         else
@@ -169,7 +170,14 @@ for pid in "${pids[@]}"; do
     wait $pid
 done
 
-# Collect results
+# Display results in order (output was suppressed while running in background)
+echo ""
+echo -e "${BLUE}=== Concurrent Request Results ===${NC}"
+for i in {1..10}; do
+    cat /tmp/bulkhead_result_$i.txt
+done
+
+# Count results by grepping the captured output files
 echo ""
 echo -e "${BLUE}=== Results Summary ===${NC}"
 success_count=0
@@ -178,26 +186,21 @@ fallback_count=0
 error_count=0
 
 for i in {1..10}; do
-    result=$(cat /tmp/bulkhead_result_$i.txt)
-    rm /tmp/bulkhead_result_$i.txt
-    results+=($result)
-    
-    # Count results by parsing the output log
-    log_entry=$(grep "\[Request $i\]" /tmp/bulkhead.log 2>/dev/null || echo "")
-    if echo "$log_entry" | grep -q "SUCCESS"; then
+    if grep -q "SUCCESS" /tmp/bulkhead_result_$i.txt 2>/dev/null; then
         success_count=$((success_count + 1))
-    elif echo "$log_entry" | grep -q "REJECTED"; then
+    elif grep -q "REJECTED" /tmp/bulkhead_result_$i.txt 2>/dev/null; then
         rejected_count=$((rejected_count + 1))
-    elif echo "$log_entry" | grep -q "FALLBACK"; then
+    elif grep -q "FALLBACK" /tmp/bulkhead_result_$i.txt 2>/dev/null; then
         fallback_count=$((fallback_count + 1))
     else
         error_count=$((error_count + 1))
     fi
+    rm /tmp/bulkhead_result_$i.txt
 done
 
 echo -e "${CYAN}Successful requests: $success_count${NC}"
-echo -e "${CYAN}Rejected requests: $rejected_count${NC}"
-echo -e "${CYAN}Fallback requests: $fallback_count${NC}"
+echo -e "${CYAN}Rejected requests (bulkhead full): $rejected_count${NC}"
+echo -e "${CYAN}Fallback requests (retries exhausted): $fallback_count${NC}"
 echo -e "${CYAN}Error requests: $error_count${NC}"
 
 # ====================================

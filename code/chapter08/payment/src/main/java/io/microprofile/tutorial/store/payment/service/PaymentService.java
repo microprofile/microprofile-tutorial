@@ -37,11 +37,11 @@ public class PaymentService {
         jitter = 500, 
         retryOn = PaymentProcessingException.class, 
         abortOn = CriticalPaymentException.class)
-    @Fallback(fallbackMethod = "fallbackProcessPayment")
-    @Bulkhead(value=5)
+    @Fallback(PaymentFallbackHandler.class)
+    @Bulkhead(value = 5, waitingTaskQueue = 2)
     @CircuitBreaker(
-        failureRatio = 0.5,
-        requestVolumeThreshold = 4,
+        failureRatio = 0.75,
+        requestVolumeThreshold = 10,
         delay = 3000
     )
     public CompletionStage<String> processPayment(PaymentDetails paymentDetails) throws PaymentProcessingException {
