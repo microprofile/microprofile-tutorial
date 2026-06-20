@@ -7,7 +7,7 @@
 
 toc::[]
 
-This microservice demonstrates MicroProfile Telemetry 2.1 integrated with the LGTM observability stack (Loki, Grafana, Tempo, Prometheus) via an OpenTelemetry Collector. It is part of the Chapter 09 MicroProfile tutorial.
+This microservice demonstrates MicroProfile Telemetry 2.1 integrated with the LGTM observability stack (Loki, Grafana, Tempo, Mimir/Prometheus) via an OpenTelemetry Collector. It is part of the Chapter 09 MicroProfile tutorial.
 
 The service processes payments with full fault tolerance (retry, fallback, circuit breaker, bulkhead, timeout) and exports **traces**, **metrics**, and **logs** over OTLP to the LGTM stack.
 
@@ -530,25 +530,9 @@ Run the following to exercise all telemetry paths:
 curl -s -X POST "http://localhost:9080/payment/authorize?amount=75.50"
 
 # 2. Full payment with card details (creates payment.process span)
-curl -s -X POST "http://localhost:9080/payment/payments" \
+curl -s -X POST "http://localhost:9080/payment/api/payments-config/process-example" \
   -H "Content-Type: application/json" \
   -d '{"cardNumber":"4111111111111111","cardHolderName":"Test User","expiryDate":"12/25","securityCode":"123","amount":99.99}'
-
-# 3. Verification flow (validation → fraud check → funds check sub-spans)
-curl -s -X POST "http://localhost:9080/payment/verify" \
-  -H "Content-Type: application/json" \
-  -d '{"cardNumber":"4111111111111111","cardHolderName":"Test User","expiryDate":"12/25","securityCode":"123","amount":150.00}'
-
-# 4. Trigger fraud check failure (card ending 0000)
-curl -s -X POST "http://localhost:9080/payment/verify" \
-  -H "Content-Type: application/json" \
-  -d '{"cardNumber":"4111111110000","cardHolderName":"Test User","expiryDate":"12/25","securityCode":"123","amount":50.00}'
-
-# 5. Gateway health check (circuit breaker path)
-curl -s "http://localhost:9080/payment/health/gateway"
-
-# 6. Async notification
-curl -s -X POST "http://localhost:9080/payment/notify/PAY-12345?recipient=ops@example.com"
 ----
 
 Run each command several times to produce enough data for Grafana to display.
@@ -564,7 +548,7 @@ Run each command several times to produce enough data for Grafana to display.
 
 You should see recent traces. Click any trace to expand the span tree. Look for:
 
-* Root HTTP span: `POST /payment/payments` or `POST /payment/verify`
+* Root HTTP span: `POST /payment/api`
 * Child span: `payment.process` with attributes `payment.amount`, `payment.method`, `payment.status`
 * For the verify flow: `validatePaymentDetails`, `performFraudCheck`, `verifyFundsAvailability`, `recordTransaction` steps appear as log events on the span
 
