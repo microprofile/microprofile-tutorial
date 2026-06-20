@@ -21,7 +21,7 @@ We will instrument our payment microservice with MicroProfile Telemetry, exporti
 ** Automatic and Manual Instrumentation
 * Tools for Trace Analysis
 * Setting Up the Observability Stack
-* Types of Telemetry
+* Types of Instrumentation
 * Agent Instrumentation
 * Analyzing Traces
 * Security Considerations for Tracing
@@ -53,7 +53,7 @@ MicroProfile Telemetry 2.1 provides a standardized set of CDI-injectable APIs co
 |Record structured application log events correlated with traces
 |===
 
-Because MicroProfile Telemetry is vendor-neutral, you can switch between observability backends (Jaeger, Grafana Tempo, Zipkin, commercial APM tools) without changing application code.
+Because MicroProfile Telemetry is vendor-neutral, you can switch between observability backends such as Grafana Cloud, the LGTM stack (Loki, Grafana, Tempo, Mimir), Datadog, or Honeycomb etc, without changing application code.
 
 == Tracing Concepts
 
@@ -246,7 +246,7 @@ public CompletionStage<String> processPayment(PaymentDetails paymentDetails)
 <6> `recordException` captures the exception stack trace inside the span for trace-based debugging.
 <7> Always end the span in `finally` to guarantee trace completeness even on exceptions.
 
-== Types of Telemetry
+== Types of Instrumentation
 
 MicroProfile Telemetry supports three approaches to instrumentation.
 
