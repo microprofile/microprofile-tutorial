@@ -10,18 +10,18 @@ This section aims to help you make informed decisions about which MicroProfile m
 
 If you're beginning a new MicroProfile-based project and are unsure which specifications you will need, starting with the entire MicroProfile dependency can give you immediate access to the full suite of MicroProfile APIs. This approach allows you to explore and experiment with different specifications without modifying your pom.xml to add or remove dependencies frequently.
 
-For projects that aim to leverage a wide range of MicroProfile specifications, including advanced features like telemetry, metrics, and fault tolerance, including the entire MicroProfile 6.1 dependency ensures that you have all the necessary APIs at your disposal. This approach simplifies dependency management, especially for complex applications.
+For projects that aim to leverage a wide range of MicroProfile specifications, including advanced features like telemetry, metrics, and fault tolerance, including the entire MicroProfile dependency ensures that you have all the necessary APIs at your disposal. This approach simplifies dependency management, especially for complex applications.
 
 *Maven*
 
 [source, xml]
 ----
 
-<!-- MicroProfile 6.1 API -->
+<!-- MicroProfile 7.1 API -->
 <dependency>
     <groupId>org.eclipse.microprofile</groupId>
     <artifactId>microprofile</artifactId>
-    <version>6.1</version>
+    <version>7.1</version>
     <type>pom</type>
     <scope>provided</scope>
 </dependency>
@@ -31,7 +31,7 @@ For projects that aim to leverage a wide range of MicroProfile specifications, i
 [source, xml]
 ----
 dependencies {
- compileOnly 'org.eclipse.microprofile:microprofile:6.1'
+ compileOnly 'org.eclipse.microprofile:microprofile:7.1'
 }
 ----
 
@@ -81,7 +81,7 @@ The list below is provided to help you select the appropriate modules for your M
 <dependency>
   <groupId>org.eclipse.microprofile.metrics</groupId>
   <artifactId>microprofile-metrics-api</artifactId>
-  <version>5.1.0</version>
+  <version>5.1.1</version>
 </dependency>
 ----
 
@@ -93,7 +93,7 @@ The list below is provided to help you select the appropriate modules for your M
 <dependency>
   <groupId>org.eclipse.microprofile.fault-tolerance</groupId>
   <artifactId>microprofile-fault-tolerance-api</artifactId>
-  <version>4.0.2</version>
+  <version>4.1.1</version>
 </dependency>
 ----
 
@@ -102,9 +102,10 @@ The list below is provided to help you select the appropriate modules for your M
 [source, xml]
 ----
 <dependency>
-  <groupId>org.eclipse.microprofile.jwt</groupId>
-  <artifactId>microprofile-jwt-auth-api</artifactId>
-  <version>2.1</version>
+    <groupId>org.eclipse.microprofile.jwt</groupId>
+    <artifactId>microprofile-jwt-auth-api</artifactId>
+    <version>2.1</version>
+    <scope>provided</scope>
 </dependency>
 ----
 
@@ -118,7 +119,8 @@ The list below is provided to help you select the appropriate modules for your M
 <dependency>
   <groupId>org.eclipse.microprofile.openapi</groupId>
   <artifactId>microprofile-openapi-api</artifactId>
-  <version>3.1.1</version>
+  <version>4.1</version>
+  <scope>provided</scope>
 </dependency>
 ----
 
@@ -129,9 +131,10 @@ The list below is provided to help you select the appropriate modules for your M
 [source, xml]
 ----
 <dependency>
-  <groupId>org.eclipse.microprofile.rest.client</groupId>
-  <artifactId>microprofile-rest-client-api</artifactId>
-  <version>3.0</version>
+    <groupId>org.eclipse.microprofile.rest.client</groupId>
+    <artifactId>microprofile-rest-client-api</artifactId>
+    <version>4.0</version>
+    <scope>provided</scope> <!-- Use 'provided' when deploying to Jakarta EE/MicroProfile runtimes -->
 </dependency>
 ----
 
@@ -141,26 +144,17 @@ The list below is provided to help you select the appropriate modules for your M
 
 [source, xml]
 ----
-<project>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.opentelemetry</groupId>
-        <artifactId>opentelemetry-bom</artifactId>
-        <version>1.29.0</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  <dependencies>
-    <dependency>
-      <groupId>io.opentelemetry</groupId>
-      <artifactId>opentelemetry-api</artifactId>
-    </dependency>
-  </dependencies>
-</project>
+<!-- MicroProfile Telemetry 2.1 API -->
+<dependency>
+    <groupId>org.eclipse.microprofile.telemetry</groupId>
+    <artifactId>microprofile-telemetry-api</artifactId>
+    <version>2.1</version>
+    <type>pom</type>
+    <scope>provided</scope>
+</dependency>
 ----
+
+NOTE: The `microprofile-telemetry-api` artifact is an aggregator POM that transitively pulls in `opentelemetry-api`, `opentelemetry-instrumentation-annotations`, and `opentelemetry-semconv`. The `<type>pom</type>` element is required so Maven resolves it correctly instead of looking for a JAR.
 
 * *Jakarta EE Core Profile* dependency provides the API set included in the Jakarta EE 10 Core Profile, which is optimized for developing microservices and cloud-native Java applications with a reduced set of specifications for a lighter runtime footprint.
 
