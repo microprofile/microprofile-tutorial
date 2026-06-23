@@ -76,12 +76,7 @@ mvn clean package
 
 == Running the Application
 
-To run the application using Liberty Maven plugin:
-
-[source,bash]
-----
-mvn liberty:dev
-----
+You can run the application using Liberty Maven plugin.
 
 === Run with Liberty server.xml
 
