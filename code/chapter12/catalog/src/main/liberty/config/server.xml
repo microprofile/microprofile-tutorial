@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="MicroProfile GraphQL Catalog Service Server">
+
+    <featureManager>
+        <platform>microProfile-7.1</platform>
+        <platform>jakartaEE-10.0</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>mpConfig</feature>
+        <feature>mpGraphQL-2.0</feature>
+    </featureManager>
+
+    <httpEndpoint id="defaultHttpEndpoint" host="*"
+                  httpPort="${default.http.port}" httpsPort="${default.https.port}" />
+
+     <variable name="io.openliberty.enableGraphQLUI" value="true" />
+
+    <webApplication location="graphql-catalog.war" contextRoot="${app.context.root}" />
+</server>

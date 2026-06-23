@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GraphiQL - Catalog API</title>
+  <style>
+    body { height: 100%; margin: 0; width: 100%; overflow: hidden; }
+    #graphiql { height: 100vh; }
+  </style>
+  <script src="vendor/react.min.js"></script>
+  <script src="vendor/react-dom.min.js"></script>
+  <link rel="stylesheet" href="vendor/graphiql.min.css" />
+  <script src="vendor/graphiql.min.js"></script>
+</head>
+<body>
+  <div id="graphiql">Loading...</div>
+  <script>
+    ReactDOM.createRoot(document.getElementById('graphiql')).render(
+      React.createElement(GraphiQL, {
+        fetcher: GraphiQL.createFetcher({ url: 'graphql' }),
+        defaultEditorToolsVisibility: true,
+      })
+    );
+  </script>
+</body>
+</html>

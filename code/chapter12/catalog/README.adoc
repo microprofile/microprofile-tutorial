@@ -76,7 +76,12 @@ mvn clean package
 
 == Running the Application
 
-You can run the application using Liberty Maven plugin.
+To run the application using Liberty Maven plugin:
+
+[source,bash]
+----
+mvn liberty:dev
+----
 
 === Run with Liberty server.xml
 
@@ -114,17 +119,22 @@ http://localhost:5060/graphql-catalog/graphql
 
 === GraphQL UI (GraphiQL)
 
-To enable the built-in GraphQL UI on Open Liberty, add the following variable to `src/main/liberty/config/server.xml`:
-
-[source,xml]
-----
-<variable name="io.openliberty.enableGraphQLUI" value="true" />
-----
-
-Once enabled, the UI is accessible at:
+A modern GraphiQL interface is included in the application and is accessible at:
 
 ----
-http://localhost:5060/graphql-catalog/graphql-ui
+http://localhost:5060/graphql-catalog/graphql-ui.html
+----
+
+This page uses React 18 and GraphiQL 3 loaded from `unpkg.com` and works in both local and GitHub Codespaces environments.
+
+NOTE: Open Liberty also has a built-in GraphQL UI endpoint at `/graphql-catalog/graphql-ui` (enabled via `io.openliberty.enableGraphQLUI` in `server.xml`), but it has a known issue where the browser displays raw HTML source instead of rendering the UI due to a missing `Content-Type: text/html` header in the Liberty-bundled servlet. Use the `/graphql-catalog/graphql-ui.html` path above instead.
+
+==== GraphQL UI in GitHub Codespaces
+
+Port 5060 is pre-configured in the devcontainer as a public forwarded port. In the VS Code *Ports* tab, find port 5060 and open the forwarded address, then append `/graphql-catalog/graphql-ui.html`:
+
+----
+https://<codespace-name>-5060.app.github.dev/graphql-catalog/graphql-ui.html
 ----
 
 == Example GraphQL Queries
@@ -418,11 +428,13 @@ Variables decouple query logic from runtime values. This is the recommended patt
 
 === Query with Variables
 
-Declares the product ID as a typed variable (`$productId: ID!`) in the operation signature. The variable value is supplied separately in the variables map, keeping the query document static.
+Declares the product ID as a typed variable (`$productId: BigInteger!`) in the operation signature. The variable value is supplied separately in the variables map, keeping the query document static.
+
+NOTE: The `id` argument maps to a Java `Long`, which SmallRye GraphQL (the MicroProfile GraphQL runtime) exposes as the `BigInteger` scalar — not `Int` or `ID`. Using any other type causes a validation error.
 
 [source,graphql]
 ----
-query GetProduct($productId: ID!) {
+query GetProduct($productId: BigInteger!) {
   product(id: $productId) {
     id
     name
@@ -439,7 +451,7 @@ Variables:
 [source,json]
 ----
 {
-  "productId": "1"
+  "productId": 1
 }
 ----
 
