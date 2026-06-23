@@ -1,0 +1,783 @@
+= MicroProfile GraphQL Catalog Service
+:toc: macro
+:toclevels: 3
+:icons: font
+:source-highlighter: highlight.js
+:experimental:
+
+toc::[]
+
+== Overview
+
+This MicroProfile GraphQL Catalog Service provides a production-ready GraphQL API for product catalog management as per MicroProfile GraphQL 2.0 specification.
+
+Key features demonstrated:
+
+* GraphQL queries and mutations for data retrieval and modification
+* Field resolvers using `@Source` for on-demand relationship resolution
+* Computed fields for derived data (tax calculations, price categories, stock status)
+* Custom error handling with GraphQL-compliant responses
+* MicroProfile Config integration for externalized configuration
+
+== MicroProfile Features Implemented
+
+=== MicroProfile GraphQL 2.0
+
+The application exposes a GraphQL API at `/graphql` with the following capabilities:
+
+==== Queries
+
+* `products` - Retrieve all products
+* `product(id)` - Get a specific product by ID
+* `searchProducts(searchTerm, category)` - Search products
+* `productCount` - Get total number of products
+* `averagePrice` - Get average product price
+* `categories` - Get all categories
+
+==== Mutations
+
+* `createProduct(input)` - Create a new product
+* `updateProduct(id, input)` - Update an existing product
+* `deleteProduct(id)` - Delete a product
+
+==== Field Resolvers
+
+* `reviews` - Get reviews for a product
+* `topReviews(limit)` - Get top reviews with a limit
+* `averageRating` - Computed average rating
+* `priceCategory` - Computed price category
+* `priceWithTax` - Computed price including tax
+* `availabilityStatus` - Computed stock status
+
+=== MicroProfile Config
+
+Configuration is externalized using MicroProfile Config:
+
+[source,properties]
+----
+product.max.results=100
+product.currency=USD
+mp.graphql.defaultErrorMessage=An error occurred processing your request
+----
+
+== Prerequisites
+
+* Java 21 or later
+* Maven 3.13 or later
+
+== Building the Application
+
+To build the application:
+
+[source,bash]
+----
+mvn clean package
+----
+
+== Running the Application
+
+Run the application using Liberty Maven plugin.
+
+=== Run with Liberty server.xml
+
+This project includes Liberty configuration at `src/main/liberty/config/server.xml`.
+The Liberty Maven plugin uses this file automatically.
+
+Start the server in development mode:
+
+[source,bash]
+----
+mvn liberty:dev
+----
+
+Or start in normal mode:
+
+[source,bash]
+----
+mvn liberty:start
+----
+
+The application will start on:
+
+* HTTP: `http://localhost:5060`
+* Context root: `/graphql-catalog`
+
+=== Accessing GraphQL Endpoint
+
+The GraphQL endpoint is available at:
+
+----
+http://localhost:5060/graphql-catalog/graphql
+----
+
+=== GraphQL UI (GraphiQL)
+
+A modern GraphiQL interface is included in the application and is accessible at:
+
+----
+http://localhost:5060/graphql-catalog/graphql-ui.html
+----
+
+This page uses React 18 and GraphiQL 3 loaded from `unpkg.com` and works in both local and GitHub Codespaces environments.
+
+NOTE: Open Liberty also has a built-in GraphQL UI endpoint at `/graphql-catalog/graphql-ui` (enabled via `io.openliberty.enableGraphQLUI` in `server.xml`), but it has a known issue where the browser displays raw HTML source instead of rendering the UI due to a missing `Content-Type: text/html` header in the Liberty-bundled servlet. Use the `/graphql-catalog/graphql-ui.html` path above instead.
+
+==== GraphQL UI in GitHub Codespaces
+
+Port 5060 is pre-configured in the devcontainer as a public forwarded port. In the VS Code *Ports* tab, find port 5060 and open the forwarded address, then append `/graphql-catalog/graphql-ui.html`:
+
+----
+https://<codespace-name>-5060.app.github.dev/graphql-catalog/graphql-ui.html
+----
+
+== Example GraphQL Queries
+
+This section provides example GraphQL queries and mutations that you can run against the GraphQL Catalog API at `http://localhost:5060/graphql-catalog/graphql`.
+
+=== Get All Products
+
+Retrieves the full list of products in the catalog. Use this query to display a product listing or to pre-populate a UI with basic product data.
+
+[source,graphql]
+----
+query {
+  products {
+    id
+    name
+    price
+    category
+    stockQuantity
+  }
+}
+----
+
+=== Get Product by ID
+
+Fetches complete details for a single product by its unique identifier. Useful for product detail pages where you need a specific product's full data.
+
+[source,graphql]
+----
+query {
+  product(id: 1) {
+    id
+    name
+    description
+    price
+    category
+    stockQuantity
+  }
+}
+----
+
+=== Get Product with Computed Fields
+
+Retrieves a product with server-side computed fields. `priceWithTax` applies an 8% tax rate, `priceCategory` classifies the product as Budget, Mid-range, or Premium, and `availabilityStatus` reflects current stock levels (In Stock, Low Stock, or Out of Stock).
+
+[source,graphql]
+----
+query {
+  product(id: 1) {
+    id
+    name
+    price
+    priceWithTax
+    priceCategory
+    availabilityStatus
+  }
+}
+----
+
+=== Get Product with Reviews
+
+Fetches a product together with all its customer reviews and a computed average rating. The `reviews` field is resolved by a `@Source` field resolver that loads reviews on demand for the specified product.
+
+[source,graphql]
+----
+query {
+  product(id: 1) {
+    id
+    name
+    price
+    reviews {
+      id
+      reviewerName
+      rating
+      comment
+      createdAt
+    }
+    averageRating
+  }
+}
+----
+
+=== Get Multiple Products with Reviews
+
+Retrieves all products along with their associated reviews in a single request. Each product's `reviews` field is resolved individually by the `@Source` field resolver.
+
+[source,graphql]
+----
+query {
+  products {
+    id
+    name
+    price
+    reviews {
+      reviewerName
+      rating
+      comment
+    }
+  }
+}
+----
+
+=== Get Product with Top Reviews
+
+Fetches a product's highest-rated reviews up to a configurable limit. The `topReviews` field resolver accepts a `limit` argument (default: 5) and returns reviews sorted by rating descending — ideal for surfacing the best customer feedback.
+
+[source,graphql]
+----
+query {
+  product(id: 1) {
+    id
+    name
+    topReviews(limit: 3) {
+      reviewerName
+      rating
+      comment
+    }
+  }
+}
+----
+
+=== Search Products
+
+Searches the catalog for products whose name or description matches a keyword, with an optional category filter. Both arguments are optional — omit `category` to search across all categories.
+
+[source,graphql]
+----
+query {
+  searchProducts(searchTerm: "laptop", category: "Electronics") {
+    id
+    name
+    price
+    stockQuantity
+  }
+}
+----
+
+=== Search by Term Only
+
+Searches for products by keyword without restricting results to a specific category.
+
+[source,graphql]
+----
+query {
+  searchProducts(searchTerm: "mouse") {
+    id
+    name
+    price
+  }
+}
+----
+
+=== Get Catalog Statistics
+
+Returns aggregate statistics about the catalog: the total number of products, the mean price across all products, and a deduplicated list of all product categories.
+
+[source,graphql]
+----
+query {
+  productCount
+  averagePrice
+  categories
+}
+----
+
+=== Complex Query with All Features
+
+A single request that combines all query capabilities — basic fields, computed fields, field resolver data (reviews, average rating, top reviews), and catalog-level statistics. Demonstrates GraphQL's strength in replacing multiple REST calls with one efficient network round-trip.
+
+[source,graphql]
+----
+query {
+  products {
+    id
+    name
+    description
+    price
+    priceWithTax
+    priceCategory
+    availabilityStatus
+    category
+    stockQuantity
+    reviews {
+      reviewerName
+      rating
+      comment
+    }
+    averageRating
+    topReviews(limit: 2) {
+      rating
+      comment
+    }
+  }
+  productCount
+  averagePrice
+  categories
+}
+----
+
+== Mutations
+
+=== Create Product
+
+Creates a new product in the catalog. The server auto-generates the `id`. The response can include computed fields so you can confirm the persisted state without an extra query.
+
+[source,graphql]
+----
+mutation {
+  createProduct(input: {
+    name: "Wireless Charger"
+    description: "Fast wireless charging pad"
+    price: 39.99
+    category: "Electronics"
+    stockQuantity: 100
+  }) {
+    id
+    name
+    price
+    priceWithTax
+    priceCategory
+  }
+}
+----
+
+=== Update Product
+
+Updates an existing product identified by its `id`. All `input` fields are applied to the stored product. The updated product is returned so you can verify the change immediately without a separate query.
+
+[source,graphql]
+----
+mutation {
+  updateProduct(
+    id: 1
+    input: {
+      name: "Gaming Laptop Pro"
+      description: "Professional gaming laptop with RTX 4080"
+      price: 1499.99
+      category: "Electronics"
+      stockQuantity: 25
+    }
+  ) {
+    id
+    name
+    price
+    stockQuantity
+  }
+}
+----
+
+=== Delete Product
+
+Removes the specified product from the catalog by ID. Returns `true` if the product was found and deleted successfully.
+
+[source,graphql]
+----
+mutation {
+  deleteProduct(id: 6)
+}
+----
+
+=== Create and Query in Same Request
+
+GraphQL allows sending a mutation and a query together. The mutation runs first, then the query returns current catalog state. This pattern confirms the effect of the mutation in a single round-trip.
+
+[source,graphql]
+----
+mutation {
+  createProduct(input: {
+    name: "USB Cable"
+    description: "USB-C to USB-C cable"
+    price: 12.99
+    category: "Accessories"
+    stockQuantity: 500
+  }) {
+    id
+    name
+    price
+    priceCategory
+    availabilityStatus
+  }
+}
+
+query {
+  productCount
+}
+----
+
+== GraphQL Variables
+
+Variables decouple query logic from runtime values. This is the recommended pattern in client applications because it avoids string interpolation, improves type safety, and makes query documents reusable.
+
+=== Query with Variables
+
+Declares the product ID as a typed variable (`$productId: BigInteger!`) in the operation signature. The variable value is supplied separately in the variables map, keeping the query document static.
+
+NOTE: The `id` argument maps to a Java `Long`, which SmallRye GraphQL (the MicroProfile GraphQL runtime) exposes as the `BigInteger` scalar — not `Int` or `ID`. Using any other type causes a validation error.
+
+[source,graphql]
+----
+query GetProduct($productId: BigInteger!) {
+  product(id: $productId) {
+    id
+    name
+    price
+    reviews {
+      rating
+      comment
+    }
+  }
+}
+----
+
+Variables:
+[source,json]
+----
+{
+  "productId": 1
+}
+----
+
+=== Mutation with Variables
+
+Passes the entire product input as a typed variable (`$input: ProductInput!`). The mutation document stays constant while the payload changes at runtime, which also enables server-side validation of the input shape.
+
+[source,graphql]
+----
+mutation CreateProduct($input: ProductInput!) {
+  createProduct(input: $input) {
+    id
+    name
+    price
+  }
+}
+----
+
+Variables:
+[source,json]
+----
+{
+  "input": {
+    "name": "Smart Watch",
+    "description": "Fitness tracking smart watch",
+    "price": 199.99,
+    "category": "Wearables",
+    "stockQuantity": 75
+  }
+}
+----
+
+== Aliases
+
+Aliases let you execute the same field multiple times with different arguments within a single request. Each result appears under its chosen alias key in the response, making it easy to fetch several data sets in one network call.
+
+[source,graphql]
+----
+query {
+  budget: searchProducts(searchTerm: "mouse") {
+    id
+    name
+    price
+  }
+  premium: searchProducts(searchTerm: "laptop") {
+    id
+    name
+    price
+  }
+}
+----
+
+== Fragments
+
+Fragments define reusable, named field selections that can be composed across multiple queries or mutations. They reduce repetition and keep large query documents maintainable. Fragments can spread other fragments using the `...` operator.
+
+[source,graphql]
+----
+fragment ProductBasic on Product {
+  id
+  name
+  price
+  category
+}
+
+fragment ProductDetailed on Product {
+  ...ProductBasic
+  description
+  stockQuantity
+  priceWithTax
+  availabilityStatus
+}
+
+query {
+  products {
+    ...ProductBasic
+  }
+  product(id: 1) {
+    ...ProductDetailed
+    reviews {
+      rating
+      comment
+    }
+  }
+}
+----
+
+== Error Handling
+
+The service uses `ProductNotFoundException` (extending `RuntimeException`) to signal missing products. MicroProfile GraphQL catches unchecked exceptions and returns a structured error response. The response message is controlled by the `mp.graphql.defaultErrorMessage` configuration property.
+
+=== Query Non-Existent Product
+
+Requesting a product that does not exist triggers the custom exception. The `product` field resolves to `null` and the `errors` array describes the failure.
+
+[source,graphql]
+----
+query {
+  product(id: 9999) {
+    id
+    name
+  }
+}
+----
+
+Expected response:
+[source,json]
+----
+{
+  "data": {
+    "product": null
+  },
+  "errors": [
+    {
+      "message": "An error occurred processing your request",
+      "locations": [{"line": 2, "column": 3}],
+      "path": ["product"]
+    }
+  ]
+}
+----
+
+=== Update Non-Existent Product
+
+Attempting to update a product that does not exist follows the same error pattern — the mutation returns `null` and the `errors` array explains the failure.
+
+[source,graphql]
+----
+mutation {
+  updateProduct(
+    id: 9999
+    input: {
+      name: "Test"
+      price: 1.0
+    }
+  ) {
+    id
+  }
+}
+----
+
+== Using with curl
+
+All GraphQL requests are HTTP POST calls with a JSON body containing a `query` field. The examples below target the local development server.
+
+=== Simple Query
+
+Sends a compact inline query to retrieve all product IDs, names, and prices.
+
+[source,bash]
+----
+curl -X POST http://localhost:5060/graphql-catalog/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ products { id name price } }"}'
+----
+
+=== Query with Variables
+
+Sends a parameterized query. The `variables` object maps variable names to their runtime values and is processed server-side alongside the query document.
+
+[source,bash]
+----
+curl -X POST http://localhost:5060/graphql-catalog/graphql \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query GetProduct($id: ID!) { product(id: $id) { id name price } }",
+    "variables": {"id": "1"}
+  }'
+----
+
+=== Mutation
+
+Sends a `createProduct` mutation. Double quotes inside the query string are escaped with a backslash when using a single-quoted shell string.
+
+[source,bash]
+----
+curl -X POST http://localhost:5060/graphql-catalog/graphql \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation { createProduct(input: { name: \"Test\", price: 9.99, category: \"Test\" }) { id name } }"
+  }'
+----
+
+== Schema Introspection
+
+GraphQL supports built-in introspection queries that expose schema structure at runtime. Tools like GraphiQL use introspection to power autocompletion and inline documentation.
+
+=== Get All Schema Types
+
+Returns all types in the schema — built-in scalars, custom types (`Product`, `Review`), and input types (`ProductInput`). Use this to understand the complete type inventory of the API.
+
+[source,graphql]
+----
+query {
+  __schema {
+    types {
+      name
+      kind
+    }
+  }
+}
+----
+
+=== Get Type Information for Product
+
+Returns the field definitions for the `Product` type: each field's name and its return type. Useful for exploring the exact shape of a type without reading source code.
+
+[source,graphql]
+----
+query {
+  __type(name: "Product") {
+    name
+    fields {
+      name
+      type {
+        name
+        kind
+      }
+    }
+  }
+}
+----
+
+=== Get Available Query Operations
+
+Lists all available query operations with their names, descriptions, and accepted arguments. This is the foundation for dynamic documentation generators and query builders.
+
+[source,graphql]
+----
+query {
+  __schema {
+    queryType {
+      fields {
+        name
+        description
+        args {
+          name
+          type {
+            name
+          }
+        }
+      }
+    }
+  }
+}
+----
+
+== Project Structure
+
+----
+catalog/
+├── pom.xml
+├── README.adoc
+└── src/
+    └── main/
+        ├── java/
+        │   └── io/microprofile/tutorial/graphql/product/
+        │       ├── Product.java                    # Product entity
+        │       ├── ProductInput.java               # Input type for mutations
+        │       ├── ProductReview.java              # Review entity
+        │       ├── ProductService.java             # Business logic
+        │       ├── ReviewService.java              # Review operations
+        │       ├── ProductGraphQLApi.java          # GraphQL API
+        │       └── ProductNotFoundException.java   # Custom exception
+        ├── liberty/
+        │   └── config/
+        │       └── server.xml                      # Liberty configuration
+        └── resources/
+            └── META-INF/
+                └── microprofile-config.properties  # Configuration
+----
+
+== Key Implementation Details
+
+=== @GraphQLApi Annotation
+
+The `ProductGraphQLApi` class is marked with `@GraphQLApi` to expose it as a GraphQL endpoint:
+
+[source,java]
+----
+@GraphQLApi
+@ApplicationScoped
+@Description("Product management GraphQL API")
+public class ProductGraphQLApi {
+    // Queries and mutations
+}
+----
+
+=== Field Resolvers with @Source
+
+Field resolvers add additional fields to types:
+
+[source,java]
+----
+@Description("Reviews for this product")
+public List<ProductReview> reviews(@Source Product product) {
+    return reviewService.findByProductId(product.getId());
+}
+----
+
+=== Computed Fields
+
+Computed fields are defined directly in the entity:
+
+[source,java]
+----
+public Double getPriceWithTax() {
+    return price != null ? price * 1.08 : null;
+}
+----
+
+=== Custom Error Handling
+
+Custom exceptions extend `RuntimeException`. MicroProfile GraphQL catches unchecked exceptions and returns a structured error response with the message defined by `mp.graphql.defaultErrorMessage`:
+
+[source,java]
+----
+public class ProductNotFoundException extends RuntimeException {
+    public ProductNotFoundException(Long productId) {
+    super("Product not found: " + productId);
+    }
+}
+----
+
+== Development Tips
+
+* Use GraphiQL to interactively explore the schema and test queries
+* The schema is automatically generated from your Java classes
+* Use `@Description` annotations to document your API
+* Use `@DefaultValue` for optional parameters
+* Use `@Source` to add computed or related fields to GraphQL types without modifying the entity class
+* Use `@Name` to customize argument names in the schema
+
+== Stopping the Application
+
+To stop the development server, press `Ctrl+C` or type `q` and press Enter in the Liberty dev mode console.
