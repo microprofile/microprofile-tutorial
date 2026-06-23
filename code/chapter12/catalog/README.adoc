@@ -76,12 +76,7 @@ mvn clean package
 
 == Running the Application
 
-To run the application using Liberty Maven plugin:
-
-[source,bash]
-----
-mvn liberty:dev
-----
+Run the application using Liberty Maven plugin.
 
 === Run with Liberty server.xml
 
@@ -107,9 +102,7 @@ The application will start on:
 * HTTP: `http://localhost:5060`
 * Context root: `/graphql-catalog`
 
-== Accessing GraphQL
-
-=== GraphQL Endpoint
+=== Accessing GraphQL Endpoint
 
 The GraphQL endpoint is available at:
 
