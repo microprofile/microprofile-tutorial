@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Liberty Reactive Messaging Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .messages-box {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .message-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #667eea;
+            font-size: 14px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Open Liberty Reactive Messaging</h1>
+            <p>MicroProfile Reactive Messaging 3.0 Demo</p>
+        </div>
+        
+        <div class="content">
+            <div id="statusMessage"></div>
+            
+            <div class="section">
+                <h2>📤 Publish Message</h2>
+                <div class="input-group">
+                    <input type="text" id="messageInput" placeholder="Enter your message..." value="Hello from Open Liberty!">
+                    <button onclick="publishMessage()">Publish</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📊 Statistics</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="messageCount">0</div>
+                        <div class="stat-label">Messages Received</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="serverStatus">✓</div>
+                        <div class="stat-label">Server Status</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📬 Received Messages</h2>
+                <div>
+                    <button onclick="loadMessages()">Refresh</button>
+                    <button class="btn-secondary" onclick="clearMessages()">Clear All</button>
+                </div>
+                <div id="messagesContainer" class="messages-box">
+                    <div class="empty-state">Click "Refresh" to load messages</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/hello';
+        
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 3000);
+        }
+        
+        async function publishMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) {
+                showStatus('Please enter a message', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/publish`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                });
+                
+                const data = await response.json();
+                showStatus(`✓ Message published: "${data.message}"`, 'success');
+                input.value = '';
+                
+                // Auto-refresh messages after a short delay
+                setTimeout(loadMessages, 500);
+            } catch (error) {
+                showStatus('Failed to publish message: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadMessages() {
+            try {
+                const response = await fetch(`${API_BASE}/messages`);
+                const data = await response.json();
+                
+                const container = document.getElementById('messagesContainer');
+                document.getElementById('messageCount').textContent = data.count;
+                
+                if (data.messages.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No messages received yet</div>';
+                } else {
+                    container.innerHTML = data.messages.map(msg => 
+                        `<div class="message-item">${escapeHtml(msg)}</div>`
+                    ).join('');
+                }
+                
+                showStatus(`Loaded ${data.count} message(s)`, 'success');
+            } catch (error) {
+                showStatus('Failed to load messages: ' + error.message, 'error');
+            }
+        }
+        
+        async function clearMessages() {
+            if (!confirm('Clear all received messages?')) {
+                return;
+            }
+            
+            try {
+                await fetch(`${API_BASE}/messages`, {
+                    method: 'DELETE'
+                });
+                
+                showStatus('All messages cleared', 'success');
+                loadMessages();
+            } catch (error) {
+                showStatus('Failed to clear messages: ' + error.message, 'error');
+            }
+        }
+        
+        async function checkHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                document.getElementById('serverStatus').textContent = data.status === 'UP' ? '✓' : '✗';
+            } catch (error) {
+                document.getElementById('serverStatus').textContent = '✗';
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Allow Enter key to publish
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                publishMessage();
+            }
+        });
+        
+        // Check health on load
+        checkHealth();
+        setInterval(checkHealth, 10000); // Check every 10 seconds
+    </script>
+</body>
+</html>

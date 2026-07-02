@@ -73,11 +73,15 @@ jobs:
           ruby-version: '3.2'
           bundler-cache: false
 
-      # Install Antora CLI, site generator, and advanced extensions
+      # Install Antora CLI, site generator, and advanced extensions.
+      # Uses `npm ci` to install the exact versions pinned in package-lock.json.
+      # A bare `npm install <pkg>` fetches whatever is currently tagged "latest" on
+      # npm, which for these pre-1.0 Antora packages can silently pull in a newer,
+      # API-incompatible combination (e.g. @antora/pdf-extension -> @antora/assembler
+      # requiring a ContentCatalog API not present in the pinned site-generator).
       - name: Install Antora and Extensions
         run: |
-          npm install @antora/cli @antora/site-generator-default
-          npm install @antora/lunr-extension @antora/pdf-extension @asciidoctor/tabs
+          npm ci
           gem install asciidoctor-pdf asciidoctor-kroki asciidoctor-plantuml
 
       # Make update-repo-url.sh executable and run it to update URLs
@@ -195,13 +199,17 @@ jobs:
           ruby-version: '3.2'
           bundler-cache: false
 
-      # Install Antora CLI, site generator, and advanced extensions
+      # Install Antora CLI, site generator, and advanced extensions.
+      # Uses `npm ci` to install the exact versions pinned in package-lock.json.
+      # A bare `npm install <pkg>` fetches whatever is currently tagged "latest" on
+      # npm, which for these pre-1.0 Antora packages can silently pull in a newer,
+      # API-incompatible combination (e.g. @antora/pdf-extension -> @antora/assembler
+      # requiring a ContentCatalog API not present in the pinned site-generator).
       - name: Install Antora and Extensions
         run: |
-          npm install @antora/cli @antora/site-generator-default
-          npm install @antora/lunr-extension @antora/pdf-extension @asciidoctor/tabs
+          npm ci
           gem install asciidoctor-pdf asciidoctor-kroki asciidoctor-plantuml
-      
+
       # Verify that Antora was installed correctly (useful for debugging)
       - name: Verify Antora Installation
         run: npm list @antora/cli @antora/site-generator-default || echo "Antora packages are not installed."

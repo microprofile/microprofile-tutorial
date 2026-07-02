@@ -1,0 +1,115 @@
+= Payment Reactive Messaging
+
+The project focuses on a single CDI messaging bean that demonstrates a full in-memory channel pipeline:
+
+* On startup, `PaymentRequestHandler` injects an `Emitter<Order>` and sends a sample `Order` to the `order-created` channel.
+* `PaymentRequestHandler.processPayment(...)` consumes from the `order-created` channel, sets the order status to `PAID`, and forwards the updated order to the `payment-authorized` channel.
+* `PaymentRequestHandler.handlePaidOrder(...)` consumes from the `payment-authorized` channel and logs the completed payment.
+
+== How it works
+
+[source,text]
+----
++------------------------------------------------+
+| PaymentRequestHandler                          |
+|                                                |
+| @Inject @Channel("order-created")              |
+| Emitter<Order> — fires once on startup         |
++----------------------+-------------------------+
+                       |
+                       v
+             +------------------+
+             | order-created    |
+             |    channel       |
+             +--------+---------+
+                      |
+                      v
++------------------------------------------------+
+| PaymentRequestHandler                          |
+|                                                |
+| @Incoming("order-created")                     |
+| @Outgoing("payment-authorized")                |
+| processPayment(Order): Order (status = PAID)   |
++----------------------+-------------------------+
+                       |
+                       v
+             +--------------------+
+             | payment-authorized |
+             |      channel       |
+             +--------+-----------+
+                      |
+                      v
++------------------------------------------------+
+| PaymentRequestHandler                          |
+|                                                |
+| @Incoming("payment-authorized")                |
+| handlePaidOrder(Order): void                   |
++------------------------------------------------+
+----
+
+== Project structure
+
+[source,text]
+----
+src/
+└── main/
+    ├── java/
+    │   └── io/microprofile/tutorial/store/payment/
+    │       ├── entity/
+    │       │   ├── Order.java               # minimal order payload
+    │       │   └── OrderStatus.java         # order status enum
+    │       └── service/
+    │           └── PaymentRequestHandler.java  # reactive messaging emitter and processors
+    ├── liberty/
+    │   └── config/
+    │       └── server.xml                   # Open Liberty runtime configuration
+    ├── resources/
+    │   └── META-INF/
+    │       └── microprofile-config.properties  # messaging configuration notes
+    └── webapp/
+        └── WEB-INF/
+            └── beans.xml                    # CDI bean discovery
+----
+
+== Prerequisites
+
+* Java 21
+* Maven 3.8+
+
+== Build the project
+
+[source,bash]
+----
+cd code/chapter13/payment
+mvn clean package
+----
+
+== Run the application
+
+[source,bash]
+----
+mvn liberty:run
+----
+
+The application is deployed by Open Liberty at:
+
+* `http://localhost:9080/payment/`
+
+== What to expect
+
+This minimal version does not expose any HTTP API for submitting orders.
+
+When the application starts, `PaymentRequestHandler` uses an injected `Emitter<Order>` to send a single sample order into the `order-created` channel. The `processPayment` method processes it and forwards the updated order to the `payment-authorized` channel. Finally, `handlePaidOrder` logs the completed payment.
+
+Typical log entries look like:
+
+[source,text]
+----
+[INFO] [4/5/26, 4:38:47:582 UTC] 0000002d profile.tutorial.store.payment.service.PaymentRequestHandler I Created order 1001 for user 1
+[INFO] [4/5/26, 4:38:47:587 UTC] 0000002d profile.tutorial.store.payment.service.PaymentRequestHandler I Processing payment for order 1001
+[INFO] [4/5/26, 4:38:47:588 UTC] 0000002d profile.tutorial.store.payment.service.PaymentRequestHandler I Order 1001 marked as PAID for user 1
+----
+
+== Stop the application
+
+Press `Ctrl+C` in the terminal running `mvn liberty:run`.

@@ -1,0 +1,326 @@
+= Open Liberty Reactive Messaging Hello World
+
+A demonstration of MicroProfile Reactive Messaging 3.0 on Open Liberty, showing how to publish messages programmatically via an `Emitter` and consume them asynchronously — in-memory or through Apache Kafka.
+
+== Features
+
+* *Message Publishing* — Send messages via REST API using an injected `Emitter`
+* *Message Consumption* — Receive and process messages asynchronously with `@Incoming`
+* *Kafka Ready* — Default configuration targets Apache Kafka via the `liberty-kafka` connector
+* *In-Memory Mode* — Can be switched to in-memory transport for local development (see <<switching-to-in-memory>>)
+* *REST API* — Full HTTP interface for publishing, querying, and clearing messages
+
+== Architecture
+
+[source,text]
+----
+REST client
+    │
+    ▼
+HelloResource (POST /hello/publish)
+    │
+    ▼
+HelloPublisher
+  Emitter<String> @Channel("hello-in")
+    │
+    │   Kafka topic: hello-topic
+    │   (or in-memory when connectors are removed)
+    │
+    ▼
+HelloConsumer
+  @Incoming("hello-out")
+  consumeHelloMessage(String)
+----
+
+The `Emitter` publishes to channel `hello-in`. The consumer subscribes on channel `hello-out`. In Kafka mode both channels map to the same topic (`hello-topic`), so messages flow across the broker. In in-memory mode both classes must share the same channel name (see <<switching-to-in-memory>>).
+
+== Prerequisites
+
+* Java 21 or later
+* Maven 3.8+
+* Open Liberty (downloaded automatically by the Maven plugin)
+* A running Apache Kafka broker (default: `localhost:9092`) — see <<start-kafka>>
+
+== Project Structure
+
+[source,text]
+----
+reactive-messaging-hello/
+├── pom.xml
+└── src/main/
+    ├── java/com/example/reactive/
+    │   ├── ReactiveMessagingApplication.java   # JAX-RS bootstrap (@ApplicationPath("/api"))
+    │   ├── model/
+    │   │   └── HelloMessage.java               # Message model (content, sender, timestamp)
+    │   ├── publisher/
+    │   │   └── HelloPublisher.java             # Emitter-based publisher + optional @Outgoing stream
+    │   ├── consumer/
+    │   │   └── HelloConsumer.java              # @Incoming consumer, stores messages in memory
+    │   └── resource/
+    │       └── HelloResource.java              # REST endpoints
+    ├── resources/META-INF/
+    │   └── microprofile-config.properties      # Kafka connector configuration
+    ├── liberty/config/
+    │   └── server.xml                          # Liberty features + port 5050
+    └── webapp/WEB-INF/
+        └── beans.xml                           # CDI bean discovery
+----
+
+[[start-kafka]]
+== Start Kafka
+
+The application expects a Kafka broker at `localhost:9092`. Start one with Docker:
+
+[source,bash]
+----
+docker run --rm -p 9092:9092 \
+  -e KAFKA_NODE_ID=1 \
+  -e KAFKA_PROCESS_ROLES=broker,controller \
+  -e KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093 \
+  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
+  -e KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093 \
+  -e KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER \
+  -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+  apache/kafka:latest
+----
+
+Stop it with `Ctrl+C` (the `--rm` flag removes the container on exit).
+
+== Quick Start
+
+=== 1. Build and run
+
+[source,bash]
+----
+mvn clean package liberty:run
+----
+
+The server starts on http://localhost:5050.
+
+=== 2. Publish a message
+
+[source,bash]
+----
+curl -X POST http://localhost:5050/reactive-messaging-hello/api/hello/publish \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hello Reactive Messaging!"}'
+----
+
+=== 3. Verify the message was received
+
+[source,bash]
+----
+curl http://localhost:5050/reactive-messaging-hello/api/hello/messages
+----
+
+== REST Endpoints
+
+[cols="1,2,3", options="header"]
+|===
+| Method | Path | Description
+
+| `GET`
+| `/api/hello`
+| Welcome + endpoint listing
+
+| `POST`
+| `/api/hello/publish`
+| Publish a message (`{"message": "..."}`)
+
+| `GET`
+| `/api/hello/messages`
+| List all received messages
+
+| `DELETE`
+| `/api/hello/messages`
+| Clear the received-message list
+
+| `GET`
+| `/api/hello/health`
+| Health check
+|===
+
+== Kafka Configuration
+
+`microprofile-config.properties` wires the two channels to the same Kafka topic:
+
+[source,properties]
+----
+mp.messaging.connector.liberty-kafka.bootstrap.servers=localhost:9092
+
+# Emitter -> channel hello-in -> Kafka topic hello-topic
+mp.messaging.outgoing.hello-in.connector=liberty-kafka
+mp.messaging.outgoing.hello-in.topic=hello-topic
+mp.messaging.outgoing.hello-in.key.serializer=org.apache.kafka.common.serialization.StringSerializer
+mp.messaging.outgoing.hello-in.value.serializer=org.apache.kafka.common.serialization.StringSerializer
+
+# Kafka topic hello-topic -> channel hello-out -> HelloConsumer
+mp.messaging.incoming.hello-out.connector=liberty-kafka
+mp.messaging.incoming.hello-out.topic=hello-topic
+mp.messaging.incoming.hello-out.group.id=hello-consumer-group
+mp.messaging.incoming.hello-out.auto.offset.reset=earliest
+mp.messaging.incoming.hello-out.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.hello-out.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+----
+
+=== Why different channel names for Emitter and consumer?
+
+MicroProfile Reactive Messaging raises `SRMSG00073` if the same channel name is assigned to both an `mp.messaging.outgoing.*` connector and an `mp.messaging.incoming.*` connector at the same time. Using `hello-in` for the outgoing (Emitter) side and `hello-out` for the incoming (consumer) side, both pointing to the same Kafka topic, avoids the conflict.
+
+[[switching-to-in-memory]]
+== Switching to in-memory
+
+To run without a Kafka broker:
+
+. In `HelloConsumer.java`, change `@Incoming("hello-out")` to `@Incoming("hello-in")` so both the `Emitter` and the consumer share the same channel name. MicroProfile Reactive Messaging auto-wires them in-memory.
+
+. Comment out all `mp.messaging.*` lines in `microprofile-config.properties`.
+
+. Rebuild and run:
++
+[source,bash]
+----
+mvn clean package liberty:run
+----
+
+To go back to Kafka, revert both changes.
+
+== Key Concepts
+
+=== Emitter-based publishing
+
+[source,java]
+----
+@Inject
+@Channel("hello-in")
+Emitter<String> helloEmitter;
+
+public void publishMessage(String message) {
+    helloEmitter.send(message);
+}
+----
+
+Unlike `@Outgoing`, an `Emitter` publishes messages on demand (e.g., triggered by a REST call) rather than emitting a fixed stream at startup.
+
+=== Simple consumer
+
+[source,java]
+----
+@Incoming("hello-out")
+public void consumeHelloMessage(String message) {
+    LOGGER.info("Received: " + message);
+}
+----
+
+=== Consumer with explicit acknowledgment
+
+[source,java]
+----
+@Incoming("hello-out")
+public CompletionStage<Void> consumeHelloMessageWithAck(Message<String> message) {
+    String payload = message.getPayload();
+    // process...
+    return message.ack();
+}
+----
+
+=== Optional: periodic stream publisher
+
+`HelloPublisher` contains a commented-out `@Outgoing` method that generates messages automatically. Uncomment the annotation to enable it:
+
+[source,java]
+----
+@Outgoing("hello-in")
+public Publisher<String> generatePeriodicMessages() { ... }
+----
+
+NOTE: Do not enable both the `Emitter` injection and the `@Outgoing` annotation on the same channel at the same time — that would create two competing publishers on `hello-in`.
+
+== Testing Scenarios
+
+=== Scenario 1: Single message
+
+[source,bash]
+----
+curl -X POST http://localhost:5050/reactive-messaging-hello/api/hello/publish \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Test Message 1"}'
+
+curl http://localhost:5050/reactive-messaging-hello/api/hello/messages
+----
+
+=== Scenario 2: Bulk publishing
+
+[source,bash]
+----
+for i in {1..5}; do
+  curl -X POST http://localhost:5050/reactive-messaging-hello/api/hello/publish \
+    -H "Content-Type: application/json" \
+    -d "{\"message\": \"Bulk Message $i\"}"
+done
+
+curl http://localhost:5050/reactive-messaging-hello/api/hello/messages
+----
+
+== Server Logs
+
+[source,bash]
+----
+tail -f target/liberty/wlp/usr/servers/reactiveMessagingServer/logs/messages.log
+----
+
+Expected output after publishing a message:
+
+[source,text]
+----
+[INFO] Publishing message via Emitter: Hello Reactive Messaging!
+[INFO] ✓ Received message: Hello Reactive Messaging!
+[INFO] Processing: Hello Reactive Messaging!
+----
+
+== Troubleshooting
+
+=== Messages are published but never received
+
+* Confirm Kafka is running: `docker ps`
+* Check that `bootstrap.servers` in `microprofile-config.properties` matches the broker address
+* Check Liberty logs for connector errors: `target/liberty/wlp/usr/servers/reactiveMessagingServer/logs/messages.log`
+
+=== Deployment fails with SRMSG00073
+
+This error means the same channel name is assigned to both an outgoing and incoming connector. Ensure the Emitter channel (`hello-in`) and the consumer channel (`hello-out`) are different, and that each is configured for only one direction in `microprofile-config.properties`.
+
+=== CDI injection fails
+
+Ensure `beans.xml` is present under `src/main/webapp/WEB-INF/` and that `bean-discovery-mode="all"` is set.
+
+== Advanced Topics
+
+=== Consumer with error handling
+
+[source,java]
+----
+@Incoming("hello-out")
+public CompletionStage<Void> consume(Message<String> message) {
+    try {
+        processMessage(message.getPayload());
+        return message.ack();
+    } catch (Exception e) {
+        return message.nack(e);
+    }
+}
+----
+
+=== Dead Letter Queue
+
+[source,properties]
+----
+mp.messaging.incoming.hello-out.failure-strategy=dead-letter-queue
+mp.messaging.incoming.hello-out.dead-letter-queue.topic=hello-dlq
+----
+
+== References
+
+* link:https://download.eclipse.org/microprofile/microprofile-reactive-messaging-3.0/microprofile-reactive-messaging-spec-3.0.html[MicroProfile Reactive Messaging 3.0 Specification]
+* link:https://openliberty.io/docs/latest/reactive-messaging.html[Open Liberty: Reactive Messaging]
+* link:https://smallrye.io/smallrye-reactive-messaging/[SmallRye Reactive Messaging]

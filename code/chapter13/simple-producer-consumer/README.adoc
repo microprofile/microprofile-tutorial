@@ -1,0 +1,153 @@
+= Simple Producer/Consumer Demo
+
+A minimal Open Liberty project that demonstrates MicroProfile Reactive Messaging with a producer using `@Outgoing` and a consumer using `@Incoming`.
+
+This project shows a linear three-stage message pipeline inside one application. A producer emits three messages to the `greetings-in` channel, a processor transforms each one and forwards it to the `greetings-out` channel, and a consumer logs the final messages to the server console.
+
+== How it works
+
+[source,text]
+----
++---------------------------------------+
+| SimpleMessageBean                     |
+|                                       |
+| @Outgoing("greetings-in")             |
+| produce(): PublisherBuilder<String>   |
++------------------+--------------------+
+                   |
+                   v
+          +----------------+
+          | greetings-in   |
+          |   channel      |
+          +-------+--------+
+                  |
+                  v
++------------------------------------------+
+| SimpleMessageBean                        |
+|                                          |
+| @Incoming("greetings-in")               |
+| @Outgoing("greetings-out")              |
+| process(String): String (toUpperCase)    |
++------------------+-----------------------+
+                   |
+                   v
+          +----------------+
+          | greetings-out  |
+          |   channel      |
+          +-------+--------+
+                  |
+                  v
++---------------------------------------+
+| SimpleMessageBean                     |
+|                                       |
+| @Incoming("greetings-out")            |
+| consume(String message)               |
++---------------------------------------+
+----
+
+== Project structure
+
+[source,text]
+----
+src/
+└── main/
+    ├── java/
+    │   └── com/example/simple/
+    │       └── SimpleMessageBean.java        # producer, processor, and consumer methods
+    ├── liberty/
+    │   └── config/
+    │       └── server.xml                    # Open Liberty runtime configuration
+    ├── resources/
+    │   └── META-INF/
+    │       └── microprofile-config.properties  # messaging configuration notes
+    └── webapp/
+        └── WEB-INF/
+            └── beans.xml                     # CDI bean discovery
+----
+
+== Run the project
+
+Always use `mvn clean package` before the first run, or after pulling changes, to ensure Liberty picks up the latest `server.xml` and WAR:
+
+[source,bash]
+----
+mvn clean package liberty:run
+----
+
+By default, this demo starts on port `9085` to avoid conflicts with other tutorial projects that commonly use `9080`.
+
+The `server.xml` sets `consoleLogLevel="INFO"` so that `java.util.logging` INFO entries appear in the Maven console output.
+When the application starts, you should see log entries similar to the following shortly after the `CWWKZ0001I: Application started` line:
+
+[source,text]
+----
+[INFO    ] Sending message: Hello, MicroProfile Reactive Messaging
+[INFO    ] Sending message: Reactive streams are non-blocking
+[INFO    ] Sending message: Backpressure is handled automatically
+[INFO    ] Processing message: Hello, MicroProfile Reactive Messaging
+[INFO    ] Received message: HELLO, MICROPROFILE REACTIVE MESSAGING
+[INFO    ] Processing message: Reactive streams are non-blocking
+[INFO    ] Received message: REACTIVE STREAMS ARE NON-BLOCKING
+[INFO    ] Processing message: Backpressure is handled automatically
+[INFO    ] Received message: BACKPRESSURE IS HANDLED AUTOMATICALLY
+----
+
+The three `Sending message` lines appear first because `produce()` logs all items synchronously before returning the publisher.
+The framework then subscribes and delivers messages one at a time, producing alternating `Processing` / `Received` pairs.
+
+== Messaging transport: in-memory vs Kafka
+
+=== In-memory (this project)
+
+No connector properties are required. When both the producer and consumer of a channel live in the same application and share the same channel name, MicroProfile Reactive Messaging automatically creates an in-memory pipe between them. No broker, no configuration needed.
+
+This project uses that pattern for both channels:
+
+[source,text]
+----
+greetings-in  : produce() [@Outgoing] ─── in-memory ───> process() [@Incoming]
+greetings-out : process() [@Outgoing] ─── in-memory ───> consume() [@Incoming]
+----
+
+=== Why you cannot switch this project to Kafka with configuration alone
+
+Attempting to add both an outgoing and an incoming connector for the same channel name — for example:
+
+[source,properties]
+----
+mp.messaging.outgoing.greetings-in.connector=liberty-kafka
+mp.messaging.incoming.greetings-in.connector=liberty-kafka
+----
+
+causes the following deployment failure:
+
+[source,text]
+----
+SRMSG00073: Invalid configuration, the following channel names cannot be
+used for both incoming and outgoing: [greetings-out, greetings-in]
+----
+
+MicroProfile Reactive Messaging (and the SmallRye engine used by Open Liberty) forbids a channel from being simultaneously an external outbound endpoint and an external inbound endpoint. When you assign a connector to a channel, the runtime treats it as a boundary to an external broker, and a single channel name can only cross that boundary in one direction.
+
+The in-memory design of this project — where `@Outgoing("X")` and `@Incoming("X")` share the same name — relies on name-based auto-wiring within a single application. That design is incompatible with a Kafka connector on both sides of the same name, so there is no config-only switch.
+
+=== Kafka: the cross-application pattern
+
+Kafka connectors work across application boundaries. Each application owns only one side of a channel:
+
+[source,text]
+----
+Producer app                              Consumer app
+────────────────────                      ──────────────────────
+@Outgoing("orders")                       @Incoming("orders")
+  + outgoing Kafka config  ─── topic ───>   + incoming Kafka config
+----
+
+The `order` and `payment` projects in this chapter demonstrate this pattern. Each service configures only its own side of the shared Kafka topic.
+
+== What it shows
+
+* `@Outgoing("greetings-in")` on `produce()` returns a `PublisherBuilder<String>` built from a fixed list of three strings using `ReactiveStreams.fromIterable()`. The publisher completes after all items in the list are emitted, so the pipeline terminates cleanly without an infinite generator loop.
+* `@Incoming("greetings-in")` + `@Outgoing("greetings-out")` on `process()` demonstrates the processor pattern — consuming from one channel, transforming the payload to uppercase, and publishing to a different channel.
+* `@Incoming("greetings-out")` on `consume()` is the terminal consumer that logs the final transformed message.
+* Using distinct channel names (`greetings-in`, `greetings-out`) avoids a loopback anti-pattern where the same bean both produces and consumes on the same channel.
