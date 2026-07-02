@@ -35,11 +35,10 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
-# Liberty
+# Liberty (target/liberty/ already covered by target/ above)
 .liberty/
 .factorypath
 wlp/
-liberty/
 
 # IntelliJ IDEA
 .idea/

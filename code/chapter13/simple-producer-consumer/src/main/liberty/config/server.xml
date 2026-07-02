@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="Simple Producer Consumer Demo">
+
+    <featureManager>
+        <feature>cdi-4.0</feature>
+        <feature>mpReactiveMessaging-3.0</feature>
+        <feature>servlet-6.0</feature>
+    </featureManager>
+
+    <variable name="http.port"  defaultValue="9085"/>
+    <variable name="https.port" defaultValue="9443"/>
+
+    <logging consoleLogLevel="INFO"/>
+
+    <httpEndpoint id="defaultHttpEndpoint"
+                  httpPort="${http.port}"
+                  httpsPort="${https.port}"/>
+
+</server>

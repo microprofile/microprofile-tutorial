@@ -22,7 +22,7 @@ public class HelloConsumer {
     /**
      * Simple message consumption - payload only
      */
-    @Incoming("hello-in")
+    @Incoming("hello-out")
     public void consumeHelloMessage(String message) {
         LOGGER.info("✓ Received message: " + message);
         receivedMessages.add(message);
@@ -36,7 +36,7 @@ public class HelloConsumer {
      * Uncomment to use this instead of the simple consumer above
      */
     /*
-    @Incoming("hello-in")
+    @Incoming("hello-out")
     public CompletionStage<Void> consumeHelloMessageWithAck(Message<String> message) {
         String payload = message.getPayload();
         LOGGER.info("✓ Received message with ack: " + payload);

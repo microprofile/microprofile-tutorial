@@ -75,6 +75,8 @@
                 <version>3.10</version>
                 <configuration>
                     <serverName>OrderServer</serverName>
+                    <appsDirectory>apps</appsDirectory>
+                    <looseApplication>false</looseApplication>
                 </configuration>
             </plugin>
         </plugins>

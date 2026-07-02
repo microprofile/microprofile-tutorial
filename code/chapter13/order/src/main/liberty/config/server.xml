@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="Order Service">
+
+    <featureManager>
+        <feature>cdi-4.0</feature>
+        <feature>mpReactiveMessaging-3.0</feature>
+        <feature>restfulWS-3.1</feature>
+        <feature>jsonb-3.0</feature>
+        <feature>beanValidation-3.0</feature>
+        <feature>mpOpenAPI-4.0</feature>
+        <feature>mpConfig-3.1</feature>
+    </featureManager>
+
+    <variable name="http.port"  defaultValue="8050"/>
+    <variable name="https.port" defaultValue="8051"/>
+
+    <logging consoleLogLevel="INFO"/>
+
+    <httpEndpoint id="defaultHttpEndpoint"
+                  httpPort="${http.port}"
+                  httpsPort="${https.port}"/>
+
+</server>

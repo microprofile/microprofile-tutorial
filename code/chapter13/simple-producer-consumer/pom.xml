@@ -63,6 +63,8 @@
                 <version>3.10</version>
                 <configuration>
                     <serverName>simpleProducerConsumerServer</serverName>
+                    <appsDirectory>apps</appsDirectory>
+                    <looseApplication>false</looseApplication>
                 </configuration>
             </plugin>
         </plugins>

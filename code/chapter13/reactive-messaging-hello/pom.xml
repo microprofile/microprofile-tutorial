@@ -14,8 +14,8 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <liberty.var.http.port>9080</liberty.var.http.port>
-        <liberty.var.https.port>9443</liberty.var.https.port>
+        <liberty.var.http.port>5050</liberty.var.http.port>
+        <liberty.var.https.port>5051</liberty.var.https.port>
     </properties>
 
     <dependencies>
@@ -80,6 +80,8 @@
                 <version>3.10</version>
                 <configuration>
                     <serverName>reactiveMessagingServer</serverName>
+                    <appsDirectory>apps</appsDirectory>
+                    <looseApplication>false</looseApplication>
                 </configuration>
             </plugin>
         </plugins>

@@ -15,9 +15,13 @@ public class SimpleMessageBean {
 
     @Outgoing("greetings-in")
     public PublisherBuilder<String> produce() {
-        String message = "Hello, MicroProfile Reactive Messaging";
-        LOGGER.info("Sending message: " + message);
-        return ReactiveStreams.of(message);
+        java.util.List<String> messages = java.util.List.of(
+            "Hello, MicroProfile Reactive Messaging",
+            "Reactive streams are non-blocking",
+            "Backpressure is handled automatically"
+        );
+        messages.forEach(m -> LOGGER.info("Sending message: " + m));
+        return ReactiveStreams.fromIterable(messages);
     }
 
     @Incoming("greetings-in")

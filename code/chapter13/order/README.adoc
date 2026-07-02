@@ -1,0 +1,509 @@
+= Order Service
+:toc: left
+:icons: font
+:source-highlighter: highlightjs
+
+The Order service is the system of record for the order lifecycle in the MicroProfile e-commerce tutorial.
+It persists orders, exposes a full REST API for order management, and participates in a cross-service Reactive Messaging workflow alongside the Payment service.
+
+== Overview
+
+When a new order is created through the REST API, the service:
+
+. Persists the order with status `CREATED`.
+. Emits the order ID to the `order-created` Kafka topic so the Payment service can authorize payment.
+. Listens on the `payment-authorized` topic and transitions the order to `PAID` once payment is confirmed.
+. Logs the status change via `NotificationService`.
+
+This demonstrates a hybrid architecture: synchronous REST for client-facing operations, asynchronous Reactive Messaging for cross-service workflow progression.
+
+== Project structure
+
+[source]
+----
+order/
++-- pom.xml
++-- src/main/
+    +-- java/io/microprofile/tutorial/store/order/
+    |   +-- OrderApplication.java
+    |   +-- entity/
+    |   |   +-- Order.java
+    |   |   +-- OrderItem.java
+    |   |   +-- OrderStatus.java
+    |   +-- repository/
+    |   |   +-- OrderRepository.java
+    |   |   +-- OrderItemRepository.java
+    |   +-- resource/
+    |   |   +-- OrderResource.java
+    |   |   +-- OrderItemResource.java
+    |   +-- service/
+    |       +-- NotificationService.java
+    |       +-- OrderService.java
+    |       +-- OrderStatusEventHandler.java
+    +-- liberty/config/server.xml
+    +-- resources/META-INF/microprofile-config.properties
+----
+
+== Key classes
+
+=== OrderService
+
+`@ApplicationScoped` bean that owns all order business logic.
+
+* Injects `@Channel("order-created") Emitter<Long>` to publish the new order ID after `createOrder` persists successfully.
+* Calculates `totalPrice` from `orderItems` when not supplied by the caller.
+* `updateOrderStatus` transitions the order to a given `OrderStatus` and persists the change.
+
+[source,java]
+----
+@Inject
+@Channel("order-created")
+private Emitter<Long> orderCreatedEmitter;
+
+@Transactional
+public Order createOrder(Order order) {
+    // ... persist order and items ...
+    orderCreatedEmitter.send(savedResult.getOrderId());
+    return savedResult;
+}
+----
+
+=== OrderStatusEventHandler
+
+`@ApplicationScoped` bean that bridges incoming Reactive Messaging events to order state transitions.
+
+[source,java]
+----
+@Incoming("payment-authorized")
+public void onPaymentAuthorized(Long orderId) {
+    Order updatedOrder = orderService.updateOrderStatus(orderId, OrderStatus.PAID);
+    notificationService.notifyOrderStatusChanged(updatedOrder);
+}
+----
+
+=== NotificationService
+
+Lightweight `@ApplicationScoped` bean that logs order lifecycle events using `java.util.logging`.
+
+=== OrderResource
+
+JAX-RS resource at `/orders`. Annotated with MicroProfile OpenAPI annotations for auto-generated documentation.
+
+[cols="1,2,3", options="header"]
+|===
+|Method |Path |Description
+
+|GET
+|`/orders`
+|List all orders with their items
+
+|GET
+|`/orders/{id}`
+|Get a specific order by ID
+
+|GET
+|`/orders/user/{userId}`
+|Get orders for a specific user
+
+|GET
+|`/orders/status/{status}`
+|Get orders filtered by status
+
+|POST
+|`/orders`
+|Create a new order; triggers the `order-created` Kafka event
+
+|PUT
+|`/orders/{id}`
+|Replace an existing order
+
+|PATCH
+|`/orders/{id}/status/{status}`
+|Update only the order status
+
+|DELETE
+|`/orders/{id}`
+|Delete an order and all its items
+|===
+
+=== OrderItemResource
+
+JAX-RS resource at `/orderItems` for line-item management.
+
+[cols="1,2,3", options="header"]
+|===
+|Method |Path |Description
+
+|GET
+|`/orderItems/{id}`
+|Get an order item by ID
+
+|GET
+|`/orderItems/order/{orderId}`
+|List all items for a given order
+
+|POST
+|`/orderItems/order/{orderId}`
+|Add an item to an existing order; recalculates total price
+
+|PUT
+|`/orderItems/{id}`
+|Update an existing order item; recalculates total price
+
+|DELETE
+|`/orderItems/{id}`
+|Remove an order item; recalculates total price
+|===
+
+== Data model
+
+=== Order
+
+[cols="1,1,2", options="header"]
+|===
+|Field |Type |Notes
+
+|`orderId`
+|`Long`
+|Generated primary key
+
+|`userId`
+|`Long`
+|Required; identifies the customer
+
+|`totalPrice`
+|`BigDecimal`
+|Auto-calculated from `orderItems` if zero or not supplied
+
+|`status`
+|`OrderStatus`
+|Defaults to `CREATED` on creation
+
+|`createdAt`
+|`LocalDateTime`
+|Set automatically on create
+
+|`updatedAt`
+|`LocalDateTime`
+|Updated on every change
+
+|`orderItems`
+|`List<OrderItem>`
+|Eagerly loaded on every read
+|===
+
+*OrderStatus values:* `CREATED`, `PAID`, `PROCESSING`, `SHIPPED`, `DELIVERED`, `CANCELLED`
+
+=== OrderItem
+
+[cols="1,1,2", options="header"]
+|===
+|Field |Type |Notes
+
+|`orderItemId`
+|`Long`
+|Generated primary key
+
+|`orderId`
+|`Long`
+|Foreign key to `Order`
+
+|`productId`
+|`Long`
+|Reference to the catalog product
+
+|`quantity`
+|`Integer`
+|Must be >= 1
+
+|`priceAtOrder`
+|`BigDecimal`
+|Price captured at the time of ordering; >= 0
+|===
+
+== Reactive Messaging channels
+
+[cols="1,1,1,2", options="header"]
+|===
+|Channel |Direction |Payload type |Description
+
+|`order-created`
+|Outgoing (`Emitter`)
+|`Long` (orderId)
+|Emitted after a new order is persisted; consumed by the Payment service
+
+|`payment-authorized`
+|Incoming (`@Incoming`)
+|`Long` (orderId)
+|Consumed from Kafka after the Payment service authorizes payment; triggers the `CREATED -> PAID` transition
+|===
+
+=== microprofile-config.properties
+
+[source,properties]
+----
+# Kafka connector shared bootstrap
+mp.messaging.connector.liberty-kafka.bootstrap.servers=localhost:9092
+
+# Outgoing: order-created
+mp.messaging.outgoing.order-created.connector=liberty-kafka
+mp.messaging.outgoing.order-created.topic=order-created-topic
+
+# Incoming: payment-authorized
+mp.messaging.incoming.payment-authorized.connector=liberty-kafka
+mp.messaging.incoming.payment-authorized.topic=payment-authorized-topic
+mp.messaging.incoming.payment-authorized.group.id=order-service-group
+----
+
+== Liberty server configuration
+
+`server.xml` enables exactly the features this service needs:
+
+[source,xml]
+----
+<featureManager>
+    <feature>cdi-4.0</feature>
+    <feature>mpReactiveMessaging-3.0</feature>
+    <feature>restfulWS-3.1</feature>
+    <feature>jsonb-3.0</feature>
+    <feature>beanValidation-3.0</feature>
+    <feature>mpOpenAPI-4.0</feature>
+    <feature>mpConfig-3.1</feature>
+</featureManager>
+
+<logging consoleLogLevel="INFO"/>
+----
+
+`consoleLogLevel="INFO"` is required for `java.util.logging` INFO messages (published by `NotificationService`) to appear in the Maven console output.
+
+== Maven plugin configuration
+
+[source,xml]
+----
+<plugin>
+    <groupId>io.openliberty.tools</groupId>
+    <artifactId>liberty-maven-plugin</artifactId>
+    <version>3.10</version>
+    <configuration>
+        <serverName>OrderServer</serverName>
+        <appsDirectory>apps</appsDirectory>
+        <looseApplication>false</looseApplication>
+    </configuration>
+</plugin>
+----
+
+* `appsDirectory=apps` -- deploys the WAR into the `apps/` directory that Liberty's auto-deployment scan watches, matching the convention used when `server.xml` does not contain an explicit `<webApplication>` element.
+* `looseApplication=false` -- forces the plugin to deploy the packaged WAR (`target/order.war`) rather than a loose XML descriptor. This makes `mvn clean package liberty:run` self-contained and predictable from a fresh checkout.
+
+== Prerequisites
+
+* Java 21
+* Apache Maven 3.9+
+* Docker (to run Kafka)
+* Payment service running on port 9080
+
+== Running the service
+
+=== Step 1: Start Kafka
+
+[source,bash]
+----
+docker rm -f kafka 2>/dev/null; \
+docker run -d --name kafka \
+  -p 9092:9092 \
+  -e KAFKA_NODE_ID=1 \
+  -e KAFKA_PROCESS_ROLES=broker,controller \
+  -e KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093 \
+  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
+  -e KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093 \
+  -e KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER \
+  -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+  apache/kafka:latest
+----
+
+`docker rm -f kafka 2>/dev/null` stops and removes any existing `kafka` container before starting a fresh one.
+The `2>/dev/null` suppresses the harmless "No such container" message when no prior container exists.
+
+=== Step 2: Start the Order service
+
+[source,bash]
+----
+cd code/chapter13/order
+mvn clean package liberty:run
+----
+
+The server starts on port *8050* (HTTP) and *8051* (HTTPS).
+
+`mvn clean package` before `liberty:run` ensures Liberty picks up the latest WAR and `server.xml`.
+Look for `CWWKZ0001I: Application order started` in the console before sending requests.
+
+=== Step 3: Start the Payment service (separate terminal)
+
+[source,bash]
+----
+cd code/chapter13/payment
+mvn clean package liberty:run
+----
+
+The Payment service starts on port *9080*.
+
+== Verifying the end-to-end flow
+
+=== Create an order
+
+[source,bash]
+----
+curl -s -X POST http://localhost:8050/order/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "totalPrice": 99.99,
+    "orderItems": [
+      {"productId": 101, "quantity": 2, "priceAtOrder": 49.99}
+    ]
+  }' | jq .
+----
+
+Note the `orderId` in the response. The service simultaneously emits that ID to `order-created-topic`.
+
+=== Verify the messages in Kafka
+
+Use the Kafka console consumer, run inside the `kafka` container started in Step 1, to inspect the messages published to each topic.
+The order ID is sent as a raw `Long`, so pass `value.deserializer` as a formatter property; otherwise the consumer prints unreadable bytes.
+
+[source,bash]
+----
+docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic order-created-topic \
+  --from-beginning \
+  --formatter-property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
+----
+
+Expected: the `orderId` from the response above (e.g. `1`).
+
+Once the Payment service has processed the order, check `payment-authorized-topic` the same way:
+
+[source,bash]
+----
+docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh \
+  --bootstrap-server localhost:9092 \
+  --topic payment-authorized-topic \
+  --from-beginning \
+  --formatter-property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
+----
+
+Expected: the same `orderId`, confirming the Payment service consumed the event and published its authorization back.
+
+Press kbd:[Ctrl+C] to stop watching. Drop `--from-beginning` to see only new messages going forward.
+
+=== Confirm initial status is CREATED
+
+[source,bash]
+----
+curl -s http://localhost:8050/order/api/orders/1 | jq .status
+----
+
+Expected: `"CREATED"`
+
+=== After payment processing, verify the transition to PAID
+
+Allow a moment for the Payment service to consume the event and publish to `payment-authorized-topic`.
+
+[source,bash]
+----
+curl -s http://localhost:8050/order/api/orders/1 | jq .status
+----
+
+Expected: `"PAID"`
+
+== Expected log output
+
+Order service console:
+
+[source]
+----
+[OrderService] Publishing order-created event for orderId=1
+[OrderStatusEventHandler] onPaymentAuthorized called with orderId=1
+[NotificationService] Order status changed: orderId=1, status=PAID
+----
+
+Payment service console:
+
+[source]
+----
+[PaymentRequestHandler] Processing payment for order 1
+----
+
+== Additional API examples
+
+=== List all orders
+
+[source,bash]
+----
+curl -s http://localhost:8050/order/api/orders | jq .
+----
+
+=== Get orders by user
+
+[source,bash]
+----
+curl -s http://localhost:8050/order/api/orders/user/1 | jq .
+----
+
+=== Filter orders by status
+
+[source,bash]
+----
+curl -s http://localhost:8050/order/api/orders/status/PAID | jq .
+----
+
+=== Manually patch order status
+
+[source,bash]
+----
+curl -s -X PATCH http://localhost:8050/order/api/orders/1/status/PROCESSING | jq .status
+----
+
+=== Add a line item to an existing order
+
+[source,bash]
+----
+curl -s -X POST http://localhost:8050/order/api/orderItems/order/1 \
+  -H "Content-Type: application/json" \
+  -d '{"productId": 202, "quantity": 1, "priceAtOrder": 29.99}' | jq .
+----
+
+=== Delete an order
+
+[source,bash]
+----
+curl -s -X DELETE http://localhost:8050/order/api/orders/1
+----
+
+Returns HTTP 204 No Content on success.
+
+== OpenAPI documentation
+
+With the service running, the interactive UI is available at:
+
+----
+http://localhost:8050/order/openapi/ui
+----
+
+The raw OpenAPI document:
+
+----
+http://localhost:8050/order/openapi
+----
+
+== Stopping the services
+
+[source,bash]
+----
+# Stop Liberty in each service directory
+mvn liberty:stop
+
+# Stop and remove the Kafka container
+docker stop kafka && docker rm kafka
+----

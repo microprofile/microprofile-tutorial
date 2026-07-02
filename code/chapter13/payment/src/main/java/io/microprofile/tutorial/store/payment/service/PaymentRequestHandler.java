@@ -1,7 +1,5 @@
 package io.microprofile.tutorial.store.payment.service;
 
-import io.microprofile.tutorial.store.payment.entity.Order;
-import io.microprofile.tutorial.store.payment.entity.OrderStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
@@ -9,8 +7,9 @@ import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import java.util.logging.Logger;
 
 /**
- * Reactive messaging handler that runs in the payment service and marks
- * incoming orders as paid for downstream processing.
+ * Reactive messaging handler that runs in the payment service.
+ * Receives an order ID from order-created, authorizes payment,
+ * and forwards the same order ID to payment-authorized.
  */
 @ApplicationScoped
 public class PaymentRequestHandler {
@@ -19,9 +18,9 @@ public class PaymentRequestHandler {
 
     @Incoming("order-created")
     @Outgoing("payment-authorized")
-    public Order processPayment(Order order) {
-        LOGGER.info(() -> "Processing payment for order " + order.getOrderId());
-        order.setStatus(OrderStatus.PAID);
-        return order;
+    public Long processPayment(Long orderId) {
+        LOGGER.info(() -> "Processing payment for order " + orderId);
+        // Payment authorization logic would go here
+        return orderId;
     }
 }

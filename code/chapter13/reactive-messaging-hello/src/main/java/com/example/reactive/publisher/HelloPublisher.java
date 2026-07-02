@@ -20,7 +20,7 @@ public class HelloPublisher {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     @Inject
-    @Channel("hello-out")
+    @Channel("hello-in")
     Emitter<String> helloEmitter;
 
     /**
@@ -35,7 +35,7 @@ public class HelloPublisher {
      * Stream-based publishing - generates messages every 10 seconds
      * Uncomment the @Outgoing annotation to enable automatic publishing
      */
-    // @Outgoing("hello-out")
+    // @Outgoing("hello-in")
     public Publisher<String> generatePeriodicMessages() {
         return ReactiveStreams.generate(() -> {
             int count = counter.incrementAndGet();

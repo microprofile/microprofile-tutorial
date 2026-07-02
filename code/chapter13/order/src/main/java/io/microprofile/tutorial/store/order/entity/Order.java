@@ -33,7 +33,7 @@ public class Order {
     private BigDecimal totalPrice;
 
     @NotNull(message = "Status cannot be null")
-    private OrderStatus status;
+    private OrderStatus status = OrderStatus.CREATED;
 
     private LocalDateTime createdAt;
     

@@ -256,3 +256,269 @@ This approach gives the caller an immediate response at checkout time while stil
 === Step 4: Publish normalized order state
 
 * Order Service becomes the single place that converts downstream outcomes into official order statuses
+
+== Running the examples
+
+This chapter contains three runnable projects, each demonstrating a different level of MicroProfile Reactive Messaging.
+
+[cols="2,2,1,2", options="header"]
+|===
+|Project |What it shows |Port |Broker required
+
+|`simple-producer-consumer`
+|In-memory producer → processor → consumer pipeline in a single bean
+|9085
+|None
+
+|`reactive-messaging-hello`
+|Programmatic publishing via `Emitter` + REST API to trigger and inspect messages
+|5050
+|None (Kafka optional)
+
+|`order` + `payment`
+|Cross-service event flow: order creation emits an event that the payment service consumes and acknowledges
+|8050 / 9080
+|Kafka
+|===
+
+=== Prerequisites
+
+* Java 21
+* Apache Maven 3.9+
+* Docker (only for the `order` + `payment` services)
+
+=== Example 1: simple-producer-consumer
+
+The `SimpleMessageBean` class wires a three-stage in-memory pipeline entirely within a single CDI bean.
+No external broker or connector configuration is required.
+
+[source,bash]
+----
+cd code/chapter13/simple-producer-consumer
+mvn clean package liberty:run
+----
+
+Use `mvn clean package` before `liberty:run` on a fresh checkout (or after changes) so Liberty picks up the latest `server.xml` and WAR.
+The `server.xml` sets `consoleLogLevel="INFO"`, which is required for `java.util.logging` INFO messages to appear in the Maven console.
+
+The pipeline fires at CDI startup.
+Watch the console for these entries shortly after `CWWKZ0001I: Application started`:
+
+[source]
+----
+[INFO    ] Sending message: Hello, MicroProfile Reactive Messaging
+[INFO    ] Sending message: Reactive streams are non-blocking
+[INFO    ] Sending message: Backpressure is handled automatically
+[INFO    ] Processing message: Hello, MicroProfile Reactive Messaging
+[INFO    ] Received message: HELLO, MICROPROFILE REACTIVE MESSAGING
+[INFO    ] Processing message: Reactive streams are non-blocking
+[INFO    ] Received message: REACTIVE STREAMS ARE NON-BLOCKING
+[INFO    ] Processing message: Backpressure is handled automatically
+[INFO    ] Received message: BACKPRESSURE IS HANDLED AUTOMATICALLY
+----
+
+Stop the server with `Ctrl+C` or:
+
+[source,bash]
+----
+mvn liberty:stop
+----
+
+=== Example 2: reactive-messaging-hello
+
+`HelloPublisher` injects an `Emitter<String>` on channel `hello-in`.
+`HelloConsumer` is annotated with `@Incoming("hello-in")`.
+Both use the same channel name so the runtime wires them in-memory by default — no Kafka needed.
+
+[source,bash]
+----
+cd code/chapter13/reactive-messaging-hello
+mvn clean package liberty:run
+----
+
+The server starts on port *5050*.
+Use the REST API to publish messages and observe delivery.
+
+==== Publish a message
+
+[source,bash]
+----
+curl -s -X POST http://localhost:5050/reactive-messaging-hello/api/hello/publish \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hello Reactive World"}' | jq .
+----
+
+Expected response:
+
+[source,json]
+----
+{"status":"published","message":"Hello Reactive World"}
+----
+
+==== Check received messages
+
+[source,bash]
+----
+curl -s http://localhost:5050/reactive-messaging-hello/api/hello/messages | jq .
+----
+
+Expected response (after the publish above):
+
+[source,json]
+----
+{"count":1,"messages":["Hello Reactive World"]}
+----
+
+==== Trigger the warning-log branch
+
+[source,bash]
+----
+curl -s -X POST http://localhost:5050/reactive-messaging-hello/api/hello/publish \
+  -H "Content-Type: application/json" \
+  -d '{"message": "simulate error condition"}' | jq .
+----
+
+The server log will show a `WARNING` line from `HelloConsumer.processMessage()` because the payload contains the word `error`.
+
+==== Clear messages and health check
+
+[source,bash]
+----
+# Clear the in-memory list
+curl -s -X DELETE http://localhost:5050/reactive-messaging-hello/api/hello/messages | jq .
+
+# Health check
+curl -s http://localhost:5050/reactive-messaging-hello/api/hello/health | jq .
+----
+
+==== Switch to Kafka (optional)
+
+To use a real Kafka broker instead of in-memory wiring, start Kafka and edit
+`src/main/resources/META-INF/microprofile-config.properties`:
+uncomment the Kafka connector lines and comment out the default in-memory section,
+then restart the server with `mvn liberty:run`.
+
+[source,bash]
+----
+docker run -d --name kafka \
+  -p 9092:9092 \
+  -e KAFKA_NODE_ID=1 \
+  -e KAFKA_PROCESS_ROLES=broker,controller \
+  -e KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093 \
+  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
+  -e KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093 \
+  -e KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER \
+  -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+  apache/kafka:latest
+----
+
+=== Example 3: order + payment services
+
+These two services demonstrate a real cross-service Reactive Messaging flow.
+
+* The *Order* service emits a `Long` order ID to the `order-created` Kafka topic after persisting an order.
+* The *Payment* service consumes `order-created`, authorizes the payment, and re-emits the order ID to `payment-authorized`.
+* The *Order* service consumes `payment-authorized` and transitions the order status to `PAID`.
+
+==== Start Kafka
+
+[source,bash]
+----
+docker run -d --name kafka \
+  -p 9092:9092 \
+  -e KAFKA_NODE_ID=1 \
+  -e KAFKA_PROCESS_ROLES=broker,controller \
+  -e KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093 \
+  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
+  -e KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093 \
+  -e KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER \
+  -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+  apache/kafka:latest
+----
+
+==== Start the Order service
+
+[source,bash]
+----
+cd code/chapter13/order
+mvn clean package liberty:run
+----
+
+The Order service starts on port *8050*.
+
+==== Start the Payment service (separate terminal)
+
+[source,bash]
+----
+cd code/chapter13/payment
+mvn clean package liberty:run
+----
+
+The Payment service starts on port *9080*.
+
+==== Validate the end-to-end flow
+
+*Step 1* — Create an order.
+The Order service persists it, sets status `CREATED`, then emits its ID to the `order-created` topic.
+
+[source,bash]
+----
+curl -s -X POST http://localhost:8050/order/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "totalPrice": 99.99,
+    "orderItems": [
+      {"productId": 101, "quantity": 2, "priceAtOrder": 49.99}
+    ]
+  }' | jq .
+----
+
+Note the `orderId` from the response (for example, `1`).
+
+*Step 2* — Confirm initial status is `CREATED`.
+
+[source,bash]
+----
+curl -s http://localhost:8050/order/api/orders/1 | jq .status
+----
+
+Expected: `"CREATED"`
+
+*Step 3* — Wait a moment for the Payment service to consume the event, then verify the status has transitioned.
+
+[source,bash]
+----
+curl -s http://localhost:8050/order/api/orders/1 | jq .status
+----
+
+Expected: `"PAID"`
+
+==== Expected log output
+
+Order service:
+
+[source]
+----
+[OrderService] Publishing order-created event for orderId=1
+[OrderStatusEventHandler] onPaymentAuthorized called with orderId=1
+[NotificationService] Order status changed: orderId=1, status=PAID
+----
+
+Payment service:
+
+[source]
+----
+[PaymentRequestHandler] Processing payment for order 1
+----
+
+==== Stop all services
+
+[source,bash]
+----
+# In each service directory
+mvn liberty:stop
+
+# Stop Kafka
+docker stop kafka && docker rm kafka
+----
