@@ -1,13 +1,13 @@
 <server description="MicroProfile Tutorial Liberty Server">
     <featureManager>
+        <platform>microProfile-7.1</platform>
         <platform>jakartaEE-10.0</platform>
-        <platform>microProfile-6.1</platform>
         <feature>restfulWS</feature>
         <feature>jsonp</feature>
         <feature>jsonb</feature>
         <feature>cdi</feature>
         <feature>mpConfig</feature>
-        <feature>mpOpenAPI</feature>
+        <feature>mpOpenAPI-4.1</feature>
         <feature>mpHealth</feature>
         <feature>mpMetrics</feature>
         <feature>mpFaultTolerance</feature>
@@ -16,7 +16,16 @@
     <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
                   id="defaultHttpEndpoint" host="*" />
     <mpMetrics authentication="false"/>
+
+    <!-- The Bulkhead on sendPaymentNotification allows 10 concurrent + 20 queued
+         executions, but Liberty's default executor sizes its thread pool to the
+         number of available CPU cores (as low as 4 on small hosts). With too few
+         real threads, @Asynchronous tasks queue behind each other, and that extra
+         wait time counts against @Timeout, producing timeouts that have nothing
+         to do with the simulated failure rate. Size the pool so the bulkhead's
+         concurrency limits - not host CPU count - govern demo behavior. -->
+    <executor id="default" coreThreads="25" maxThreads="50" />
     <webApplication location="payment.war" contextRoot="${app.context.root}"/>
-    <logging traceSpecification="*=info:com.ibm.ws.webcontainer*=all:com.ibm.ws.jaxrs*=all:com.ibm.ws.app.manager*=all:com.ibm.ws.microprofile.health.*=all:io.microprofile.tutorial.store.product.*=all:io.microprofile.tutorial.store.payment.*=all" />
+    <logging traceSpecification="*=info:io.microprofile.tutorial.store.payment.*=all" maxFileSize="20" maxFiles="10" />
     
 </server>

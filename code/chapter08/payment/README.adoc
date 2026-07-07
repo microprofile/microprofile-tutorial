@@ -1,132 +1,610 @@
-= Payment Service
+= Payment Service - MicroProfile Fault Tolerance
 :toc: macro
-:toclevels: 3
+:toclevels: 1
 :icons: font
 :source-highlighter: highlight.js
 :experimental:
 
 toc::[]
 
-This microservice is part of the Jakarta EE 10 and MicroProfile 6.1-based e-commerce application. It handles payment processing and transaction management.
+This microservice demonstrates MicroProfile Fault Tolerance patterns for building resilient payment processing services. It is part of the Jakarta EE and MicroProfile based e-commerce tutorial.
 
 == Features
 
-* Payment transaction processing
-* Dynamic configuration management via MicroProfile Config
-* RESTful API endpoints with JSON support
-* Custom ConfigSource implementation
-* OpenAPI documentation
-* **MicroProfile Fault Tolerance with Retry Policies**
-* **Circuit Breaker protection for external services**
-* **Fallback mechanisms for service resilience**
-* **Bulkhead pattern for concurrency control**
-* **Timeout protection for long-running operations**
+* **Payment Authorization** with Retry, Timeout, and Fallback
+* **Gateway Health Checks** with Circuit Breaker protection
+* **Async Notifications** with Bulkhead resource isolation
 
 == MicroProfile Fault Tolerance Implementation
 
-The Payment Service implements comprehensive fault tolerance patterns using MicroProfile Fault Tolerance annotations:
+The Payment Service demonstrates three distinct fault tolerance patterns, each applied to different service methods:
 
-=== Retry Policies
+=== 1. Payment Authorization (Retry + Timeout + Fallback)
 
-The service implements different retry strategies based on operation criticality:
+**Method**: `PaymentService.authorizePayment()`
 
-==== Payment Authorization Retry (@Retry)
-* **Max Retries**: 3 attempts
-* **Delay**: 1000ms with 500ms jitter
-* **Max Duration**: 10 seconds
-* **Retry On**: RuntimeException, WebApplicationException
-* **Use Case**: Standard payment authorization with exponential backoff
+**Fault Tolerance Strategy:**
 
+* **@Retry**: Handles transient network failures (up to 3 retries with jitter)
+* **@Timeout**: Prevents indefinite waits (3 second limit per attempt)
+* **@Fallback**: Provides degraded service when gateway unavailable
+
+**Configuration:**
 [source,java]
 ----
 @Retry(
     maxRetries = 3,
     delay = 2000,
-    maxDuration = 10000
     jitter = 500,
-    retryOn = {RuntimeException.class, WebApplicationException.class}
+    retryOn = PaymentProcessingException.class,
+    abortOn = CriticalPaymentException.class
 )
+@Timeout(3000)
+@Fallback(fallbackMethod = "fallbackAuthorizePayment")
+public String authorizePayment(PaymentDetails paymentDetails)
 ----
 
-=== Circuit Breaker Protection
+**Behavior:**
 
-Payment capture operations use circuit breaker pattern:
+* Retries transient failures (network timeouts, temporary gateway issues)
+* Does NOT retry critical errors (invalid card, insufficient funds)
+* Falls back to offline processing queue if all retries fail
+* Each retry attempt has its own 3-second timeout
 
+=== 2. Gateway Health Check (Circuit Breaker + Timeout)
+
+**Method**: `PaymentService.checkGatewayHealth()`
+
+**Fault Tolerance Strategy:**
+
+* **@CircuitBreaker**: Prevents hammering failed gateway (opens at 50% failure rate)
+* **@Timeout**: Quick health check (2 second limit)
+
+**Configuration:**
 [source,java]
 ----
 @CircuitBreaker(
     failureRatio = 0.5,
     requestVolumeThreshold = 4,
-    delay = 5000
+    delay = 5000,
+    successThreshold = 2
 )
+@Timeout(2000)
+public boolean checkGatewayHealth()
 ----
 
-* **Failure Ratio**: 50% failure rate triggers circuit opening
-* **Request Volume**: Minimum 4 requests for evaluation
-* **Recovery Delay**: 5 seconds before attempting recovery
+**Circuit Breaker States:**
 
-=== Timeout Protection
+* **CLOSED**: Normal operation, all health checks pass through
+* **OPEN**: Circuit breaker activated after 50% failure rate (2 of 4 requests fail)
+* **HALF_OPEN**: After 5-second delay, allows 2 test requests
+* **CLOSED**: Returns to normal after 2 consecutive successful tests
 
-Operations with potential long delays are protected with timeouts:
+**Behavior:**
 
+* Prevents repeated health checks to failed gateway
+* Automatically recovers when gateway comes back online
+* Reduces load on failing systems
+
+=== 3. Payment Notification (Asynchronous + Bulkhead + Fallback)
+
+**Method**: `PaymentService.sendPaymentNotification()`
+
+**Fault Tolerance Strategy:**
+
+* **@Asynchronous**: Non-blocking execution in separate thread
+* **@Bulkhead**: Limits concurrent notifications (max 10, queue 20)
+* **@Timeout**: Prevents stuck notification threads (5 second limit)
+* **@Fallback**: Logs failed notifications for retry
+
+**Configuration:**
 [source,java]
 ----
-@Timeout(value = 3000)
+@Asynchronous
+@Bulkhead(value = 10, waitingTaskQueue = 20)
+@Timeout(5000)
+@Fallback(fallbackMethod = "fallbackSendNotification")
+public CompletionStage<String> sendPaymentNotification(String paymentId, String recipient)
 ----
 
-=== Bulkhead Pattern
+**Behavior:**
 
-The bulkhead pattern limits concurrent requests to prevent system overload:
+* Returns immediately (non-blocking) via CompletionStage
+* Up to 10 concurrent notifications processing
+* Additional 20 notifications queued
+* Excess notifications rejected to prevent overload
+* Failed notifications logged for later retry
 
-[source,java]
-----
-@Bulkhead(value = 5)
-----
-
-* **Concurrent Requests**: Limited to 5 concurrent requests
-* **Excess Requests**: Rejected immediately instead of queuing
-* **Use Case**: Protect service from traffic spikes and cascading failures
-
-=== Fallback Mechanisms
-
-All critical operations have fallback methods that provide graceful degradation:
-
-* **Payment Authorization Fallback**: Returns service unavailable with retry instructions
-
-== Endpoints
-
-=== GET /payment/api/payment-config
-* Returns all current payment configuration values
-* Example: `GET http://localhost:9080/payment/api/payment-config`
-* Response: `{"gateway.endpoint":"https://api.paymentgateway.com"}`
-
-=== POST /payment/api/payment-config
-* Updates a payment configuration value
-* Example: `POST http://localhost:9080/payment/api/payment-config`
-* Request body: `{"key": "payment.gateway.endpoint", "value": "https://new-api.paymentgateway.com"}`
-* Response: `{"key":"payment.gateway.endpoint","value":"https://new-api.paymentgateway.com","message":"Configuration updated successfully"}`
+== REST Endpoints
 
 === POST /payment/api/authorize
-* Processes a payment authorization with retry policy
-* **Retry Configuration**: 3 attempts, 1s delay, 500ms jitter
-* **Fallback**: Service unavailable response
-* Example: `POST http://localhost:9080/payment/api/authorize`
-* Request body: `{"cardNumber":"4111111111111111", "cardHolderName":"Test User", "expiryDate":"12/25", "securityCode":"123", "amount":100.00}`
-* Response: `{"status":"success", "message":"Payment authorized successfully", "transactionId":"TXN1234567890", "amount":100.00}`
-* Fallback Response: `{"status":"failed", "message":"Payment gateway unavailable. Please try again later.", "fallback":true}`
 
-=== POST /payment/api/payment-config/process-example
-* Example endpoint demonstrating payment processing with configuration
-* Example: `POST http://localhost:9080/payment/api/payment-config/process-example`
-* Request body: `{"cardNumber":"4111111111111111", "cardHolderName":"Test User", "expiryDate":"12/25", "securityCode":"123", "amount":100.00}`
-* Response: `{"amount":100.00,"message":"Payment processed successfully","status":"success","configUsed":{"gatewayEndpoint":"https://new-api.paymentgateway.com"}}`
+Authorize a payment with full fault tolerance protection.
+
+**Request:**
+[source,bash]
+----
+curl -X POST "http://localhost:9080/payment/api/authorize?amount=100.50"
+----
+
+**Success Response (200 OK):**
+[source,json]
+----
+{
+  "status": "success",
+  "message": "Payment authorized",
+  "amount": 100.50
+}
+----
+
+**Fallback Response (200 OK - degraded service):**
+[source,json]
+----
+{
+  "status": "pending",
+  "message": "Payment queued for processing",
+  "amount": 100.50
+}
+----
+
+**Error Response (400 Bad Request):**
+[source,json]
+----
+{
+  "error": "Invalid payment amount: -10"
+}
+----
+
+=== GET /payment/api/health/gateway
+
+Check payment gateway health with circuit breaker protection.
+
+**Request:**
+[source,bash]
+----
+curl http://localhost:9080/payment/api/health/gateway
+----
+
+**Healthy Response (200 OK):**
+[source,json]
+----
+{
+  "status": "healthy",
+  "message": "Payment gateway is operational"
+}
+----
+
+**Circuit Open Response (503 Service Unavailable):**
+[source,json]
+----
+{
+  "status": "circuit_open",
+  "message": "Circuit breaker is open - gateway appears to be down"
+}
+----
+
+=== POST /payment/api/notify/{paymentId}
+
+Send asynchronous payment notification with bulkhead protection.
+
+**Request:**
+[source,bash]
+----
+curl -X POST "http://localhost:9080/payment/api/notify/PAY-12345?recipient=customer@example.com"
+----
+
+**Success Response (200 OK):**
+[source,json]
+----
+{
+  "status": "success",
+  "message": "Notification sent successfully"
+}
+----
+
+**Bulkhead Rejected Response (503 Service Unavailable):**
+[source,json]
+----
+{
+  "status": "rejected",
+  "message": "Too many concurrent notifications - please try again later"
+}
+----
+
+== Testing and Verifying Fault Tolerance
+
+This section explains how to test and verify that each fault tolerance pattern is working correctly.
+
+=== Automated Test Scripts
+
+The payment service includes comprehensive test scripts that demonstrate all fault tolerance patterns:
+
+[source,bash]
+----
+cd code/chapter08/payment
+
+# 1. Basic smoke test - verify all endpoints work
+./test-payment-basic.sh
+
+# 2. Test retry behavior (30% simulated failure rate)
+./test-payment-retry.sh
+
+# 3. Test circuit breaker state transitions
+./test-payment-circuit-breaker.sh
+
+# 4. Test asynchronous execution
+./test-payment-async.sh
+
+# 5. Test bulkhead resource isolation
+./test-payment-bulkhead.sh
+
+# 6. Comprehensive load test (all patterns)
+./test-payment-concurrent-load.sh
+----
+
+=== Manual Testing: Retry Pattern
+
+**What to test:** The authorization endpoint retries transient failures but aborts on critical errors.
+
+**Test valid payment (may trigger retries):**
+[source,bash]
+----
+curl -X POST "http://localhost:9080/payment/api/authorize?amount=100.50"
+----
+
+**Expected behavior:**
+* 70% success rate (simulated)
+* Failed requests automatically retry up to 3 times
+* Each retry has 2-2.5 second delay (2000ms + 500ms jitter)
+* Total duration reveals retry count:
+  - ~1.5s = Success on 1st attempt
+  - ~4s = Needed 1 retry
+  - ~6.5s = Needed 2 retries
+  - ~9-12s = All 3 retries or fallback
+
+**Test abort condition (no retries):**
+[source,bash]
+----
+curl -X POST "http://localhost:9080/payment/api/authorize?amount=0"
+curl -X POST "http://localhost:9080/payment/api/authorize?amount=-50"
+----
+
+**Expected behavior:**
+* Immediate failure (~1.5s) with HTTP 400
+* No retries attempted (abort on CriticalPaymentException)
+
+**Verification:**
+[source,bash]
+----
+# Check retry metrics
+curl http://localhost:9080/metrics?scope=base | grep "ft_authorizePayment_retry"
+
+# Look for:
+# - retry_callsSucceededNotRetried_total (first-attempt successes)
+# - retry_callsSucceededRetried_total (succeeded after retry)
+# - retry_retries_total (total number of retries executed)
+----
+
+=== Manual Testing: Circuit Breaker Pattern
+
+**What to test:** The health check endpoint opens the circuit after repeated failures, preventing cascade.
+
+**Trigger circuit breaker (50% simulated failure rate):**
+[source,bash]
+----
+# Send 10 health checks - circuit should open after ~4-5 requests
+for i in {1..10}; do
+  echo "Request $i:"
+  curl http://localhost:9080/payment/api/health/gateway
+  echo ""
+  sleep 0.5
+done
+----
+
+**Expected state transitions:**
+1. **CLOSED** (0): First few requests pass through normally
+2. **OPEN** (1): After 2 failures out of 4 requests (50% threshold), circuit opens
+3. Subsequent requests fail immediately with "Circuit breaker is OPEN" message
+4. **HALF_OPEN** (2): After 5-second delay, circuit allows test requests
+5. **CLOSED** (0): After 2 consecutive successes, circuit returns to normal
+
+**Wait for recovery:**
+[source,bash]
+----
+# Wait 5 seconds for circuit delay
+sleep 5
+
+# Send requests to test HALF_OPEN → CLOSED transition
+curl http://localhost:9080/payment/api/health/gateway  # Test 1
+curl http://localhost:9080/payment/api/health/gateway  # Test 2 (should close circuit)
+----
+
+**Verification:**
+[source,bash]
+----
+# Check circuit breaker state
+curl http://localhost:9080/metrics?scope=base | grep "ft_checkGatewayHealth_circuitbreaker"
+
+# Look for:
+# - circuitbreaker_state_total{state="0"} = CLOSED count
+# - circuitbreaker_state_total{state="1"} = OPEN count
+# - circuitbreaker_state_total{state="2"} = HALF_OPEN count
+# - circuitbreaker_opened_total = Number of times circuit opened
+----
+
+=== Manual Testing: Bulkhead Pattern
+
+**What to test:** The notification endpoint limits concurrent executions and rejects excess requests.
+
+**Send concurrent requests to test limits:**
+[source,bash]
+----
+# Send 15 concurrent notifications
+# Expected: 3 concurrent + 2 queued = 5 accepted, 10 rejected
+for i in {1..15}; do
+  curl -X POST "http://localhost:9080/payment/api/notify/PAY-$(printf "%05d" $i)" &
+done
+wait
+----
+
+**Expected behavior:**
+* **Bulkhead capacity:** 3 concurrent + 2 waiting queue = 5 total
+* Requests 1-3: Execute immediately (concurrent slots)
+* Requests 4-5: Queued for execution (waiting queue)
+* Requests 6-15: **Rejected** with BulkheadException (HTTP 503)
+
+**Verification:**
+[source,bash]
+----
+# Check bulkhead metrics
+curl http://localhost:9080/metrics?scope=base | grep "ft_sendPaymentNotification_bulkhead"
+
+# Look for:
+# - bulkhead_callsAccepted_total (accepted requests)
+# - bulkhead_callsRejected_total (rejected requests)
+# - bulkhead_executionDuration_* (execution time stats)
+# - bulkhead_queuePopulation_current (current queue size)
+----
+
+=== Manual Testing: Asynchronous Pattern
+
+**What to test:** The notification endpoint returns immediately (non-blocking) despite 2-second processing time.
+
+**Send sequential async requests:**
+[source,bash]
+----
+# Time 5 sequential async requests
+time for i in {1..5}; do
+  curl -X POST "http://localhost:9080/payment/api/notify/PAY-0000$i"
+done
+
+# Expected: < 2.5 seconds total (if truly async)
+# If blocking: ~10 seconds (5 requests × 2s each)
+----
+
+**Expected behavior:**
+* Each request returns immediately (< 0.5s)
+* Total time for 5 requests: < 2.5 seconds
+* Processing continues in background
+* Uses CompletionStage (not Future) for proper fault tolerance integration
+
+**Verification:**
+* Check response time (should be < 500ms per request)
+* Monitor server logs for async processing
+* Verify bulkhead metrics show concurrent executions
+
+=== Observing Fault Tolerance in Server Logs
+
+Monitor the Liberty server logs to see fault tolerance in action:
+
+[source,bash]
+----
+# Tail the server logs
+tail -f target/liberty/wlp/usr/servers/defaultServer/logs/messages.log
+
+# Look for log messages indicating:
+# - "Processing payment..." (method entry)
+# - "Retry attempt X of 3" (retry behavior)
+# - "Circuit breaker opened/closed" (state changes)
+# - "Bulkhead rejected request" (resource limits)
+# - "Fallback invoked" (degraded service)
+----
+
+=== Validating Configuration
+
+Test that fault tolerance configuration is loaded correctly:
+
+[source,bash]
+----
+# Check all fault tolerance configuration properties
+curl http://localhost:9080/payment/api/payment-config | grep -E "(retry|timeout|circuitbreaker|bulkhead)"
+----
+
+=== Complete Verification Checklist
+
+Use this checklist to verify all fault tolerance patterns:
+
+- [ ] **Retry**: Failed requests retry automatically (check logs and metrics)
+- [ ] **Retry Abort**: Critical errors don't retry (test with amount=0)
+- [ ] **Timeout**: Requests timeout after configured duration
+- [ ] **Circuit Breaker**: Circuit opens after failure threshold
+- [ ] **Circuit Recovery**: Circuit closes after successful probes
+- [ ] **Bulkhead**: Concurrent requests limited (check rejected count)
+- [ ] **Async**: Requests return immediately (< 500ms response time)
+- [ ] **Fallback**: Degraded service provided on failures
+- [ ] **Metrics**: All fault tolerance metrics exposed and updating
+
+**Success criteria:** All test scripts complete successfully, and metrics show expected fault tolerance activations.
+
+== Monitoring with MicroProfile Metrics
+
+Access fault tolerance metrics at the metrics endpoint:
+
+[source,bash]
+----
+# View all base scope metrics (includes fault tolerance)
+curl http://localhost:9080/metrics?scope=base
+
+# Filter for payment authorization retry metrics
+curl http://localhost:9080/metrics?scope=base | grep "authorizePayment.*retry"
+
+# Check circuit breaker state (0=CLOSED, 1=OPEN, 2=HALF_OPEN)
+curl http://localhost:9080/metrics?scope=base | grep "circuitbreaker.state"
+
+# View bulkhead metrics
+curl http://localhost:9080/metrics?scope=base | grep "bulkhead"
+----
+
+**Key Metrics to Monitor:**
+
+[cols="2,3", options="header"]
+|===
+| Metric | Description
+
+| `ft_authorizePayment_retry_callsSucceededNotRetried_total`
+| Payments that succeeded without retry
+
+| `ft_authorizePayment_retry_callsSucceededRetried_total`
+| Payments that succeeded after retrying
+
+| `ft_authorizePayment_fallback_calls_total`
+| Number of times fallback was invoked
+
+| `ft_checkGatewayHealth_circuitbreaker_state_total`
+| Circuit breaker state (0/1/2)
+
+| `ft_sendPaymentNotification_bulkhead_callsRejected_total`
+| Notifications rejected by bulkhead
+|===
+
+== Building and Running
+
+=== Prerequisites
+
+* JDK 21 or higher
+* Maven 3.13.x or higher
+
+=== Local Development
+
+[source,bash]
+----
+# Navigate to payment service directory
+cd code/chapter08/payment
+
+# Build the application
+mvn clean package
+
+# Run with Liberty
+mvn liberty:run
+
+# In another terminal, test the endpoints
+curl -X POST "http://localhost:9080/payment/api/authorize?amount=100"
+----
+
+The server will start on:
+* HTTP: `http://localhost:9080`
+* HTTPS: `https://localhost:9081`
+
+=== Docker
+
+[source,bash]
+----
+# Build and run with Docker
+./run-docker.sh
+----
+
+== Project Structure
+
+[source]
+----
+payment/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── io/microprofile/tutorial/store/payment/
+│   │   │       ├── PaymentRestApplication.java
+│   │   │       ├── service/
+│   │   │       │   └── PaymentService.java              # Fault tolerance patterns
+│   │   │       ├── resource/
+│   │   │       │   ├── PaymentResource.java             # REST endpoints
+│   │   │       │   └── PaymentConfigResource.java
+│   │   │       ├── entity/
+│   │   │       │   └── PaymentDetails.java
+│   │   │       ├── exception/
+│   │   │       │   ├── PaymentProcessingException.java  # Retryable errors
+│   │   │       │   └── CriticalPaymentException.java    # Non-retryable errors
+│   │   │       └── config/
+│   │   │           ├── PaymentServiceConfigSource.java
+│   │   │           └── PaymentConfig.java
+│   │   ├── liberty/config/
+│   │   │   └── server.xml                                # mpFaultTolerance feature
+│   │   └── resources/
+│   │       └── META-INF/
+│   │           └── microprofile-config.properties
+│   └── test/
+│       └── java/
+├── pom.xml
+└── README.adoc
+----
+
+== Key Concepts Demonstrated
+
+This chapter demonstrates:
+
+**1. Retry Pattern**
+- Automatically retry transient failures
+- Configure retry delays with jitter
+- Distinguish retryable vs non-retryable exceptions
+
+**2. Circuit Breaker Pattern**
+- Prevent cascading failures
+- Automatic recovery detection
+- State transitions (CLOSED → OPEN → HALF_OPEN → CLOSED)
+
+**3. Bulkhead Pattern  **
+- Resource isolation
+- Thread pool style with queuing
+- Prevent resource exhaustion
+
+**4. Timeout Pattern**
+- Prevent indefinite blocking
+- Per-attempt timeout with retry
+- Free resources for other operations
+
+**5. Fallback Pattern**
+- Graceful degradation
+- Alternative responses during failures
+- Maintain service availability
+
+**6. Asynchronous Execution**
+- Non-blocking operations
+- CompletionStage for proper fault tolerance integration
+- Improved scalability
+
+**7. Configuration Externalization**
+- Runtime configuration via MicroProfile Config
+- Environment-specific fault tolerance parameters
+- No code changes required
+
+## Related Chapters
+
+- **Chapter 3**: Idempotency (safe retries) and Audit Logging
+- **Chapter 5**: MicroProfile Config (externalize fault tolerance settings)
+- **Chapter 7**: MicroProfile Metrics (monitor fault tolerance behavior)
+- **Chapter 11**: Complete integrated e-commerce application
+
+== Further Reading
+
+- link:https://download.eclipse.org/microprofile/microprofile-fault-tolerance-4.1/microprofile-fault-tolerance-spec-4.1.html[MicroProfile Fault Tolerance 4.1 Specification]
+- link:https://openliberty.io/docs/latest/fault-tolerance.html[Open Liberty Fault Tolerance Guide]
+- link:https://openliberty.io/blog/2020/06/04/asynchronous-programming-microprofile-fault-tolerance.html[Asynchronous Programming with MicroProfile Fault Tolerance]
 
 == Building and Running the Service
 
 === Prerequisites
 
-* JDK 17 or higher
-* Maven 3.6.0 or higher
+* JDK 21 or higher
+* Maven 3.13.x or higher
 
 === Local Development
 

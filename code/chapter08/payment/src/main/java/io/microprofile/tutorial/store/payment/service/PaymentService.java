@@ -16,72 +16,180 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.logging.Logger;
 
+/**
+ * Payment service demonstrating MicroProfile Fault Tolerance patterns.
+ * 
+ * Each method demonstrates specific fault tolerance strategies:
+ * - authorizePayment: Retry + Timeout + Fallback for transient failures
+ * - checkGatewayHealth: Circuit Breaker + Timeout to prevent hammering failed services
+ * - sendPaymentNotification: Asynchronous + Bulkhead + Fallback (see {@link NotificationFallbackHandler}) for resource isolation
+ * 
+ * These patterns work together to prevent cascading failures and ensure resilient payment processing.
+ */
 @ApplicationScoped
 public class PaymentService {
 
-    @ConfigProperty(name = "payment.gateway.endpoint", defaultValue = "https://defaultapi.paymentgateway.com")
+    private static final Logger logger = Logger.getLogger(PaymentService.class.getName());
+
+    @ConfigProperty(name = "payment.gateway.endpoint", defaultValue = "https://api.paymentgateway.com")
     private String endpoint;
 
     /**
-     * Process the payment request.
-     *
-     * @param paymentDetails details of the payment
-     * @return response message indicating success or failure
-     * @throws PaymentProcessingException if a transient issue occurs
+     * Authorize a payment transaction with fault tolerance.
+     * 
+     * Fault Tolerance Strategy:
+     * - @Retry: Handles transient network failures (up to 3 retries with jitter)
+     * - @Timeout: Prevents indefinite waits (3 second limit per attempt)
+     * - @Fallback: Provides degraded service when gateway unavailable
+     * 
+     * @param paymentDetails Payment details to authorize
+     * @return Authorization result JSON
+     * @throws CriticalPaymentException For non-retryable failures (invalid card, insufficient funds)
      */
-    @Asynchronous
+    @Retry(
+        maxRetries = 3,
+        delay = 2000,
+        jitter = 500,
+        retryOn = PaymentProcessingException.class,
+        abortOn = CriticalPaymentException.class
+    )
     @Timeout(3000)
-    @Retry(maxRetries = 3, 
-        delay = 2000, 
-        jitter = 500, 
-        retryOn = PaymentProcessingException.class, 
-        abortOn = CriticalPaymentException.class)
-    @Fallback(fallbackMethod = "fallbackProcessPayment")
-    @Bulkhead(value=5)
+    @Fallback(fallbackMethod = "fallbackAuthorizePayment")
+    public String authorizePayment(PaymentDetails paymentDetails) 
+        throws PaymentProcessingException {
+        
+        logger.info("Calling payment gateway at: " + endpoint);
+        logger.info("Processing payment for amount: " + paymentDetails.getAmount());
+
+        // Simulate network latency
+        simulateDelay(1500);
+
+        // Simulate transient failures (60% failure rate to demonstrate retries)
+        if (Math.random() > 0.4) {
+            throw new PaymentProcessingException(
+                "Temporary payment gateway failure - will retry"
+            );
+        }
+
+        return String.format(
+            "{\"status\":\"success\",\"message\":\"Payment authorized\",\"amount\":%s}",
+            paymentDetails.getAmount()
+        );
+    }
+
+    /**
+     * Fallback method for payment authorization.
+     * Returns a pending status and queues payment for offline processing.
+     * 
+     * @param paymentDetails Payment details
+     * @return Fallback response indicating payment is queued
+     */
+    public String fallbackAuthorizePayment(PaymentDetails paymentDetails) {
+        logger.warning("Payment gateway unavailable - using fallback for amount: " 
+            + paymentDetails.getAmount());
+        
+        // In production: queue for offline processing, use backup gateway, etc.
+        return String.format(
+            "{\"status\":\"pending\",\"message\":\"Payment queued for processing\",\"amount\":%s}",
+            paymentDetails.getAmount()
+        );
+    }
+
+    /**
+     * Check payment gateway health with circuit breaker protection.
+     * 
+     * Fault Tolerance Strategy:
+     * - @CircuitBreaker: Prevents hammering failed gateway (opens at 50% failure rate)
+     * - @Timeout: Quick health check (2 second limit)
+     * 
+     * Circuit breaker will OPEN after 2 failures out of 4 requests (50% failure ratio),
+     * wait 5 seconds in OPEN state, then transition to HALF_OPEN to test recovery.
+     * Two consecutive successes in HALF_OPEN state will CLOSE the circuit.
+     * 
+     * @return true if gateway is healthy, false otherwise
+     */
     @CircuitBreaker(
         failureRatio = 0.5,
         requestVolumeThreshold = 4,
-        delay = 3000
+        delay = 5000,
+        successThreshold = 2
     )
-    public CompletionStage<String> processPayment(PaymentDetails paymentDetails) throws PaymentProcessingException {
+    @Timeout(2000)
+    public boolean checkGatewayHealth() {
+        logger.info("Checking payment gateway health");
         
-        // Example logic to call the payment gateway API
-        System.out.println("Calling payment gateway API at: " + endpoint);
+        // Simulate health check call
+        simulateDelay(500);
+        
+        // Simulate intermittent gateway failures (60% success rate)
+        if (Math.random() > 0.6) {
+            throw new RuntimeException("Gateway health check failed");
+        }
+        
+        return true;
+    }
 
-        simulateDelay();
+    /**
+     * Send payment notification asynchronously with resource isolation.
+     * 
+     * Fault Tolerance Strategy:
+     * - @Asynchronous: Non-blocking execution in separate thread
+     * - @Bulkhead: Limits concurrent notifications (max 10 concurrent, queue up to 20)
+     * - @Timeout: Prevents stuck notification threads (7 second limit)
+     * - @Fallback: Logs failed notifications for later retry
+     *
+     * Uses CompletionStage (not Future) to ensure fault tolerance annotations
+     * react properly to asynchronous failures. With CompletionStage, exceptions
+     * in exceptionally-completed stages trigger @Retry, @CircuitBreaker, and @Fallback.
+     *
+     * Timeout is set to 7s rather than the ~2s task time alone: a request queued
+     * behind a full bulkhead (10 concurrent, 20 queued) can wait up to two full
+     * rounds (~4s) before it even starts executing, then take ~2s to run. A
+     * tighter timeout would fire on legitimately-queued work, not just genuinely
+     * stuck calls, muddying the demo of Bulkhead vs Timeout behavior.
+     *
+     * @param paymentId Payment identifier
+     * @param recipient Notification recipient email/phone
+     * @return CompletionStage that completes when notification is sent
+     */
+    @Asynchronous
+    @Bulkhead(value = 10, waitingTaskQueue = 20)
+    @Timeout(7000)
+    @Fallback(NotificationFallbackHandler.class)
+    public CompletionStage<String> sendPaymentNotification(
+        String paymentId,
+        String recipient
+    ) {
+        logger.info("Sending notification for payment: " + paymentId + " to " + recipient);
 
-        System.out.println("Processing payment for amount: " + paymentDetails.getAmount());
+        // Simulate calling an external notification service (SMS/email gateway).
+        // The delay keeps the bulkhead slot occupied so concurrent-load tests
+        // can observe rejection when value + waitingTaskQueue is exceeded.
+        simulateDelay(2000);
 
-        // Simulating a transient failure
-        if (Math.random() > 0.7) {
-            throw new PaymentProcessingException("Temporary payment processing failure");
+        // Simulate notification failures (80% success rate)
+        if (Math.random() > 0.8) {
+            logger.warning("Notification service unavailable for payment: " + paymentId);
+            throw new RuntimeException("Notification service unavailable");
         }
 
-        // Simulating successful processing
-        return CompletableFuture.completedFuture("{\"status\":\"success\", \"message\":\"Payment processed successfully.\"}");
+        logger.info("Notification sent successfully for payment: " + paymentId);
+        return CompletableFuture.completedFuture("Notification sent successfully");
     }
 
     /**
-     * Fallback method when payment processing fails.
-     *
-     * @param paymentDetails details of the payment
-     * @return response message for fallback
+     * Simulate network/processing delay.
+     * 
+     * @param milliseconds Delay duration in milliseconds
      */
-    public CompletionStage<String> fallbackProcessPayment(PaymentDetails paymentDetails) {
-        System.out.println("Fallback invoked for payment of amount: " + paymentDetails.getAmount());
-        return CompletableFuture.completedFuture("{\"status\":\"failed\", \"message\":\"Payment service is currently unavailable.\"}");
-    }
-
-    /**
-     * Simulate a delay in processing to demonstrate timeout.
-     */
-    private void simulateDelay() {
+    private void simulateDelay(long milliseconds) {
         try {
-            Thread.sleep(1500); // Simulated long-running task
+            Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Processing interrupted");
+            throw new RuntimeException("Processing interrupted", e);
         }
     }
 }

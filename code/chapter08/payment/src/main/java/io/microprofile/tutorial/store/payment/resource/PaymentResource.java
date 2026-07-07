@@ -1,6 +1,7 @@
 package io.microprofile.tutorial.store.payment.resource;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
@@ -11,15 +12,18 @@ import io.microprofile.tutorial.store.payment.exception.PaymentProcessingExcepti
 import io.microprofile.tutorial.store.payment.service.PaymentService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.json.Json;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.math.BigDecimal;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 @RequestScoped
@@ -60,11 +64,7 @@ public class PaymentResource {
                 BigDecimal.valueOf(amount) // amount
             );
 
-            // Use PaymentService with full fault tolerance features
-            CompletionStage<String> result = paymentService.processPayment(paymentDetails);
-            
-            // Wait for async result (in production, consider different patterns)
-            String paymentResult = result.toCompletableFuture().get();
+            String paymentResult = paymentService.authorizePayment(paymentDetails);
             
             return Response.ok(paymentResult, MediaType.APPLICATION_JSON).build();
             
@@ -75,6 +75,63 @@ public class PaymentResource {
             // Handle other exceptions
             throw new PaymentProcessingException("Payment processing failed: " + e.getMessage());
         }
+    }
+
+    @GET
+    @Path("/health/gateway")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Check gateway health", description = "Check payment gateway health with Circuit Breaker and Timeout protection")
+    @APIResponses(value = {
+        @APIResponse(responseCode = "200", description = "Gateway is healthy"),
+        @APIResponse(responseCode = "503", description = "Gateway is unhealthy or circuit breaker is OPEN")
+    })
+    public Response checkGatewayHealth() {
+        try {
+            paymentService.checkGatewayHealth();
+            return Response.ok(Json.createObjectBuilder()
+                .add("status", "healthy")
+                .add("gateway", endpoint)
+                .build()).build();
+        } catch (CircuitBreakerOpenException e) {
+            return Response.status(503)
+                .entity(Json.createObjectBuilder()
+                    .add("status", "circuit_open")
+                    .add("message", "Circuit breaker is OPEN — gateway requests blocked")
+                    .build())
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+        } catch (Exception e) {
+            return Response.status(503)
+                .entity(Json.createObjectBuilder()
+                    .add("status", "unhealthy")
+                    .add("message", e.getMessage())
+                    .build())
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+        }
+    }
+
+    @POST
+    @Path("/notify/{paymentId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Send payment notification", description = "Send async payment notification with Bulkhead and Timeout protection")
+    @APIResponses(value = {
+        @APIResponse(responseCode = "202", description = "Notification accepted for processing"),
+        @APIResponse(responseCode = "500", description = "Internal server error")
+    })
+    public CompletionStage<Response> sendNotification(
+        @PathParam("paymentId") String paymentId,
+        @QueryParam("recipient") @DefaultValue("customer@example.com") String recipient
+    ) {
+        return paymentService.sendPaymentNotification(paymentId, recipient)
+            .thenApply(message -> Response.accepted()
+                .entity(Json.createObjectBuilder()
+                    .add("status", "accepted")
+                    .add("message", message)
+                    .add("paymentId", paymentId)
+                    .build())
+                .type(MediaType.APPLICATION_JSON)
+                .build());
     }
 
 }

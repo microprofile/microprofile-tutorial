@@ -1,4 +1,4 @@
-FROM icr.io/appcafe/open-liberty:full-java17-openj9-ubi
+FROM icr.io/appcafe/open-liberty:full-java21-openj9-ubi
 
 # Copy configuration files
 COPY --chown=1001:0 src/main/liberty/config/ /config/

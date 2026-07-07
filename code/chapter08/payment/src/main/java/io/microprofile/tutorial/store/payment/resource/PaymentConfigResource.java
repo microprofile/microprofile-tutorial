@@ -9,11 +9,12 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+
 import io.microprofile.tutorial.store.payment.config.PaymentConfig;
-import io.microprofile.tutorial.store.payment.entity.PaymentDetails;
 
 /**
  * Resource to demonstrate the use of the custom ConfigSource.
@@ -30,11 +31,9 @@ public class PaymentConfigResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPaymentConfig() {
-        Map<String, String> configValues = new HashMap<>();
-        
-        // Retrieve values from our custom ConfigSource
-        configValues.put("gateway.endpoint", PaymentConfig.getConfigProperty("payment.gateway.endpoint"));
-        
+        JsonObject configValues = Json.createObjectBuilder()
+            .add("gateway.endpoint", PaymentConfig.getConfigProperty("payment.gateway.endpoint"))
+            .build();
         return Response.ok(configValues).build();
     }
     
@@ -53,46 +52,26 @@ public class PaymentConfigResource {
         
         if (key == null || value == null) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Both 'key' and 'value' must be provided").build();
+                    .entity(Json.createObjectBuilder()
+                        .add("error", "Both 'key' and 'value' must be provided")
+                        .build()).build();
         }
-        
+
         // Only allow updating specific payment properties
         if (!key.startsWith("payment.")) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Only payment configuration properties can be updated").build();
+                    .entity(Json.createObjectBuilder()
+                        .add("error", "Only payment configuration properties can be updated")
+                        .build()).build();
         }
-        
-        // Update the property in our custom ConfigSource
+
         PaymentConfig.updateProperty(key, value);
-        
-        return Response.ok(Map.of("message", "Configuration updated successfully", 
-                "key", key, "value", value)).build();
+
+        return Response.ok(Json.createObjectBuilder()
+                .add("message", "Configuration updated successfully")
+                .add("key", key)
+                .add("value", value)
+                .build()).build();
     }
     
-    /**
-     * Example of how to use the payment configuration in a real payment processing method.
-     * 
-     * @param paymentDetails Payment details for processing
-     * @return Response with payment result
-     */
-    @POST
-    @Path("/process-example")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response processPaymentExample(PaymentDetails paymentDetails) {
-        // Using configuration values in payment processing logic
-        String gatewayEndpoint = PaymentConfig.getConfigProperty("payment.gateway.endpoint");
-        
-        // This is just for demonstration - in a real implementation, 
-        // we would use these values to configure the payment gateway client
-        Map<String, Object> result = new HashMap<>();
-        result.put("status", "success");
-        result.put("message", "Payment processed successfully");
-        result.put("amount", paymentDetails.getAmount());
-        result.put("configUsed", Map.of(
-                "gatewayEndpoint", gatewayEndpoint
-        ));
-        
-        return Response.ok(result).build();
-    }
 }

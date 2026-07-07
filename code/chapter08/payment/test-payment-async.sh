@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Enhanced test script for verifying asynchronous processing
-# This script shows the asynchronous behavior by:
-# 1. Checking for concurrent processing
-# 2. Monitoring response times to verify non-blocking behavior
-# 3. Analyzing the server logs to confirm retry patterns
+# Test script for asynchronous payment notification processing
+# Demonstrates @Asynchronous annotation behavior
 
 # Color definitions
 RED='\033[0;31m'
@@ -15,107 +12,175 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Check if bc is installed and install it if not
+# Check if bc is installed
 if ! command -v bc &> /dev/null; then
-    echo -e "${YELLOW}The 'bc' command is not found. Installing bc...${NC}"
+    echo -e "${YELLOW}Installing bc...${NC}"
     sudo apt-get update && sudo apt-get install -y bc
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}Failed to install bc. Please install it manually.${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}bc installed successfully.${NC}"
 fi
 
-# Set payment endpoint URL
-HOST="localhost"
-PAYMENT_URL="http://${HOST}:9080/payment/api/authorize"
-
-echo -e "${BLUE}=== Enhanced Asynchronous Testing ====${NC}"
-echo -e "${CYAN}This test will send a series of requests to demonstrate asynchronous processing${NC}"
-echo ""
-
-# First, let's check server logs before test
-echo -e "${YELLOW}Checking server logs before test...${NC}"
-echo -e "${CYAN}(This establishes a baseline for comparison)${NC}"
-cd /workspaces/liberty-rest-app/payment
-MESSAGES_LOG="target/liberty/wlp/usr/servers/mpServer/logs/messages.log"
-
-if [ -f "$MESSAGES_LOG" ]; then
-    echo -e "${PURPLE}Server log file exists at: $MESSAGES_LOG${NC}"
-    # Count initial payment processing messages
-    INITIAL_PROCESSING_COUNT=$(grep -c "Processing payment for amount" "$MESSAGES_LOG")
-    INITIAL_FALLBACK_COUNT=$(grep -c "Fallback invoked for payment" "$MESSAGES_LOG")
-    
-    echo -e "${CYAN}Initial payment processing count: $INITIAL_PROCESSING_COUNT${NC}"
-    echo -e "${CYAN}Initial fallback count: $INITIAL_FALLBACK_COUNT${NC}"
+# Dynamically determine the base URL
+if [ -n "$CODESPACE_NAME" ] && [ -n "$GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN" ]; then
+    BASE_URL="http://localhost:9080/payment/api"
+    echo -e "${CYAN}Detected GitHub Codespaces environment${NC}"
+elif [ -n "$GITPOD_WORKSPACE_URL" ]; then
+    GITPOD_HOST=$(echo $GITPOD_WORKSPACE_URL | sed 's|https://||' | sed 's|/||')
+    BASE_URL="https://9080-$GITPOD_HOST/payment/api"
+    echo -e "${CYAN}Detected Gitpod environment${NC}"
 else
-    echo -e "${RED}Server log file not found at: $MESSAGES_LOG${NC}"
-    INITIAL_PROCESSING_COUNT=0
-    INITIAL_FALLBACK_COUNT=0
+    BASE_URL="http://localhost:9080/payment/api"
+    echo -e "${CYAN}Using local environment${NC}"
 fi
 
 echo ""
-echo -e "${YELLOW}Now sending 3 requests in rapid succession...${NC}"
+echo -e "${BLUE}=== Testing Asynchronous Payment Notifications ===${NC}"
+echo -e "${CYAN}Endpoint: POST /notify/{paymentId}${NC}"
+echo -e "${CYAN}Base URL: $BASE_URL${NC}"
+echo ""
 
-# Function to send request and measure time
-send_request() {
+echo -e "${YELLOW}Asynchronous Configuration:${NC}"
+echo "  • Method: sendPaymentNotification()"
+echo "  • Return Type: CompletionStage<String>"
+echo "  • Processing: Non-blocking"
+echo "  • Simulated delay: ~2 seconds"
+echo ""
+
+echo -e "${CYAN}🔍 Testing Goals:${NC}"
+echo "  1. Show that a single request still takes ~2s — @Asynchronous doesn't"
+echo "     shorten one request's response time, it frees the server thread"
+echo "  2. Demonstrate concurrent requests run in parallel, not one at a time"
+echo "  3. Show CompletionStage behavior enabling Bulkhead-based concurrency"
+echo ""
+
+# Function to send notification and measure response time
+send_async_notification() {
     local id=$1
-    local amount=$2
-    local start_time=$(date +%s.%N)
+    local payment_id=$2
     
-    response=$(curl -s -X POST "${PAYMENT_URL}?amount=${amount}")
+    start_time=$(date +%s.%N)
+    response=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+        -X POST "${BASE_URL}/notify/${payment_id}" 2>/dev/null || echo "HTTP_STATUS:000")
+    end_time=$(date +%s.%N)
+
+    http_code=$(echo "$response" | grep "HTTP_STATUS:" | cut -d: -f2)
+    body=$(echo "$response" | sed '/HTTP_STATUS:/d')
     
-    local end_time=$(date +%s.%N)
-    local duration=$(echo "$end_time - $start_time" | bc)
+    wall_time=$(echo "$end_time - $start_time" | bc)
+    wall_time_formatted=$(printf "%.3f" $wall_time)
     
-    echo -e "${GREEN}[Request $id] Completed in ${duration}s${NC}"
-    echo -e "${CYAN}[Request $id] Response: $response${NC}"
+    if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+        # Note: a single request always takes ~2s (the simulated notification
+        # work) regardless of @Asynchronous — the client only gets a response
+        # once that work finishes. This is not a pass/fail check.
+        echo -e "${GREEN}[Request $id] ✓ Completed in ${wall_time_formatted}s${NC}"
+        echo -e "${GREEN}            Response: $body${NC}"
+    else
+        echo -e "${RED}[Request $id] ✗ ERROR (HTTP $http_code, ${wall_time_formatted}s)${NC}"
+        echo -e "${RED}            Response: $body${NC}"
+    fi
     
-    return 0
+    echo "$wall_time_formatted"
 }
 
-# Send 3 requests in rapid succession
-for i in {1..3}; do
-    # Use a fixed amount for consistency
-    amount=25.99
-    echo -e "${PURPLE}[Request $i] Sending request for \$$amount...${NC}"
-    send_request $i $amount &
-    # Sleep briefly to ensure log messages are distinguishable
-    sleep 0.1
-done
+# Test 1: Single request baseline
+echo -e "${BLUE}=== Test 1: Single Request (Baseline Latency) ===${NC}"
+echo -e "${CYAN}Sending a single notification to measure round-trip latency...${NC}"
+echo -e "${YELLOW}Expected: ~2s. @Asynchronous does not shorten this — the client${NC}"
+echo -e "${YELLOW}always waits for the notification work to finish before getting a response.${NC}"
+echo ""
 
-# Wait for all background processes to complete
-wait
+send_async_notification 1 "PAY-00001"
 
 echo ""
-echo -e "${YELLOW}Waiting 5 seconds for processing to complete...${NC}"
-sleep 5
+echo -e "${BLUE}----------------------------------------${NC}"
+echo ""
 
-# Check the server logs after test
-echo -e "${YELLOW}Checking server logs after test...${NC}"
+# Test 2: Multiple sequential requests
+echo -e "${BLUE}=== Test 2: Sequential Requests (Baseline Comparison) ===${NC}"
+echo -e "${CYAN}Sending 5 requests one after another from this single client...${NC}"
+echo -e "${YELLOW}Expected: ~2s per request, ~10s total. Sequential calls don't benefit${NC}"
+echo -e "${YELLOW}from async — this client waits for each response before sending the next,${NC}"
+echo -e "${YELLOW}so it's a baseline to contrast with Test 3's concurrent requests.${NC}"
+echo ""
 
-if [ -f "$MESSAGES_LOG" ]; then
-    # Count final payment processing messages
-    FINAL_PROCESSING_COUNT=$(grep -c "Processing payment for amount" "$MESSAGES_LOG")
-    FINAL_FALLBACK_COUNT=$(grep -c "Fallback invoked for payment" "$MESSAGES_LOG")
-    
-    NEW_PROCESSING=$(($FINAL_PROCESSING_COUNT - $INITIAL_PROCESSING_COUNT))
-    NEW_FALLBACKS=$(($FINAL_FALLBACK_COUNT - $INITIAL_FALLBACK_COUNT))
-    
-    echo -e "${CYAN}New payment processing events: $NEW_PROCESSING${NC}"
-    echo -e "${CYAN}New fallback events: $NEW_FALLBACKS${NC}"
-    
-    # Extract the latest log entries
-    echo ""
-    echo -e "${BLUE}Latest server log entries related to payment processing:${NC}"
-    grep "Processing payment for amount\|Fallback invoked for payment" "$MESSAGES_LOG" | tail -10
+total_start=$(date +%s.%N)
+
+for i in {2..6}; do
+    payment_id=$(printf "PAY-%05d" $i)
+    send_async_notification $i $payment_id
+done
+
+total_end=$(date +%s.%N)
+total_time=$(echo "$total_end - $total_start" | bc)
+total_time_formatted=$(printf "%.2f" $total_time)
+
+echo ""
+echo -e "${PURPLE}Total time for 5 sequential requests: ${total_time_formatted}s${NC}"
+echo -e "${CYAN}Expected: ~10s (5 × ~2s) — this is normal for sequential calls and${NC}"
+echo -e "${CYAN}does not indicate blocking. Compare against Test 3's concurrent total.${NC}"
+
+echo ""
+echo -e "${BLUE}----------------------------------------${NC}"
+echo ""
+
+# Test 3: Concurrent requests
+echo -e "${BLUE}=== Test 3: Concurrent Requests (True Async Test) ===${NC}"
+echo -e "${CYAN}Sending 5 concurrent requests in parallel...${NC}"
+echo -e "${YELLOW}This is where @Asynchronous + @Bulkhead actually pay off: the server${NC}"
+echo -e "${YELLOW}runs all 5 notifications in parallel on background threads instead of${NC}"
+echo -e "${YELLOW}queueing them one at a time, so the total should be ~2s, not ~10s.${NC}"
+echo ""
+
+concurrent_start=$(date +%s.%N)
+
+# Launch background jobs
+for i in {7..11}; do
+    payment_id=$(printf "PAY-%05d" $i)
+    (send_async_notification $i $payment_id) &
+    sleep 0.05  # Small stagger to make output readable
+done
+
+# Wait for all background jobs
+wait
+
+concurrent_end=$(date +%s.%N)
+concurrent_time=$(echo "$concurrent_end - $concurrent_start" | bc)
+concurrent_time_formatted=$(printf "%.2f" $concurrent_time)
+
+echo ""
+echo -e "${PURPLE}Total time for 5 concurrent requests: ${concurrent_time_formatted}s${NC}"
+echo -e "${CYAN}Expected: ~2-3s — all 5 notifications run in parallel, so total time${NC}"
+echo -e "${CYAN}tracks one notification's duration, not the sum of all five.${NC}"
+
+if (( $(echo "$concurrent_time < $total_time / 2" | bc -l) )); then
+    echo -e "${GREEN}✓ CONFIRMED: Concurrent total (${concurrent_time_formatted}s) is far below the${NC}"
+    echo -e "${GREEN}  sequential total (${total_time_formatted}s) — notifications ran in parallel.${NC}"
 else
-    echo -e "${RED}Server log file not found after test${NC}"
+    echo -e "${YELLOW}⚠ WARNING: Concurrent total is close to the sequential total — check that${NC}"
+    echo -e "${YELLOW}  @Asynchronous/@Bulkhead are active and the bulkhead isn't saturated.${NC}"
 fi
 
 echo ""
-echo -e "${BLUE}=== Asynchronous Behavior Analysis ====${NC}"
-echo -e "${CYAN}1. Rapid response times indicate non-blocking behavior${NC}"
-echo -e "${CYAN}2. Multiple processing entries in logs show concurrent execution${NC}"
-echo -e "${CYAN}3. Fallbacks demonstrate the fault tolerance mechanism${NC}"
-echo -e "${CYAN}4. All @Asynchronous methods return quickly while processing continues in background${NC}"
+echo -e "${BLUE}----------------------------------------${NC}"
+echo ""
+
+# Summary
+echo -e "${BLUE}=== Asynchronous Processing Summary ===${NC}"
+echo ""
+echo -e "${CYAN}Key Observations:${NC}"
+echo "  • @Asynchronous methods return CompletionStage, run on a background thread pool"
+echo "  • JAX-RS endpoint returns CompletionStage<Response>, completing the HTTP"
+echo "    response only once that background work finishes — a single client still"
+echo "    waits the full ~2s; @Asynchronous does not make one request faster"
+echo "  • What it does buy: the request-handling thread isn't blocked while waiting,"
+echo "    so the server can process many notifications concurrently instead of"
+echo "    queueing them one at a time (see Test 3 vs Test 2)"
+echo "  • @Bulkhead caps how many of these background notifications run at once"
+echo ""
+
+echo -e "${CYAN}CompletionStage vs Future:${NC}"
+echo "  • CompletionStage: Fault tolerance applied, supports chaining"
+echo "  • Future: Fault tolerance NOT applied (avoid!)"
+echo ""
+
+echo -e "${GREEN}=== Test Complete ===${NC}"
+echo ""
