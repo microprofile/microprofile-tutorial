@@ -1,16 +1,153 @@
-= MicroProfile Tutorial Documentation
+= MicroProfile Tutorial
 :toc: macro
 :toc-title: Table of Contents
-:toclevels: 3
+:toclevels: 2
 :doctype: book
 
-The MicroProfile Tutorial is a comprehensive guide for learning about https://microprofile.io[MicroProfile]. This repository contains the documentation built with https://antora.org/[Antora].
+The MicroProfile Tutorial is a comprehensive guide for learning about https://microprofile.io[MicroProfile]. This repository contains both the documentation (built with https://antora.org/[Antora]) and the source code examples for the tutorial.
 
 toc::[]
 
-# Getting Started with MicroProfile Tutorial
+# What's New in MicroProfile 7.1 Tutorial
 
-This repository contains the documentation for the MicroProfile Tutorial, built with Antora. This README provides information on how to set up, build, and customize the documentation site.
+The MicroProfile Tutorial has been updated to reflect the latest features and changes in MicroProfile 7.1.
+
+## Version and Branch Strategy
+
+This repository uses a **branch-per-version** strategy to maintain documentation and code examples for different MicroProfile releases. Each MicroProfile version has its own dedicated branch, ensuring long-term maintainability and clear separation between versions.
+
+### Why Version-Specific Branches?
+
+We maintain separate branches for each MicroProfile version instead of using a single `main` branch because:
+
+**1. Long-term Version Maintenance**
+
+* Each MicroProfile version follows its own lifecycle (6.1, 7.0, 7.1, 7.2, 8.0, etc.)
+* Versions may need independent bug fixes, clarifications, or dependency updates
+* With version-specific branches, we can update any version without affecting others
+
+**2. Clear Reference Points**
+
+* Developers often work on projects locked to specific MicroProfile versions for compatibility
+* Stable branch URLs (e.g., `tree/v6.1`, `tree/v7.1`) provide permanent, bookmarkable references
+* Users can easily find code examples matching their project's MicroProfile version
+* Documentation URLs remain stable even as new versions are released
+
+**3. Parallel Development**
+
+* We can work on future versions (7.2, 8.0) while earlier versions are still stabilizing
+* Separate branches allow preview/beta content without disrupting stable documentation
+* Teams can contribute to different versions simultaneously
+
+**4. Easier Comparison & Migration**
+
+* Branches make it trivial to compare differences between versions
+* Helps users understand breaking changes and migration paths (e.g., `git diff v6.1 v7.1`)
+* Clear separation of version-specific code examples and API usage
+
+**5. Antora Multi-version Support**
+
+* Antora is specifically designed to build documentation from multiple branches
+* Our build system automatically generates version-specific content (e.g., `build/site/microprofile-tutorial/6.1/` and `7.1/`)
+* Users get a version selector in the UI to switch between versions seamlessly
+
+**6. Avoiding "Moving Target" Problem**
+
+* If we used `main` for 7.1 today, what happens when 7.2 ships?
+* Version branches eliminate confusion about which version you're looking at
+* Each branch represents a stable target for learners and enterprise users
+
+### Branch Organization
+
+[cols="1,2,2"]
+|===
+|Branch |MicroProfile Version |Status
+
+|`v6.1`
+|6.1
+|Stable - maintenance mode
+
+|`v7.1`
+|7.1
+|Active development
+
+|`main`
+|Landing/Navigation
+|README and Antora configuration
+
+|Future: `v7.2`, `v8.0`
+|7.2, 8.0
+|Not yet created
+
+|===
+
+### Which Branch Should You Use?
+
+Choose the branch that matches your MicroProfile version:
+
+* **For MicroProfile 6.1 projects:** Use the `v6.1` branch
+* **For MicroProfile 7.1 projects:** Use the `v7.1` branch
+* **For the latest stable version:** Check the badges or releases page
+
+### Branches vs. Releases
+
+**Branches** (`v6.1`, `v7.1`) are living documentation:
+
+* Can be continuously updated with fixes, improvements, and clarifications
+* Antora builds the documentation site from these branches
+* Used for active development and ongoing maintenance
+
+**GitHub Releases** (`v6.1.0`, `v7.1.0`) are immutable snapshots:
+
+* Mark official milestones (e.g., "Tutorial completed for MP 7.1")
+* Provide downloadable archives of specific versions
+* Useful for citations, training certifications, or enterprise policies
+* Created from branch tags at significant points
+
+You can use both: follow a branch for the latest updates, or download a specific release for a fixed reference.
+
+### Workflow for New Versions
+
+When creating documentation for a new MicroProfile version:
+
+1. **Create a new version branch** from the most recent version:
++
+```bash
+git checkout v7.1
+git checkout -b v7.2
+```
+
+2. **Update version numbers** throughout the branch:
+   * `antora.yml` - Component version and display version
+   * All `pom.xml` files in `code/` directory - MicroProfile and dependency versions
+   * Documentation content referencing version numbers
+
+3. **Update code examples** to use new MicroProfile features and APIs
+
+4. **Test the build** locally before pushing:
++
+```bash
+antora antora-assembler.yml
+```
+
+5. **Push the branch** to the repository:
++
+```bash
+git push -u origin v7.2
+```
+
+6. **Update `antora-assembler.yml`** in `main` branch to include the new version in builds
+
+7. **Create a GitHub Release** when the version reaches a stable milestone
+
+### Building Multiple Versions
+
+The `antora-assembler.yml` file is configured to build documentation for multiple versions simultaneously. This:
+
+* Creates a version selector in the documentation UI
+* Allows users to switch between different MicroProfile versions easily
+* Builds all versions from their respective branches in a single site
+* Maintains separate navigation and content for each version
 
 ## Prerequisites
 
@@ -345,550 +482,157 @@ To apply additional customizations:
    - `js/` - Add custom JavaScript
 
 Common customizations include:
+* **Tutorial Documentation**: Comprehensive learning materials built with Antora and deployed as a static site
+* **Source Code Examples**: Practical MicroProfile e-commerce application code organized by chapter
+* **Two Specialized Guides**:
+  - link:CONTRIBUTORS.adoc[Contributors Guide] (`CONTRIBUTORS.adoc`) - For documentation contributors
+  - link:DEVELOPERS.adoc[Developers Guide] (`DEVELOPERS.adoc`) - For application developers
 
-- Header and footer modifications
-- Custom CSS for branding
-- Additional JavaScript functionality
+## Getting Started
 
-### Edit Page Links
+Depending on your goals, choose the appropriate guide:
 
-Edit page links are configured in two places:
+### For Contributors
 
-1. `antora.yml` - The `edit_url` property defines the base URL for edit links
-2. `antora-assembler.yml` - The `site.keys.show_edit_page_link` property enables the display of edit links
+If you want to contribute to the **documentation** or help maintain the **Antora-based documentation site**:
 
-If you change the repository URL or branch, update both:
-- The `edit_url` in `antora.yml`
-- The replacement URL in `fix-edit-links.sh`
+📘 **Read the link:CONTRIBUTORS.adoc[Contributors Guide]**
 
-### Redirection Configuration
+The Contributors Guide covers:
 
-The project includes a `redirect.html` file that automatically redirects users from the root URL to the latest version of the documentation. This is particularly useful when hosting the documentation on GitHub Pages or other static hosting services.
+* Setting up the Antora documentation site
+* Building and running the documentation locally
+* Development workflow for documentation changes
+* Understanding Antora configuration
+* Customizing the documentation site
+* Deployment and hosting options
 
-The redirect is configured to:
-- Use relative URLs for maximum compatibility
-- Fall back to JavaScript-based redirection if needed
+### For Developers
 
-### Further Customization Resources
+If you want to **download and run the source code** for the MicroProfile e-commerce application:
 
-For more advanced customization options, refer to the Antora documentation:
+💻 **Read the link:DEVELOPERS.adoc[Developers Guide]**
 
-- [Antora UI Documentation](https://docs.antora.org/antora-ui-default/)
-- [Customizing the UI](https://docs.antora.org/antora/latest/playbook/ui-supplemental-files/)
-- [Page Templates](https://docs.antora.org/antora/latest/templates/)
+The Developers Guide covers:
 
-## Contributing to the Documentation
+* How to download the source code
+* Setting up your development environment
+* Building and running the code for each chapter
+* Understanding the project structure
+* Working with individual microservices
+* Common development tasks and troubleshooting
 
-### Directory Structure
+## Quick Links
 
-The MicroProfile Tutorial follows the standard Antora directory structure:
+### Documentation Contributors
 
-- `modules/ROOT/pages/` - Contains the main documentation content in AsciiDoc format
-- `modules/ROOT/assets/images/` - Contains images used in the documentation
+* link:CONTRIBUTORS.adoc[Contributors Guide] - Complete guide for documentation contributors
+* https://docs.antora.org/[Antora Documentation] - Official Antora documentation
+* `modules/ROOT/pages/` - Documentation source files
+* `antora-assembler.yml` - Main Antora configuration file
 
-### AsciiDoc Best Practices
+### Application Developers
 
-When contributing to the documentation, follow these AsciiDoc best practices:
+* link:DEVELOPERS.adoc[Developers Guide] - Complete guide for application developers
+* `code/` - Source code organized by chapter
+* https://microprofile.io[MicroProfile] - Official MicroProfile documentation
+* https://openliberty.io/guides/[Open Liberty Guides] - Additional learning resources
 
-1. Use proper heading levels (start with `==` for top-level headings within a page)
-2. Use cross-references to link between pages (`xref:page-id.adoc[]`)
-3. Add proper metadata to each page:
-+
-----
-= Page Title
-:page-id: unique-id
-----
-+
-4. For code examples, use proper language specifiers:
-+
-----
-[source,java]
-----
-// Java code here
-----
-----
+## Repository Structure
 
-### Adding New Content
-
-To add new content to the documentation:
-
-1. Create a new `.adoc` file in the appropriate directory under `modules/ROOT/pages/`
-2. Add a reference to the new page in the navigation file (`modules/ROOT/pages/nav.adoc`)
-3. Build the site to verify your changes
-
-### Handling Images
-
-When adding images to the documentation:
-
-1. Place image files in the `modules/ROOT/images/` directory
-2. Reference images using the `image::` directive:
-+
-----
-image::image-name.png[Alt text for the image, width=600]
-----
-
-## Troubleshooting
-
-### Common Build Issues
-
-1. **Missing dependencies**
-   ```
-   npm install -g @antora/cli @antora/site-generator-default
-   ```
-
-2. **Edit links not working**
-   - Make sure `fix-edit-links.sh` is executable: `chmod +x fix-edit-links.sh`
-   - Verify the GitHub repository URL and branch in both `antora.yml` and `fix-edit-links.sh`
-
-3. **Incorrect links in navigation**
-   - Check that page references in `nav.adoc` use proper xref syntax
-   - Verify that page IDs are unique across the documentation
-
-### Getting Help
-
-If you encounter issues not covered in this documentation, check the following resources:
-
-- [Antora Documentation](https://docs.antora.org/)
-- [AsciiDoc Syntax Quick Reference](https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/)
-
-## Hosting and Deployment
-
-The MicroProfile Tutorial documentation site is designed to be deployed as static HTML, which can be hosted on various platforms. Here are some common hosting options and deployment methods:
-
-### GitHub Pages
-
-GitHub Pages is a simple and free hosting option for static sites:
-
-1. Build the site: `antora antora-assembler.yml && ./fix-edit-links.sh`
-2. Copy the contents of the `build/site` directory to your GitHub Pages branch (typically `gh-pages`)
-3. Configure GitHub repository settings to enable GitHub Pages
-
-The `redirect.html` file can be renamed to `index.html` at the repository root to automatically redirect visitors to the latest documentation version.
-
-### Static Web Hosting
-
-Any static web hosting service can host the documentation:
-
-1. Build the site: `antora antora-assembler.yml && ./fix-edit-links.sh`
-2. Upload the contents of the `build/site` directory to your web server
-3. Configure your web server to serve `index.html` as the default document
-
-### Continuous Integration
-
-To automate the build and deployment process, you can use GitHub Actions or another CI/CD system:
-
-1. Set up a workflow that triggers on pushes to the main branch
-2. Configure the workflow to:
-   - Install Node.js and required dependencies
-   - Run the Antora build
-   - Execute the fix-edit-links script
-   - Deploy the generated site to your hosting platform
-
-Example GitHub Actions workflow file (`.github/workflows/deploy.yml`):
-
-[source,yaml]
-----
-name: Deploy Documentation
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          
-      - name: Install dependencies
-        run: npm install -g @antora/cli @antora/site-generator-default
-        
-      - name: Build site
-        run: |
-          antora antora-assembler.yml
-          chmod +x ./fix-edit-links.sh
-          ./fix-edit-links.sh
-          
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/site
-----
-
-### Custom Domain Configuration
-
-If you're hosting the documentation on a custom domain:
-
-1. Update the `site.url` property in `antora-assembler.yml` to match your domain
-2. Configure your domain's DNS settings to point to your hosting provider
-3. If using GitHub Pages, add a CNAME file to the `build/site` directory
-
-## GitHub Actions Workflow for Automated Deployment
-
-The MicroProfile Tutorial documentation is automatically built and deployed using a GitHub Actions workflow. This section explains the workflow configuration and how it ensures continuous deployment of the documentation.
-
-### Workflow Overview
-
-The repository includes a comprehensive GitHub Actions workflow (`antora.yml`) that:
-
-- **Validates builds on pull requests** without deploying
-- **Automatically deploys** to GitHub Pages when changes are pushed to the main branch  
-- **Handles concurrent deployments** to prevent conflicts
-- **Ensures GitHub Pages is enabled** automatically
-
-### Workflow Configuration
-
-The workflow is defined in `.github/workflows/build-and-deploy-tutorials.yml` and includes two main jobs:
-
-#### 1. Pull Request Validation (`validate-build`)
-
-This job runs on pull requests and validates that the documentation builds correctly:
-
-- **Triggers**: Pull requests to the main branch
-- **Purpose**: Validates documentation builds without deploying
-- **Steps**:
-  * Checkout repository code
-  * Set up Node.js environment with npm caching
-  * Install Antora CLI and site generator
-  * Generate the site to validate build success
-  * Verify build output exists
-
-#### 2. Build and Deploy (`build-and-deploy`)
-
-This job runs on pushes to the main branch and deploys the documentation:
-
-- **Triggers**: Pushes to main branch, manual workflow dispatch
-- **Purpose**: Build and deploy documentation to GitHub Pages
-- **Environment**: Uses `github-pages` environment for deployment tracking
-- **Steps**:
-  * Checkout repository code
-  * Set up Node.js environment with npm caching
-  * Install Antora CLI and site generator
-  * Verify Antora installation
-  * Generate site using Antora with `--fetch` and `--stacktrace` options
-  * Configure GitHub Pages settings
-  * Upload generated site as artifact
-  * Deploy to GitHub Pages
-
-### Key Features
-
-#### Concurrency Control
-```yaml
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 ```
-Prevents multiple deployments from running simultaneously while allowing in-progress deployments to complete.
-
-#### Automatic Pages Enablement
-The workflow automatically enables GitHub Pages if it's not already configured, ensuring the repository is properly set up for deployment.
-
-#### Environment Protection
-Uses the `github-pages` environment for deployment tracking and provides the deployment URL after successful completion.
-
-#### Performance Optimizations
-- **npm caching**: Speeds up Node.js setup
-- **Conditional deployment**: Only deploys from main branch pushes
-- **Comprehensive error handling**: Includes verification steps and detailed logging
-
-### Required Permissions
-
-The workflow requires specific GitHub token permissions:
-
-```yaml
-permissions:
-  id-token: write  # Required for OIDC authentication to GitHub Pages
-  contents: read   # Required to read repository contents and checkout code
-  pages: write     # Required to deploy artifacts to GitHub Pages
+microprofile-tutorial/
+├── CONTRIBUTORS.adoc           # Guide for documentation contributors
+├── DEVELOPERS.adoc             # Guide for application developers
+├── README.adoc                 # This file
+├── code/                       # Source code examples by chapter
+│   ├── chapter02/              # Getting Started
+│   ├── chapter03/              # Persistence and Database
+│   ├── chapter04/              # Configuration
+│   └── ...                     # Additional chapters
+├── modules/ROOT/               # Antora documentation content
+│   └── pages/                  # Documentation pages
+├── antora-assembler.yml        # Antora site configuration
+├── antora.yml                  # Component configuration
+└── build/                      # Generated documentation site (after build)
 ```
 
-### Deployment Process
+## Prerequisites
 
-When code is pushed to the main branch:
+### For Documentation Work (Contributors)
 
-1. **Build Validation**: The workflow validates that Antora can successfully build the site
-2. **Site Generation**: Antora processes the `antora-assembler.yml` configuration and generates the static site
-3. **Pages Configuration**: GitHub Pages is automatically configured if needed
-4. **Artifact Upload**: The generated site (`./build/site`) is uploaded as a deployment artifact
-5. **Deployment**: The artifact is deployed to GitHub Pages
+* Node.js (for Antora)
+* npm (comes with Node.js)
+* Antora CLI and Site Generator
 
-### Accessing the Deployed Site
+See the link:CONTRIBUTORS.adoc[Contributors Guide] for detailed setup instructions.
 
-After successful deployment, the documentation is available at:
-```
-https://<username>.github.io/<repository-name>/
-```
+### For Code Development (Developers)
 
-For the MicroProfile Tutorial, this would be:
-```
-https://microprofile.github.io/microprofile-tutorial/
-```
+* Java Development Kit (JDK) 21 or later
+* Maven 3.13 or later
+* Git
 
-### Monitoring Deployments
+See the link:DEVELOPERS.adoc[Developers Guide] for detailed setup instructions.
 
-You can monitor deployment status through:
+## Quick Start
 
-- **GitHub Actions tab**: View workflow runs and their status
-- **Environment tab**: Track deployments to the `github-pages` environment  
-- **Settings > Pages**: Verify GitHub Pages configuration
-- **Repository insights**: View deployment frequency and success rates
+### Building the Documentation
 
-### Troubleshooting Workflow Issues
-
-Common issues and solutions:
-
-1. **Build Failures**:
-   - Check the workflow logs for Antora errors
-   - Verify `antora-assembler.yml` configuration
-   - Ensure all referenced content sources are accessible
-
-2. **Deployment Failures**:
-   - Verify GitHub Pages is enabled in repository settings
-   - Check that the workflow has necessary permissions
-   - Ensure the repository has GitHub Pages configured
-
-3. **Content Not Updating**:
-   - Check if the workflow completed successfully
-   - Verify the build generated the expected output
-   - Clear browser cache to see latest changes
-
-### Workflow Customization
-
-To customize the workflow for your needs:
-
-1. **Change trigger conditions**: Modify the `on:` section to change when the workflow runs
-2. **Update Node.js version**: Change the Node.js version in the setup step
-3. **Add build steps**: Include additional processing steps before or after Antora
-4. **Configure notifications**: Add steps to notify team members of deployment status
-
-### Migration from Static Deployment
-
-Previously, the repository included a `static.yml` workflow that deployed raw repository content. This has been removed in favor of the Antora-based workflow because:
-
-- **Proper documentation processing**: Antora generates a structured documentation site
-- **Better navigation**: Antora provides proper navigation and cross-references
-- **Improved maintenance**: Single workflow eliminates deployment conflicts
-- **Enhanced features**: Support for themes, search, and multi-version documentation
-
-## Future Improvements
-
-Consider these potential improvements to the documentation site:
-
-1. **Multi-version documentation**: Configure Antora to build multiple versions of the documentation from different branches or tags
-2. **Search integration**: Add a custom search engine like Algolia DocSearch
-3. **Analytics**: Integrate web analytics to track usage patterns
-4. **PDF generation**: Enhance the PDF export capabilities with custom styling
-5. **Interactive examples**: Add interactive code examples using tools like Asciidoctor-Kroki for diagrams
-
-## Managing Dependencies and Updates
-
-### Node.js Dependencies
-
-The MicroProfile Tutorial documentation relies on Node.js packages, primarily Antora. These dependencies are listed in the `package.json` file. To update or manage these dependencies:
-
-1. **Update all dependencies**:
-+
+[source,bash]
 ----
-npm update
+# Install Antora (first time only)
+npm install -g @antora/cli @antora/site-generator-default
+
+# Build the documentation site
+./update-repo-url.sh && antora antora-assembler.yml && ./fix-edit-links.sh
+
+# Run locally
+cd build/site && python3 -m http.server 8080
 ----
 
-2. **Install a specific Antora version**:
-+
+For more details, see the link:CONTRIBUTORS.adoc[Contributors Guide].
+
+### Running the Code
+
+[source,bash]
 ----
-npm install -g @antora/cli@3.1.0 @antora/site-generator-default@3.1.0
-----
+# Clone the repository
+git clone https://github.com/microprofile/microprofile-tutorial.git
+cd microprofile-tutorial
 
-### Understanding the UI Bundle
+# Navigate to a chapter (e.g., Chapter 2)
+cd code/chapter02/mp-ecomm-store
 
-The UI bundle is a critical component of an Antora site that controls the overall appearance, layout, and functionality of the documentation. It's defined in `antora-assembler.yml` under the `ui.bundle` section.
-
-#### Current UI Bundle Configuration
-
-The MicroProfile Tutorial uses a customized UI bundle from the `microprofile-documentation-ui` repository:
-
-[source,yaml]
-----
-ui:
-  bundle:
-    url: https://github.com/microprofile/microprofile-tutorial-ui/releases/tag/latest/ui-bundle.zip
-    snapshot: true
-  supplemental_files: ./supplemental-ui
+# Run in development mode
+mvn liberty:dev
 ----
 
-Key properties in this configuration:
+For more details, see the link:DEVELOPERS.adoc[Developers Guide].
 
-* `url`: Specifies the location of the UI bundle ZIP file
-* `snapshot: true`: Tells Antora to fetch the bundle every time you build, ignoring any cached version
-* `supplemental_files`: Points to a directory containing files that override or extend the UI bundle
+## Contributing
 
-#### UI Bundle Components
+We welcome contributions to both the documentation and the code examples!
 
-A standard Antora UI bundle includes:
+* **Documentation Contributions**: See the link:CONTRIBUTORS.adoc[Contributors Guide]
+* **Code Contributions**: See the link:DEVELOPERS.adoc[Developers Guide]
 
-* **CSS styles**: Controls the visual appearance of the site
-* **JavaScript files**: Provides interactive functionality
-* **Handlebars templates**: Defines the HTML structure of pages
-* **Fonts and images**: Basic visual assets
-* **Layouts**: Page structure templates for different content types
+Please ensure your contributions follow the existing patterns and include appropriate tests or validation.
 
-#### Customizing the UI Bundle
+## License
 
-There are three approaches to customizing the UI:
+This project is licensed under the terms specified in the link:LICENSE[LICENSE] file.
 
-1. **Using supplemental files** (current approach):
-   * Add files to the `supplemental-ui/` directory
-   * These files override or extend the UI bundle without modifying it
-   * Good for simple customizations like favicons, headers, footers, and CSS tweaks
+## Community and Support
 
-2. **Creating a custom UI bundle**:
-   * Fork the default Antora UI repository
-   * Make extensive customizations
-   * Build and host your custom bundle
-   * Reference your custom bundle URL in `antora-assembler.yml`
+* **MicroProfile Website**: https://microprofile.io
+* **MicroProfile Google Group**: https://groups.google.com/forum/#!forum/microprofile
+* **Open Liberty**: https://openliberty.io
+* **Jakarta EE**: https://jakarta.ee
 
-3. **Using a community UI bundle**:
-   * Several alternative UI bundles are available in the Antora ecosystem
-   * Each offers different features, layouts, and styling options
+## Additional Resources
 
-#### Updating the UI Bundle
-
-To update to a newer version of the UI bundle:
-
-1. Check for new releases of the UI bundle at the GitHub repository
-2. Update the URL in `antora-assembler.yml`:
-+
-[source,yaml]
-----
-ui:
-  bundle:
-    url: https://github.com/microprofile/microprofile-tutorial-ui/releases/tag/latest/ui-bundle.zip
-    snapshot: true
-----
-
-#### Creating a Custom UI Bundle
-
-If you need extensive customization beyond what supplemental files allow:
-
-1. Fork the https://github.com/microprofile/microprofile-tutorial-ui repository
-2. Make your customizations following the project's README
-3. Build the UI bundle using `gulp bundle`
-4. Host the resulting ZIP file (e.g., on GitHub Releases)
-5. Update the `url` in `antora-assembler.yml` to point to your custom bundle
-
-This approach provides the most flexibility but requires more maintenance.
-
-## Advanced UI Bundle Configuration
-
-The UI bundle configuration in Antora offers several advanced options that can enhance the documentation site's functionality and performance.
-
-### Bundle Cache Control
-
-You can control how Antora handles UI bundle caching:
-
-[source,yaml]
-----
-ui:
-  bundle:
-    url: https://github.com/microprofile/microprofile-tutorial-ui/releases/download/latest/ui-bundle.zip
-    snapshot: true  # Always fetch the latest version
-    # snapshot: false  # Use cached version when available
-----
-
-Setting `snapshot: false` can improve build performance by using a cached version of the bundle.
-
-### Custom UI Bundle Features
-
-Modern UI bundles for Antora can include advanced features:
-
-1. **Search Integration**: Many UI bundles include built-in search functionality:
-+
-[source,yaml]
-----
-ui:
-  bundle:
-    url: https://github.com/microprofile/microprofile-tutorial-ui/releases/download/latest/ui-bundle.zip
-  supplemental_files: ./supplemental-ui
-search:
-  engine: lunr  # Or another search engine
-  index_latest_only: true
-----
-
-2. **Multiple Output Formats**: Some UI bundles support different output formats:
-+
-[source,yaml]
-----
-ui:
-  bundle:
-    url: https://github.com/microprofile/microprofile-tutorial-ui/releases/download/latest/ui-bundle.zip
-output:
-  dir: ./build/site
-  formats:
-    - html
-    - pdf
-----
-
-3. **SEO Optimizations**: Enhanced metadata for search engines:
-+
-[source,yaml]
-----
-site:
-  title: MicroProfile Tutorial
-  url: https://microprofile.io
-  keys:
-    seo_description: Comprehensive tutorial for learning MicroProfile
-    seo_keywords: microprofile, java, cloud-native, microservices
-----
-
-### Using a Local UI Bundle
-
-For development or customization, you can use a local UI bundle:
-
-[source,yaml]
-----
-ui:
-  bundle:
-    url: ./path/to/local/ui-bundle.zip
-    snapshot: true
-----
-
-Replease _./path/to/local/ui-bundle.zip_ with actual path to your local UI bundle under development.
-
-This approach is useful when developing your own UI bundle or testing modifications.
-
-### UI Bundle Development
-
-If you decide to develop your own UI bundle:
-
-1. **Prerequisites**: Node.js and Gulp
-2. **Project Structure**:
-   - `src/`: Source files (CSS, JavaScript, Handlebars templates)
-   - `gulp.d/`: Gulp tasks for building the bundle
-   - `preview-src/`: Sample content for testing
-3. **Build Process**:
-   - Run `gulp bundle` to create the UI bundle
-   - Use `gulp preview` to test with sample content
-
-### Performance Optimization Tips
-
-To optimize the performance of your documentation site:
-
-1. **Minification**: Ensure CSS and JavaScript are minified
-2. **Image Optimization**: Use optimized images and consider lazy loading
-3. **Font Subsetting**: Only include the character sets you need
-4. **Resource Caching**: Configure proper caching headers
-5. **CDN Integration**: Consider hosting assets on a CDN
-
-### Debugging UI Issues
-
-When troubleshooting UI problems:
-
-1. Use browser developer tools to inspect elements and styles
-2. Check the browser console for JavaScript errors
-3. Verify that all required resources are loading correctly
-4. Test with different browsers to identify browser-specific issues
+* https://microprofile.io[MicroProfile Official Site]
+* https://openliberty.io/guides/[Open Liberty Guides]
+* https://docs.antora.org/[Antora Documentation]
+* https://jakarta.ee[Jakarta EE]

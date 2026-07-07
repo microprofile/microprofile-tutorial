@@ -15,17 +15,9 @@
     pdfLinks.forEach(link => {
       // Only modify links that contain 'microprofile-tutorial.pdf'
       if (link.href.includes('microprofile-tutorial.pdf')) {
-        // Ensure the link points to the correct absolute path
-        const baseUrl = window.location.origin;
-        const correctPath = baseUrl + '/microprofile-tutorial/6.1/microprofile-tutorial.pdf';
-        link.href = correctPath;
-        // Set a proper download filename
+        // Don't modify the href - let it use the original relative path
+        // Just ensure it has the download attribute with proper filename
         link.setAttribute('download', 'microprofile-tutorial.pdf');
-        // Add click handler for additional debugging
-        link.addEventListener('click', function(e) {
-          console.log('PDF download clicked. URL:', this.href);
-          // Let the default download behavior proceed
-        });
         console.log('PDF download link configured:', link.href);
       }
     });
@@ -34,7 +26,7 @@
 
 <link rel="icon" href="../../../_/img/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="../../../_/img/favicon.png" type="image/png">
-<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png";      <!-- Google Tag Manager -->
+<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png">      <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -463,6 +455,7 @@ For those looking to master developing RESTful Web Services, we strongly encoura
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -475,7 +468,7 @@ import jakarta.validation.constraints.NotNull;
 public class Product {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -901,6 +894,7 @@ public Response updateProduct(Product product) {
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@DELETE
+@Transactional
 @Path("products/{id}")
 public Response deleteProduct(@PathParam("id") Long id) {
      // Delete a product

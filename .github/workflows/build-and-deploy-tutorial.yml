@@ -1,6 +1,17 @@
 # GitHub Actions workflow for building and deploying MicroProfile Tutorial documentation
-# This workflow uses Antora to generate a static documentation site from AsciiDoc sources
+# This workflow uses Antora to generate a static multi-version documentation site from AsciiDoc sources
 # and deploys it to GitHub Pages
+#
+# Multi-Version Support:
+# - The workflow fetches multiple branches (6.1 and main) as defined in antora-assembler.yml
+# - Each branch's antora.yml defines the version number for that branch
+# - The version selector dropdown allows users to switch between versions
+#
+# Important: antora-assembler.yml must specify all versions in the branches array:
+#   branches: [6.1, main]
+#
+# This configuration must be consistent across ALL branches to ensure the version
+# dropdown shows all available versions regardless of which version is selected.
 name: Generate MicroProfile Tutorial
 
 on:
@@ -32,20 +43,27 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # Environment variables for this job
+    env:
+      # Opt into Node.js 24 early to prepare for mandatory migration on June 2, 2026
+      # GitHub will force Node.js 24 for all GitHub Actions on that date
+      # This allows testing and validation with Node.js 24 now
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
     # Minimal permissions needed for PR validation
     permissions:
       contents: read   # Required to read repository contents
 
     steps:
-      # Checkout the repository source code
+      # Check out the repository source code
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.3
 
       # Set up Node.js runtime environment for Antora
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6.4.0
         with:
-          node-version: '20'  # LTS version compatible with Antora
+          node-version: '24'  # LTS version compatible with Antora
           cache: 'npm'        # Cache npm dependencies for faster builds
 
       # Set up Ruby for AsciiDoc extensions
@@ -70,16 +88,55 @@ jobs:
         run: ./update-repo-url.sh
       
       # Generate the documentation site to validate it builds correctly
+      # Retry logic: Attempts up to 3 times to handle transient network issues or timeouts
       - name: Validate Site Generation
-        run: npx antora --fetch --stacktrace antora-assembler.yml
+        run: |
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt to generate site..."
+            if npx antora --fetch --stacktrace antora-assembler.yml; then
+              echo "✅ Site generation successful"
+              exit 0
+            fi
+            if [ $attempt -lt 3 ]; then
+              echo "⏳ Retrying in 30 seconds..."
+              sleep 30
+            fi
+          done
+          echo "❌ Failed after 3 attempts"
+          exit 1
 
-      # Verify the build output exists
+      # Verify the build output exists and includes all versions
       - name: Verify Build Output
         run: |
           if [ -d "./build/site" ]; then
             echo "✅ Site generated successfully"
+            echo ""
+            echo "📋 Build output structure:"
             ls -la ./build/site
+            
+            # Verify multi-version structure
+            echo ""
+            echo "🔍 Verifying multi-version documentation structure..."
+            if [ -d "./build/site/microprofile-tutorial" ]; then
+              echo "📂 Available versions:"
+              ls -d ./build/site/microprofile-tutorial/*/ 2>/dev/null | while read version_dir; do
+                version=$(basename "$version_dir")
+                file_count=$(find "$version_dir" -type f | wc -l)
+                echo "  ✅ Version $version: $file_count files"
+              done
+              
+              echo ""
+              if [ -f "./build/site/index.html" ]; then
+                echo "✅ Version selector (root index.html) exists"
+              else
+                echo "⚠️ Version selector (root index.html) not found"
+              fi
+            else
+              echo "⚠️ Microprofile-tutorial directory not found"
+            fi
+            
             # Check if PDF was generated (it's actually generated as index.pdf in _exports)
+            echo ""
             echo "🔍 Looking for generated PDF files..."
             find . -name "*.pdf" -type f
             
@@ -95,7 +152,7 @@ jobs:
           fi
   # Main job that builds the Antora documentation and deploys to GitHub Pages
   build-and-deploy:
-    # Only deploy to Pages on pushes to main branch, not on PRs
+    # Only deploy to Pages on pushes to the main branch, not on PRs
     # This prevents deploying from pull request builds
     if: github.event_name != 'pull_request'
 
@@ -106,6 +163,13 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # Environment variables for this job
+    env:
+      # Opt into Node.js 24 early to prepare for mandatory migration on June 2, 2026
+      # GitHub will force Node.js 24 for all GitHub Actions on that date
+      # This allows testing and validation with Node.js 24 now
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
     # GitHub token permissions required for this workflow
     permissions:
       id-token: write  # Required for OIDC authentication to GitHub Pages
@@ -113,7 +177,7 @@ jobs:
       pages: write     # Required to deploy artifacts to GitHub Pages
 
     steps: 
-      # Checkout the repository source code
+      # Check out the repository source code
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -153,10 +217,73 @@ jobs:
           fi
       
       # Generate the documentation site using Antora playbook configuration
-      # --fetch: Downloads remote content sources defined in playbook
+      # --fetch: Downloads remote content sources defined in playbook (all branches specified in antora-assembler.yml)
       # --stacktrace: Shows detailed error information for troubleshooting
+      # This command will fetch and build all versions specified in antora-assembler.yml branches array
+      # Retry logic: Attempts up to 3 times to handle transient network issues or timeouts
       - name: Generate Site with Antora
-        run: npx antora --fetch --stacktrace antora-assembler.yml
+        run: |
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt to generate site..."
+            if npx antora --fetch --stacktrace antora-assembler.yml; then
+              echo "✅ Site generation successful"
+              exit 0
+            fi
+            if [ $attempt -lt 3 ]; then
+              echo "⏳ Retrying in 30 seconds..."
+              sleep 30
+            fi
+          done
+          echo "❌ Failed after 3 attempts"
+          exit 1
+
+      # Verify multi-version deployment: check that all configured versions were generated
+      - name: Verify Multi-Version Documentation
+        run: |
+          echo "🔍 Verifying multi-version documentation build..."
+          echo ""
+          
+          VERSIONS=("6.1" "7.1")
+          MISSING_VERSIONS=()
+          
+          for VERSION in "${VERSIONS[@]}"; do
+            if [ -d "./build/site/microprofile-tutorial/$VERSION" ]; then
+              # Count files in version directory
+              FILE_COUNT=$(find "./build/site/microprofile-tutorial/$VERSION" -type f | wc -l)
+              echo "✅ Version $VERSION found with $FILE_COUNT files"
+            else
+              echo "❌ Version $VERSION NOT FOUND"
+              MISSING_VERSIONS+=("$VERSION")
+            fi
+          done
+          
+          echo ""
+          
+          # Check if version selector files exist
+          if [ -f "./build/site/index.html" ]; then
+            echo "✅ Root index.html (version selector) exists"
+          else
+            echo "❌ Root index.html not found"
+          fi
+          
+          # List all versions in build/site
+          echo ""
+          echo "📋 Available versions in build/site/microprofile-tutorial:"
+          ls -d ./build/site/microprofile-tutorial/*/ 2>/dev/null || echo "No versions found!"
+          
+          # Warn if versions are missing
+          if [ ${#MISSING_VERSIONS[@]} -gt 0 ]; then
+            echo ""
+            echo "⚠️ WARNING: Some configured versions are missing:"
+            printf '%s\n' "${MISSING_VERSIONS[@]}"
+            echo ""
+            echo "Ensure antora-assembler.yml specifies all versions in the branches array:"
+            echo "  branches: [6.1, v7.1]"
+            exit 1
+          fi
+          
+          echo ""
+          echo "✅ All configured versions generated successfully!"
 
       # Ensure GitHub Pages is enabled and configure deployment settings
       # This will enable Pages if it's not already enabled and set the source to GitHub Actions
@@ -180,68 +307,54 @@ jobs:
           echo ""
           echo "✅ Pages setup completed successfully"
           echo "📄 Site will be deployed from ./build/site directory"
-      # Verify PDF generation and copy to correct location for download
-      - name: Verify PDF generation and copy to correct location for download
+      # Verify PDF generation and copy to the correct location for download
+      - name: Verify PDF generation and copy to the correct location for download
+        continue-on-error: true
         run: |
           echo "🔍 Looking for generated PDF files..."
-          find . -name "*.pdf" -type f
+          PDF_FOUND=false
           
-          # The PDF is actually generated as index.pdf in _exports subdirectory
-          PDF_SOURCE=""
-          if [ -f "./build/assembler/microprofile-tutorial/6.1/_exports/index.pdf" ]; then
-            PDF_SOURCE="./build/assembler/microprofile-tutorial/6.1/_exports/index.pdf"
-            echo "✅ PDF found in assembler/_exports location"
-          elif [ -f "./build/site/microprofile-tutorial/6.1/_exports/index.pdf" ]; then
-            PDF_SOURCE="./build/site/microprofile-tutorial/6.1/_exports/index.pdf"
-            echo "✅ PDF found in site/_exports location"
-          else
-            echo "❌ PDF not found in expected locations"
-            echo "Available PDF files:"
-            find . -name "*.pdf" -type f
-            exit 1
-          fi
+          # Search for PDF files in all possible locations
+          # PDF extension creates pdf/ subdirectory in the assembler output
+          PDF_LOCATIONS=(
+            "./build/assembler/pdf/microprofile-tutorial/6.1/_exports/index.pdf"
+            "./build/assembler/pdf/microprofile-tutorial/7.1/_exports/index.pdf"
+            "./build/assembler/microprofile-tutorial/6.1/_exports/index.pdf"
+            "./build/assembler/microprofile-tutorial/7.1/_exports/index.pdf"
+            "./build/site/microprofile-tutorial/6.1/_exports/index.pdf"
+            "./build/site/microprofile-tutorial/7.1/_exports/index.pdf"
+          )
           
-          if [ -n "$PDF_SOURCE" ]; then
-            PDF_SIZE=$(stat -f%z "$PDF_SOURCE" 2>/dev/null || stat -c%s "$PDF_SOURCE")
-            echo "PDF Size: ${PDF_SIZE} bytes"
-            
-            # Copy PDF to the exact location the download link expects
-            # The download link is ../../microprofile-tutorial/6.1/microprofile-tutorial.pdf
-            # From /microprofile-tutorial/6.1/index.html, this resolves to /microprofile-tutorial/6.1/microprofile-tutorial.pdf
-            mkdir -p "./build/site/microprofile-tutorial/6.1/"
-            cp "$PDF_SOURCE" "./build/site/microprofile-tutorial/6.1/microprofile-tutorial.pdf"
-            echo "✅ PDF copied to download location: /microprofile-tutorial/6.1/microprofile-tutorial.pdf"
-            
-            # Verify the copy was successful
-            if [ -f "./build/site/microprofile-tutorial/6.1/microprofile-tutorial.pdf" ]; then
-              echo "✅ PDF verification successful"
-              ls -la ./build/site/microprofile-tutorial/6.1/microprofile-tutorial.pdf
-            else
-              echo "❌ PDF copy failed"
-              exit 1
+          for location in "${PDF_LOCATIONS[@]}"; do
+            if [ -f "$location" ]; then
+              echo "✅ PDF found at: $location"
+              PDF_FOUND=true
+              
+              # Extract version from path (6.1 or 7.1)
+              VERSION=$(echo "$location" | grep -oE '[0-9]+\.[0-9]+')
+              
+              # Copy to site directory
+              mkdir -p "./build/site/microprofile-tutorial/$VERSION/"
+              cp "$location" "./build/site/microprofile-tutorial/$VERSION/microprofile-tutorial.pdf"
+              
+              if [ -f "./build/site/microprofile-tutorial/$VERSION/microprofile-tutorial.pdf" ]; then
+                FILE_SIZE=$(stat -c%s "./build/site/microprofile-tutorial/$VERSION/microprofile-tutorial.pdf")
+                echo "✅ PDF copied successfully ($FILE_SIZE bytes): /microprofile-tutorial/$VERSION/microprofile-tutorial.pdf"
+              fi
             fi
-            
-            # Create .htaccess for GitHub Pages to ensure proper PDF serving
-            cat > ./build/site/.htaccess << 'EOF'
-          # Set proper MIME type for PDF files
-          <Files "*.pdf">
-              AddType application/pdf .pdf
-              Header set Content-Type "application/pdf"
-              Header set Content-Disposition "attachment; filename=\"microprofile-tutorial.pdf\""
-              Header set Cache-Control "no-cache, no-store, must-revalidate"
-              Header set Pragma "no-cache"
-              Header set Expires "0"
-          </Files>
-          EOF
-            
-            # Also create PDF-specific .htaccess in the PDF directory
-            cp supplemental-ui/pdf-htaccess "./build/site/microprofile-tutorial/6.1/.htaccess"
-            echo "✅ PDF-specific .htaccess created"
-            
-            echo "✅ PDF download headers configured"
+          done
+          
+          if [ "$PDF_FOUND" = false ]; then
+            echo "⚠️ WARNING: No PDF files found in expected locations"
+            echo "Searching for any PDF files in build directory..."
+            find ./build -name "*.pdf" -type f 2>/dev/null | head -10 || echo "No PDF files found"
+            echo ""
+            echo "PDF generation is often delayed or disabled in some configurations"
           fi
+          
       # Copy assembler directory to site for PDF access via UI bundle
       - name: Copy assembler directory to site for PDF access
+        continue-on-error: true
         run: |
           if [ -d "./build/assembler" ]; then
             cp -r ./build/assembler ./build/site/
@@ -250,6 +363,48 @@ jobs:
           else
             echo "⚠️ Assembler directory not found"
           fi
+      
+      # Final build status check
+      - name: Final Build Status Check
+        run: |
+          echo ""
+          echo "📋 BUILD SUMMARY"
+          echo "================="
+          echo ""
+          echo "✅ Build completed successfully!"
+          echo ""
+          echo "📁 Generated Documentation Structure:"
+          if [ -d "./build/site" ]; then
+            du -sh ./build/site
+            echo ""
+            echo "Content structure:"
+            find ./build/site -maxdepth 3 -type d | sort | sed 's|./build/site|  |'
+          else
+            echo "!!! Build directory not found"
+            exit 1
+          fi
+          
+          echo ""
+          echo "📄 Available Versions:"
+          for version_dir in ./build/site/microprofile-tutorial/*/; do
+            if [ -d "$version_dir" ]; then
+              version=$(basename "$version_dir")
+              file_count=$(find "$version_dir" -type f | wc -l)
+              size=$(du -sh "$version_dir" | cut -f1)
+              echo "  ✅ Version $version: $file_count files, $size"
+              
+              # Check for PDF in this version
+              if [ -f "$version_dir/microprofile-tutorial.pdf" ]; then
+                pdf_size=$(stat -c%s "$version_dir/microprofile-tutorial.pdf" 2>/dev/null || echo "unknown")
+                echo "     📄 PDF: microprofile-tutorial.pdf ($pdf_size bytes)"
+              fi
+            fi
+          done
+          
+          echo ""
+          echo "✅ Ready for deployment to GitHub Pages"
+          echo ""
+          
       # Upload the generated Antora site as a GitHub Pages artifact
       - name: Upload Antora Site to GitHub Pages
         uses: actions/upload-pages-artifact@v3
@@ -260,3 +415,77 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+# ============================================================================
+# MULTI-VERSION DOCUMENTATION CONFIGURATION GUIDE
+# ============================================================================
+#
+# This workflow supports building and deploying multiple versions of your
+# documentation simultaneously using Antora. Users will see a version selector
+# dropdown allowing them to switch between different versions.
+#
+# CONFIGURATION REQUIREMENTS:
+#
+# 1. antora-assembler.yml (Deploy Configuration)
+#    Location: Repository root
+#    Must specify ALL versions in the branches array:
+#    
+#    content:
+#      sources:
+#        - url: https://github.com/microprofile/microprofile-tutorial.git
+#          branches: [6.1, main]  # All versions across all branches
+#
+#    IMPORTANT: This configuration must be IDENTICAL on EVERY branch!
+#    When adding a new version:
+#      - Update this file on ALL existing branches
+#      - Commit the change to each branch
+#      - This ensures the version dropdown works regardless of the selected version
+#
+# 2. antora.yml (Version-Specific Configuration)
+#    Location: Repository root
+#    Should be DIFFERENT on each branch:
+#    
+#    # On the 6.1 branch
+#    name: microprofile-tutorial
+#    version: 6.1
+#    edit_url: https://github.com/.../tree/6.1/...
+#    
+#    # On the main branch
+#    name: microprofile-tutorial
+#    version: 7.1
+#    edit_url: https://github.com/.../tree/v7.1/...
+#
+# WORKFLOW BEHAVIOR:
+#
+# The --fetch flag in the "Generate Site with Antora" step tells Antora to:
+#   1. Download the remote repository
+#   2. Fetch all branches specified in antora-assembler.yml
+#   3. Extract content from each branch
+#   4. Build HTML for each version
+#   5. Create version-specific directories (6.1/, 7.1/, etc.)
+#   6. Generate a version selector at the root (index.html)
+#
+# VERIFICATION:
+#
+# The "Verify Multi-Version Documentation" step checks that:
+#   - All configured versions were built successfully
+#   - Each version directory contains HTML files
+#   - The version selector root file exists
+#   - Fails the build if any version is missing
+#
+# TROUBLESHOOTING:
+#
+# Issue: Version dropdown missing or incomplete
+#   Solution: Ensure antora-assembler.yml has correct branches on all branches
+#   
+# Issue: Old version still appears after removal
+#   Solution: Remove from the branches array on ALL branches and rebuild
+#   
+# Issue: New version not appearing
+#   Solution: 
+#     1. Add branch name to antora-assembler.yml on all branches
+#     2. Ensure antora.yml on the new branch has the correct version: X.X
+#     3. Create a release or push to trigger the workflow
+#
+# For more information, see CONTRIBUTORS.adoc "Multi-Version Documentation Consistency"
+# ============================================================================

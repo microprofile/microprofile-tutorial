@@ -15,17 +15,9 @@
     pdfLinks.forEach(link => {
       // Only modify links that contain 'microprofile-tutorial.pdf'
       if (link.href.includes('microprofile-tutorial.pdf')) {
-        // Ensure the link points to the correct absolute path
-        const baseUrl = window.location.origin;
-        const correctPath = baseUrl + '/microprofile-tutorial/6.1/microprofile-tutorial.pdf';
-        link.href = correctPath;
-        // Set a proper download filename
+        // Don't modify the href - let it use the original relative path
+        // Just ensure it has the download attribute with proper filename
         link.setAttribute('download', 'microprofile-tutorial.pdf');
-        // Add click handler for additional debugging
-        link.addEventListener('click', function(e) {
-          console.log('PDF download clicked. URL:', this.href);
-          // Let the default download behavior proceed
-        });
         console.log('PDF download link configured:', link.href);
       }
     });
@@ -34,7 +26,7 @@
 
 <link rel="icon" href="../../../_/img/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="../../../_/img/favicon.png" type="image/png">
-<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png";      <!-- Google Tag Manager -->
+<link rel="shortcut icon" href="../../../_/img/favicon.png" type="image/png">      <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -176,30 +168,38 @@
 <h2 id="introduction"><a class="anchor" href="#introduction"></a>Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In the previous chapter, we saw how RESTful APIs facilitate language-agnostic access to web services from diverse environments. However, a clear and comprehensive contract is required to ensure seamless integration between clients and services. This need for a well-defined API contract has led to the adoption of the OpenAPI specification.
-This chapter will explore the primary features of MicroProfile OpenAPI, demonstrate how to integrate it into your MicroProfile applications, and show you how to annotate your RESTful services to produce rich documentation that adheres to the OpenAPI specification. Furthermore, we will introduce the OpenAPI UI, a visual interface allowing developers and stakeholders to interact with and visualize the documented APIs, enhancing understanding and facilitating integration.</p>
+<p>In previous chapters, you built Restful (Representational State Transfer) APIs that various clients can use to access your web services regardless of programming language or platform. However, clients need a clear and comprehensive contract that describes available endpoints, expected parameters, and response formats to integrate seamlessly with these web services. Organizations adopt the OpenAPI Specification to provide this well-defined API contract.</p>
+</div>
+<div class="paragraph">
+<p>This chapter introduces MicroProfile OpenAPI and shows you how to document your RESTful services using OpenAPI annotations. You will learn to generate comprehensive API documentation that follows the OpenAPI Specification, then visualize and interact with your documented APIs using Swagger UI, a browser-based interface that makes your API contract immediately accessible to developers and stakeholders.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="topics-to-be-covered"><a class="anchor" href="#topics-to-be-covered"></a>Topics to be covered:</h2>
+<h2 id="what-you-will-learn"><a class="anchor" href="#what-you-will-learn"></a>What you will learn</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>This chapter covers the following topics:</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>Introduction to MicroProfile OpenAPI</p>
+<p>Understanding MicroProfile OpenAPI</p>
 </li>
 <li>
-<p>API Specification using MicroProfile Open API</p>
+<p>Specifying APIs using MicroProfile OpenAPI</p>
 </li>
 <li>
-<p>Generating API Documentation</p>
+<p>Generating API documentation</p>
 </li>
 <li>
-<p>Documenting Authentication and Authorization Requirements</p>
+<p>Documenting authentication and authorization</p>
 </li>
 <li>
-<p>Exploring the APIs using Swagger UI</p>
+<p>Exploring APIs using Swagger UI</p>
+</li>
+<li>
+<p>Using new features in MicroProfile OpenAPI 4.1</p>
 </li>
 </ul>
 </div>
@@ -209,7 +209,7 @@ This chapter will explore the primary features of MicroProfile OpenAPI, demonstr
 <h2 id="openapi-specification"><a class="anchor" href="#openapi-specification"></a>OpenAPI Specification</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Open API Specification (OAS), formerly Swagger specification, is a technical specification that allows REST API providers to describe and publish their APIs using a format that various tools can consume. It defines a standard, language-agnostic interface to RESTful APIs, making it easy for third-party tools to generate documentation, client SDKs, and a range of tools that promote the seamless consumption of RESTful APIs.</p>
+<p>The OpenAPI Specification (OAS), formerly known as Swagger, defines a standard format for describing and publishing REST APIs. It provides a language-agnostic interface to RESTful APIs. API providers use OAS to create machine-readable documents that describe their endpoints, request and response schemas, authentication requirements, and other API characteristics. This standardization enables powerful tooling: Integrated Development Environments (IDEs) can automatically generate client code. Testing frameworks can then verify your API&#8217;s functionality against its specification. Documentation tools can build interactive API explorers, all stemming from a single OpenAPI document.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -218,13 +218,15 @@ This chapter will explore the primary features of MicroProfile OpenAPI, demonstr
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-The OpenAPI Initiative, a consortium of industry experts committed to standardizing how to describe REST APIs, maintains the OpenAPI Specification. It is a community-driven initiative, and many large organizations use it, including Google, Microsoft, and Amazon.
+<div class="paragraph">
+<p>The OpenAPI Initiative (a Linux Foundation collaborative project) maintains the specification. Industry leaders including Google, Microsoft, and Amazon contribute to this community-driven standard, which ensures it meets enterprise requirements while remaining vendor-neutral.</p>
+</div>
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>The OpenAPI specification enables creation of a well-defined, clear and comprehensive API contract. It provides a standardized way to describe the API&#8217;s structure, expected requests and responses, and authentication mechanisms, making it easier to develop, test, and maintain RESTful APIs.</p>
+<p>When you adopt OpenAPI, you create a single source of truth that serves as both human-readable documentation and a machine-parsable contract. This approach simplifies API development, testing, and long-term maintenance while making your API more accessible to consumers.</p>
 </div>
 </div>
 </div>
@@ -232,40 +234,62 @@ The OpenAPI Initiative, a consortium of industry experts committed to standardiz
 <h2 id="introduction-to-microprofile-openapi"><a class="anchor" href="#introduction-to-microprofile-openapi"></a>Introduction to MicroProfile OpenAPI</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The MicroProfile OpenAPI specification builds upon the widely recognized OpenAPI Specification (OAS) and leverages annotations from the Jakarta Restful Web Services specification. The primary focus of MicroProfile OpenAPI is on defining REST APIs that utilize JSON within the context of HTTP.</p>
-</div>
-<div class="paragraph">
-<p>The specification aims to provide a uniform way of describing APIs so that they are both human-readable and machine-readable.  It facilitates the creation of APIs that are consistent, well-documented, and easily consumable by both humans and machines.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="capabilities-of-microprofile-openapi-specification"><a class="anchor" href="#capabilities-of-microprofile-openapi-specification"></a>Capabilities of MicroProfile OpenAPI Specification</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>MicroProfile OpenAPI provides a suite of Java APIs that allows developers to define and generate API specifications that adhere to OpenAPI v3 standards. As a result, it simplifies the process of designing, documenting, and publishing RESTful APIs for developers.</p>
-</div>
-<div class="paragraph">
-<p>Developers can quickly generate documentation for their microservices using MicroProfile OpenAPI. The documentation includes information on what services are provided, how to invoke them, and what data types are used. It generates comprehensive metadata about services, ensuring interoperability across diverse platforms and tools. Also, documentation can generate client code to access the web services.</p>
-</div>
-<div class="paragraph">
-<p>The OpenAPI Specification fuels a rich ecosystem of tools that automate and support. This specification streamlines the creation of OpenAPI documentation for RESTful services using a unified approach. It generates comprehensive metadata about services, ensuring interoperability across diverse platforms and tools:</p>
+<p>The MicroProfile OpenAPI specification integrates the OpenAPI Specification (OAS) with Jakarta RESTful Web Services, previously known as JAX-RS. It provides Java annotations that automatically generate OpenAPI documentation directly from your Java code. This annotation-driven approach offers several advantages:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>API Documentation Generation</strong>: Intuitive interactive documentation portals emerge directly from the specification.</p>
+<p>Your documentation stays always synchronized with your codebase</p>
 </li>
 <li>
-<p><strong>Client SDK Creation</strong>: Client libraries in various languages can be automatically generated.</p>
+<p>You do not need to maintain and juggle between separate specification files</p>
 </li>
 <li>
-<p><strong>API Testing</strong>: Testing frameworks can leverage the specification to design robust tests.</p>
+<p>The OpenAPI output is generated automatically when your application is deployed</p>
 </li>
 <li>
-<p><strong>API Mocking</strong>: Simplifies mocking APIs for testing and development purposes.</p>
+<p>The standard Jakarta REST endpoints work without any modifications</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>MicroProfile OpenAPI 4.0 supports OpenAPI Specification 3.1. This ensures your APIs are consistent, well-documented, and easily usable across a variety of development tools, testing frameworks, and API consumers.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="capabilities-of-microprofile-openapi"><a class="anchor" href="#capabilities-of-microprofile-openapi"></a>Capabilities of MicroProfile OpenAPI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile OpenAPI provides a set of annotations and APIs that allow you to generate OpenAPI 3.1-compliant specifications directly from your Jakarta REST code. Instead of manually writing YAML (YAML Ain&#8217;t Markup Language) or JSON (JavaScript Object Notation) specification files, you document your API using Java annotations, and MicroProfile OpenAPI generates the complete specification automatically.</p>
+</div>
+<div class="paragraph">
+<p>The specification supports the full range of OpenAPI features:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Document endpoints: operations, parameters, request and response schemas, and examples</p>
+</li>
+<li>
+<p>Specify API metadata: versioning, contact information, license details, and servers</p>
+</li>
+<li>
+<p>Define data models: reusable schemas for your domain objects</p>
+</li>
+<li>
+<p>Document authentication: security requirements and schemes</p>
+</li>
+<li>
+<p>Describe responses: success and error responses with status codes</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Your generated OpenAPI specification enables a rich ecosystem of tools. Documentation portals like Swagger UI create interactive API explorers. Code generators produce client libraries in multiple languages. Testing frameworks validate requests and responses against your specification. Mock servers simulate your API for development and testing.</p>
+</div>
+<div class="paragraph">
+<p>MicroProfile OpenAPI ensures your documentation stays synchronized with your implementation, which eliminates the common problem of outdated API specifications.</p>
 </div>
 </div>
 </div>
@@ -273,46 +297,116 @@ The OpenAPI Initiative, a consortium of industry experts committed to standardiz
 <h2 id="generating-openapi-documents"><a class="anchor" href="#generating-openapi-documents"></a>Generating OpenAPI documents</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are multiple ways in which you can generate OpenAPI documents. The most common way is to use annotations. This only requires augmenting your Jakarta Restful Web Services annotations with OpenAPI annotations.</p>
+<p>MicroProfile OpenAPI provides multiple approaches to generate OpenAPI documentation. You can use annotations, static files, or a combination of both to create comprehensive API specifications.</p>
+</div>
+<div class="sect2">
+<h3 id="annotation-based-generation"><a class="anchor" href="#annotation-based-generation"></a>Annotation-based generation</h3>
+<div class="paragraph">
+<p>Add annotations to your Jakarta REST resources to generate documentation with MicroProfile OpenAPI. This annotation-driven approach keeps your documentation synchronized with your code. When you update an endpoint, you update its documentation at the same time.</p>
 </div>
 <div class="paragraph">
-<p>Besides annotations, a predefined OpenAPI document may be provided in either YAML or JSON format. This so-called static model will be merged with the model generated by scanning for Jakarta REST endpoints and the combined result will be made available to clients. However, the annotation-based approach is recommended as it is more maintainable and easier to understand. Finally, you can filter out the resources you do not want to document using configuration.</p>
+<p>Annotate your Jakarta REST classes and methods with OpenAPI annotations. MicroProfile OpenAPI scans your application at deployment time, discovers annotated endpoints, and generates a complete OpenAPI specification automatically.</p>
+</div>
+<div class="paragraph">
+<p>This approach offers several benefits:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Documentation lives alongside the code it describes</p>
+</li>
+<li>
+<p>IDE support for autocomplete and validation</p>
+</li>
+<li>
+<p>Compile-time checking ensures annotations remain valid</p>
+</li>
+<li>
+<p>No separate specification files to maintain</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="static-openapi-files-optional"><a class="anchor" href="#static-openapi-files-optional"></a>Static OpenAPI files (optional)</h3>
+<div class="paragraph">
+<p>You can also provide a static OpenAPI document in <code>.yaml</code> or <code>.json</code> format at <code>META-INF/openapi.yaml</code> or <code>META-INF/openapi.json</code>. MicroProfile OpenAPI will merge this static content with the generated specification, which allows you to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Add API-level metadata (title, version, contact information)</p>
+</li>
+<li>
+<p>Define reusable schemas or security schemes</p>
+</li>
+<li>
+<p>Override generated documentation for specific endpoints</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>However, for most applications, annotations alone provide sufficient documentation.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="selective-documentation"><a class="anchor" href="#selective-documentation"></a>Selective documentation</h3>
+<div class="paragraph">
+<p>Use the <code>mp.openapi.scan.exclude.packages</code> and <code>mp.openapi.scan.exclude.classes</code> configuration properties to exclude specific resources from documentation. This approach proves useful for internal or administrative endpoints you do not want to expose in your public API specification.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="documentation-sources"><a class="anchor" href="#documentation-sources"></a>Documentation sources</h3>
+<div class="paragraph">
+<p>MicroProfile OpenAPI merges documentation from multiple sources. Annotations override static files, and configuration properties can override both. Use filters to programmatically modify the final specification.</p>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="using-microprofile-open-api-in-your-project"><a class="anchor" href="#using-microprofile-open-api-in-your-project"></a>Using MicroProfile Open API in your project</h2>
+<h2 id="using-microprofile-openapi-in-your-project"><a class="anchor" href="#using-microprofile-openapi-in-your-project"></a>Using MicroProfile OpenAPI in your project</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To document Jakarta RESTful Web Services using MicroProfile OpenAPI, we need to annotate the resource classes and methods with the OpenAPI annotation.</p>
-</div>
-<div class="paragraph">
-<p>To use MicroProfile OpenAPI in your project, you need to add the following maven coordinates to your project:</p>
+<p>To use MicroProfile OpenAPI in your project, add the following Maven coordinates:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
   &lt;groupId&gt;org.eclipse.microprofile.openapi&lt;/groupId&gt;
   &lt;artifactId&gt;microprofile-openapi-api&lt;/artifactId&gt;
-  &lt;version&gt;3.1.1&lt;/version&gt;
+  &lt;version&gt;4.1&lt;/version&gt;
+  &lt;scope&gt;provided&lt;/scope&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
 <div class="paragraph">
-<p>Below is an illustrative example of how you might annotate a method in the <code>ProductResource</code> class to achieve this documentation using MicroProfile OpenAPI annotations:</p>
+<p>Use <code>&lt;scope&gt;provided&lt;/scope&gt;</code> because your MicroProfile runtime already includes the implementation.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="basic-annotation-example"><a class="anchor" href="#basic-annotation-example"></a>Basic annotation example</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To document Jakarta RESTful Web Services using MicroProfile OpenAPI, annotate your resource classes and methods with OpenAPI annotations.</p>
+</div>
+<div class="paragraph">
+<p>The following example shows how to annotate a method in the <code>ProductResource</code> class:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.media.Content;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// ...
 
 @ApplicationScoped
 @Path("/products")
@@ -324,19 +418,19 @@ public class ProductResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "List all products", description = "Retrieves a list of all available products")
-    @APIResponses(value = {
-        @APIResponse(
-            responseCode = "200",
-            description = "Successful, list of products found",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = Product.class))
-        ),
-        @APIResponse(
-            responseCode = "400",
-            description = "Unsuccessful, no products found",
-            content = @Content(mediaType = "application/json")
+    @APIResponse(
+        responseCode = "200",
+        description = "Successful, list of products found",
+        content = @Content(
+                      mediaType = "application/json",
+                      schema = @Schema(implementation = Product.class)
         )
-    })
+    ),
+    @APIResponse(
+        responseCode = "400",
+        description = "Unsuccessful, no products found",
+        content = @Content(mediaType = "application/json")
+    )
     public List&lt;Product&gt; getAllProducts() {
         // Method implementation
     }
@@ -344,169 +438,208 @@ public class ProductResource {
 </div>
 </div>
 <div class="paragraph">
-<p>Explanation:</p>
+<p>The annotations provide the following documentation:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>@Operation</code>: Provides a summary and description for the <code>getProducts()</code> method.</p>
+<p><code>@Tag</code>: Groups related endpoints together in the documentation</p>
 </li>
 <li>
-<p><code>@APIResponse</code>: Describes the possible responses from the <code>getProducts()</code> operation. In this case, a successful response (HTTP 200) is described, indicating that the method returns an array of Product entities.</p>
+<p><code>@Operation</code>: Describes what the endpoint does</p>
 </li>
 <li>
-<p><code>@Schema</code>: Specifies the schema of the response content. Here, it is used to indicate that the method returns an array of Product objects.</p>
+<p><code>@APIResponse</code>: Defines a specific response with status code and content</p>
+</li>
+<li>
+<p><code>@Content</code>: Specifies the response media type and structure</p>
+</li>
+<li>
+<p><code>@Schema</code>: References the data model returned (in this case, <code>Product.class</code>)</p>
 </li>
 </ul>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
 <div class="paragraph">
-<p>These annotations enrich the <code>ProductResource</code> class with metadata necessary for generating comprehensive and descriptive OpenAPI documentation automatically.</p>
+<p>The <code>@APIResponse</code> annotation is repeatable, which means you can apply it multiple times to document different response codes. You only need the <code>@APIResponses</code> wrapper annotation when using the <code>extensions</code> field to add vendor-specific metadata to all responses.</p>
 </div>
-<div class="paragraph">
-<p>We have also annotated the <code>getProducts()</code> method with the @APIResponse annotation to document the successful response from the operation. The <code>responseCode</code> field is used to specify the status code of the response, and the <code>description</code> field is used to provide a brief description of the response. There are two possible responses – a successful response containing a list of produdts with a 200 status code, and an unsuccessful response with a 400 status code, if no products are found. The content field is used to specify the schema of the response content. In this example, the response content is a list of `Product`s.</p>
-</div>
-<div class="paragraph">
-<p>Finally, we need to add the following property to the src/main/resources/META-INF/microprofile-config.properties file:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">mp.openapi.scan=true</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This property tells MicroProfile OpenAPI to scan our classes for annotations and generate API documentation for them.</p>
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>Now that we have configured MicroProfile OpenAPI, we can build and run our application.</p>
+<p>These annotations enrich the <code>ProductResource</code> class with metadata necessary for generating comprehensive OpenAPI documentation automatically.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Annotation scanning is enabled by default. If you need to disable it, you can set <code>mp.openapi.scan.disable=true</code> in your <code>microprofile-config.properties</code> file.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Build and run the application.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="how-to-view-the-generated-documentation"><a class="anchor" href="#how-to-view-the-generated-documentation"></a>How to view the generated documentation</h2>
+<h2 id="viewing-the-generated-documentation"><a class="anchor" href="#viewing-the-generated-documentation"></a>Viewing the generated documentation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To view the generated documentation, we can use the OpenAPI UI tool. The Open API UI tool is a web-based tool that can be used to view the documentation for a REST API.</p>
-</div>
-<div class="paragraph">
-<p>The OpenAPI UI tool can be accessed at the following URL:</p>
+<p>To view the generated documentation, use the OpenAPI endpoint. Access the OpenAPI specification at the following URL:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">http://localhost:&lt;port&gt;/openapi/</code></pre>
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">http://&lt;hostname&gt;:&lt;port&gt;/openapi/</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Replace <code>&lt;port&gt;</code> with the actual port used by your runtime, for e.g. 9080 which is the default port at Open Liberty server.</p>
+<p>Replace <code>&lt;hostname&gt;</code> and <code>&lt;port&gt;</code> with the actual hostname and port used by your runtime (for example, <code>localhost:9080</code>).</p>
 </div>
 <div class="paragraph">
-<p>The <code>/openapi</code> endpoint is used to get information about the OpenAPI specification generated from the comments in the source code annotations. It returns information in YAML format.</p>
+<p>The <code>/openapi</code> endpoint returns the OpenAPI specification generated from the annotations in your source code. By default, it returns the specification in YAML format.</p>
 </div>
 <div class="paragraph">
-<p>When we access the <code><a href="http://localhost:5050/openapi" class="bare">http://localhost:5050/openapi</a></code> URL, we should see the API documentation that was generated by MicroProfile OpenAPI:</p>
+<p>To receive the specification in JSON format instead, you can:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Set the <code>Accept</code> HTTP header to <code>application/json</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -H "Accept: application/json" http://localhost:9080/openapi</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Use the <code>format</code> query parameter:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">http://localhost:9080/openapi?format=JSON</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>Context root behavior:</strong></p>
+</div>
+<div class="paragraph">
+<p>The <code>/openapi</code> endpoint is provided at the root of the server, not relative to your application&#8217;s context path. If your application is deployed with a context root (e.g., <code>/myapp</code>), the OpenAPI endpoint remains at <code>/openapi</code>, not <code>/myapp/openapi</code>.</p>
+</div>
+<div class="paragraph">
+<p>However, the generated OpenAPI document will include server URLs that reflect your application&#8217;s deployment context. For example, if you define <code>@ApplicationPath("/api")</code> and deploy to context <code>/myapp</code>, the server URL in the generated spec will be <code>/myapp/api</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>When you access the <code>http://localhost:9080/openapi</code> URL, you see the API documentation that MicroProfile OpenAPI generated:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.3
-info:
-  title: Generated API
-  version: "1.0"
-servers:
-- url: http://localhost:9080/catalog
-paths:
-  /api/products:
-    get:
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
-    put:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
-      responses:
-        "200":
-          description: OK
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
-      responses:
-        "200":
-          description: OK
-  /api/products/products/{id}:
-    delete:
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
-      responses:
-        "200":
-          description: OK
-  /api/products/{id}:
-    get:
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          format: int64
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.1.0
 components:
   schemas:
     Product:
-      required:
-      - name
-      - description
-      - price
       type: object
       properties:
         id:
-          format: int64
           type: integer
+          format: int64
         name:
           type: string
         description:
           type: string
         price:
+          type: number
           format: double
-          type: number</code></pre>
+info:
+  title: Generated API
+  version: "1.0"
+paths:
+  /api/products:
+    get:
+      summary: List all products
+      description: Retrieves a complete list of products in the catalog.
+      tags:
+      - Products
+      responses:
+        "200":
+          description: Successfully retrieved product list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "500":
+          description: Internal server error
+tags:
+- name: Products
+  description: Product catalog operations
+servers:
+- url: https://localhost:5050/mp-ecomm-store</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>As we can see, MicroProfile OpenAPI has generated API documentation for our resource class. We can use this documentation to learn about the API and how to use it.</p>
+<p>MicroProfile OpenAPI generates API documentation for your resource class. You can use this documentation to learn about the API and how to use it. This documentation includes the following information:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>/products</code> endpoint description</p>
+</li>
+<li>
+<p>The GET operation summary and details</p>
+</li>
+<li>
+<p>Expected response codes (200, 500)</p>
+</li>
+<li>
+<p>The JSON structure of the Product response</p>
+</li>
+<li>
+<p>Grouping under the Products tag</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>MicroProfile OpenAPI allows developers to produce these specifications directly from their codebase, leveraging annotations and/or providing OpenAPI documents statically. This direct generation ensures that the API documentation is always up to date with the code.</p>
+<p>MicroProfile OpenAPI allows developers to produce these specifications directly from their codebase by using annotations or providing OpenAPI documents statically. This direct generation ensures that the API documentation remains synchronized with the code.</p>
+</div>
+<div class="paragraph">
+<p>Visualization tools like Swagger UI can render this specification, client generators can consume it, and testing frameworks can use it for validation.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="exploring-the-apis-using-swagger-ui"><a class="anchor" href="#exploring-the-apis-using-swagger-ui"></a>Exploring the APIs using Swagger UI</h2>
+<h2 id="exploring-apis-using-swagger-ui"><a class="anchor" href="#exploring-apis-using-swagger-ui"></a>Exploring APIs using Swagger UI</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To open Swagger UI for the API documentation generated using MicroProfile OpenAPI, you will need to deploy your application to a server that supports MicroProfile, such as Open Liberty, WildFly, Quarkus, or Payara Micro. These servers automatically generate the OpenAPI documentation for your RESTful services based on the annotations in your code.</p>
+<p>To open Swagger UI for the API documentation generated using MicroProfile OpenAPI, deploy your application to a server that supports MicroProfile, such as Open Liberty, WildFly, Quarkus, or Payara Micro. These servers automatically generate the OpenAPI documentation for your RESTful services based on the annotations in your code.</p>
 </div>
 <div class="paragraph">
-<p>Next, visit the following URL to launch the Swagger UI:</p>
+<p>Visit the following URL to launch Swagger UI:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -514,13 +647,13 @@ components:
 </div>
 </div>
 <div class="paragraph">
-<p>Swagger UI is then used to render this documentation in a user-friendly web interface. Below is the screenshot of swagger UI for the Product REST Resource.</p>
+<p>Swagger UI renders this documentation in a user-friendly web interface. The following figure shows the Swagger UI for the Product REST resource.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="../_images/figure4-1.png" alt="MicroProfile OpenAPI">
+<img src="../_images/figure4-1.png" alt="Swagger UI interface showing Product API endpoints" width="800">
 </div>
-<div class="title">Swagger UI 1. Swagger UI</div>
+<div class="title">Figure 1. Swagger UI displaying the Product Catalog API</div>
 </div>
 </div>
 </div>
@@ -528,96 +661,542 @@ components:
 <h2 id="annotations"><a class="anchor" href="#annotations"></a>Annotations</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The MicroProfile OpenAPI annotations can be used to document any Jakarta Restful Web Services resource. The annotations can also be used in conjunction with other Jakarta Restful Webservices annotations, such as @Path and @Produces. The most common annotations that are used to document RESTful web services are list in Table 4-1.</p>
+<p>You can use MicroProfile OpenAPI annotations to document any Jakarta RESTful Web Services resource. You can also use the annotations with other Jakarta RESTful Web Services annotations, such as <code>@Path</code> and <code>@Produces</code>. Table 4-1 lists the most common annotations used to document RESTful web services.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
+<caption class="title">MicroProfile OpenAPI annotations for documenting Jakarta REST resources</caption>
 <colgroup>
 <col style="width: 25%;">
 <col style="width: 75%;">
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Annotations</th>
-<th class="tableblock halign-left valign-top">Details</th>
+<th class="tableblock halign-left valign-top">Annotation</th>
+<th class="tableblock halign-left valign-top">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@OpenAPIDefinition</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@OpenAPIDefinition</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Provides metadata about the entire API. It can include information such as the title, description, version, terms of service, and contact information.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Info</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Used inside @OpenAPIDefinition to provide API metadata like title, version, description.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Info</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Used inside <code>@OpenAPIDefinition</code> to provide API metadata like title, version, and description.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Contact</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies contact information for the API, used within @Info.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Contact</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies contact information for the API, used within <code>@Info</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@License</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Defines the license information for the API, also used within @Info.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@License</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Defines the license information for the API, also used within <code>@Info</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Operation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Operation</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Describes a single API operation on a resource.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@APIResponse</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">It is used to document a response from an operation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@APIResponse</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Documents a response from an operation.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@APIResponses</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A container for multiple @APIResponse annotations, allowing documentation of different responses for a single API operation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@APIResponses</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A container for multiple <code>@APIResponse</code> annotations, allowing documentation of different responses for a single API operation.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@RequestBody</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Describes the request body of an HTTP request, specifying the content of the body and whether it is required.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@RequestBody</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Describes the request body of an HTTP request, specifying the content of the body and whether it is required. In MicroProfile OpenAPI 4.0 and later, request bodies are required by default (<code>required=true</code>). To make a request body optional, explicitly set <code>required=false</code>. Note: If migrating from earlier versions, review your API documentation to ensure optional request bodies are explicitly marked as <code>required=false</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Schema</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@RequestBodySchema</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convenience annotation that simplifies documenting request bodies. Instead of using <code>@RequestBody</code> with nested <code>@Content</code> and <code>@Schema</code>, you can directly specify the implementation class: <code>@RequestBodySchema(MyClass.class)</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@APIResponseSchema</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Convenience annotation for documenting responses. Instead of using <code>@APIResponse</code> with nested <code>@Content</code> and <code>@Schema</code>, you can directly specify the response code and implementation class: <code>@APIResponseSchema(responseCode = "200", value = MyClass.class)</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@SchemaProperty</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allows defining properties within a <code>@Schema</code> annotation without creating separate classes. Useful for inline property definitions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Schema</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Provides schema details for a response or request body, specifying the data type, format, and constraints.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Parameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Parameter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Provides information on parameters to the operation, including query parameters, header parameters, and path parameters.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Tag</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Adds metadata to a single tag that is used by the Operation. It helps in categorizing operations by resources or any other qualifier.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Tag</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Adds metadata to a single tag used by the operation. It helps in categorizing operations by resources or any other qualifier.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Content</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Content</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the media type and schema of the operation&#8217;s request or response body.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Components</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Allows the definition of reusable components such as schemas, responses, parameters, and more, which can be referenced by other annotations.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Components</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allows the definition of reusable components such as schemas, responses, parameters, and more, which other annotations can reference.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@SecurityRequirement</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies a security requirement for an operation, referencing security schemes defined in the @Components.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@SecurityRequirement</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies a security requirement for an operation, referencing security schemes defined in <code>@Components</code>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@ExternalDocumentation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@ExternalDocumentation</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Provides additional external documentation for an API or operation.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Callback</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Callback</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Specifies a callback URL for an asynchronous operation.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Callbacks</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Callbacks</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Specifies multiple <code>@Callback</code> annotations.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@Server</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Describes a server that hosts the API, specifying URL and description, which can be global or specific to operations or paths</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Server</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Describes a server that hosts the API, specifying URL and description, which can be global or specific to operations or paths.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@PathItem</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Describes operations available at a specific path. Primarily used to document webhooks in <code>@OpenAPIDefinition</code> or to define reusable path items in the <code>@Components</code> section.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@PathItemOperation</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Used within <code>@PathItem</code> to describe individual operations (GET, POST, etc.) for a path. Useful for webhook documentation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@DependentRequired</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Used within <code>@Schema</code> to specify properties that become required when another property is present. Implements JSON Schema&#8217;s <code>dependentRequired</code> keyword.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@DependentSchema</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Used within <code>@Schema</code> to specify additional validation rules that apply when a specific property is present. Implements JSON Schema&#8217;s <code>dependentSchemas</code> keyword.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@PatternProperty</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Used within <code>@Schema</code> to define validation rules for properties whose names match a regular expression. Implements JSON Schema&#8217;s <code>patternProperties</code> keyword.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>All of these annotations are defined in the org.eclipse.microprofile.openapi.annotations package.</p>
+<p>All of these annotations are defined in the <code>org.eclipse.microprofile.openapi.annotations</code> package.</p>
+</div>
+<div class="sect2">
+<h3 id="convenience-annotation-examples"><a class="anchor" href="#convenience-annotation-examples"></a>Convenience annotation examples</h3>
+<div class="paragraph">
+<p>MicroProfile OpenAPI 2.0 introduced convenience annotations that simplify common documentation patterns.</p>
+</div>
+<div class="sect3">
+<h4 id="using-requestbodyschema"><a class="anchor" href="#using-requestbodyschema"></a>Using @RequestBodySchema</h4>
+<div class="paragraph">
+<p>Instead of:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@POST
+public Response createProduct(
+    @RequestBody(
+        description = "Product to create",
+        required = true,
+        content = @Content(
+            mediaType = MediaType.APPLICATION_JSON,
+            schema = @Schema(implementation = Product.class)
+        )
+    ) Product product) {
+    // Implementation
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can use:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.openapi.annotations.parameters.RequestBodySchema;
+
+@POST
+@RequestBodySchema(Product.class)
+public Response createProduct(Product product) {
+    // Implementation
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-apiresponseschema"><a class="anchor" href="#using-apiresponseschema"></a>Using @APIResponseSchema</h4>
+<div class="paragraph">
+<p>Instead of:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@GET
+@Path("/{id}")
+@APIResponse(
+    responseCode = "200",
+    description = "Product found",
+    content = @Content(
+        mediaType = MediaType.APPLICATION_JSON,
+        schema = @Schema(implementation = Product.class)
+    )
+)
+public Response getProduct(@PathParam("id") Long id) {
+    // Implementation
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can use:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.openapi.annotations.responses.APIResponseSchema;
+
+@GET
+@Path("/{id}")
+@APIResponseSchema(value = Product.class, responseCode = "200", responseDescription = "Product found")
+public Response getProduct(@PathParam("id") Long id) {
+    // Implementation
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-schemaproperty"><a class="anchor" href="#using-schemaproperty"></a>Using @SchemaProperty</h4>
+<div class="paragraph">
+<p>For inline schema property definitions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.openapi.annotations.media.SchemaProperty;
+
+@Schema(
+    description = "Order summary",
+    properties = {
+        @SchemaProperty(
+            name = "orderId",
+            description = "Unique order identifier",
+            example = "ORD-12345"
+        ),
+        @SchemaProperty(
+            name = "total",
+            description = "Total order amount",
+            example = "99.99"
+        )
+    }
+)
+public class OrderSummary {
+    // Class implementation
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-properties"><a class="anchor" href="#configuration-properties"></a>Configuration properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile OpenAPI provides configuration properties to control its behavior. Configure these properties in <code>microprofile-config.properties</code>.</p>
+</div>
+<div class="paragraph">
+<p>Common configuration properties include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>mp.openapi.scan.exclude.packages</code> - Comma-separated list of packages to exclude from scanning</p>
+</li>
+<li>
+<p><code>mp.openapi.scan.exclude.classes</code> - Comma-separated list of classes to exclude from scanning</p>
+</li>
+<li>
+<p><code>mp.openapi.servers</code> - Comma-separated list of global server URLs</p>
+</li>
+<li>
+<p><code>mp.openapi.filter</code> - Fully qualified name of an OASFilter implementation class</p>
+</li>
+<li>
+<p><code>mp.openapi.model.reader</code> - Fully qualified name of an OASModelReader implementation class</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Configuration property names are available as constants in the <code>org.eclipse.microprofile.openapi.OASConfig</code> class for type-safe access in Java code.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Example: Exclude internal packages from scanning:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.openapi.scan.exclude.packages=io.myapp.internal,io.myapp.admin</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Example: Configure custom servers:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.openapi.servers=https://api.example.com/v1,https://api-staging.example.com/v1</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="features-in-microprofile-openapi-4-x"><a class="anchor" href="#features-in-microprofile-openapi-4-x"></a>Features in MicroProfile OpenAPI 4.x</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile OpenAPI 4.0 introduced support for OpenAPI Specification 3.1, and version 4.1 added clarifications and convenience methods.</p>
+</div>
+<div class="sect2">
+<h3 id="openapi-v3-1-specification-support"><a class="anchor" href="#openapi-v3-1-specification-support"></a>OpenAPI v3.1 specification support</h3>
+<div class="paragraph">
+<p>MicroProfile OpenAPI 4.0 supports OpenAPI v3.1, which aligns with JSON Schema 2020-12. This provides better interoperability with standard JSON Schema validators and tooling.</p>
+</div>
+<div class="sect3">
+<h4 id="nullable-type-handling"><a class="anchor" href="#nullable-type-handling"></a>Nullable type handling</h4>
+<div class="paragraph">
+<p>OpenAPI v3.1 uses JSON Schema&#8217;s standard type arrays for nullable fields. Use <code>@Schema(nullable = true)</code> in your Java code, which generates <code>type: ["string", "null"]</code> in the specification:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Schema(description = "Optional description", nullable = true)
+private String description;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jakarta-bean-validation-integration"><a class="anchor" href="#jakarta-bean-validation-integration"></a>Jakarta Bean Validation integration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile OpenAPI automatically processes Jakarta Bean Validation annotations and uses them to enhance the generated OpenAPI schemas. Common validation annotations include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@NotNull</code>, <code>@NotEmpty</code>, <code>@NotBlank</code> - Mark fields as required or with minimum constraints</p>
+</li>
+<li>
+<p><code>@Size(min, max)</code> - Set minimum and maximum length for strings, arrays, or objects</p>
+</li>
+<li>
+<p><code>@Min(value)</code>, <code>@Max(value)</code> - Set numeric range constraints</p>
+</li>
+<li>
+<p><code>@DecimalMin</code>, <code>@DecimalMax</code> - Set decimal range constraints with optional exclusive boundaries</p>
+</li>
+<li>
+<p><code>@Positive</code>, <code>@Negative</code> - Enforce positive or negative numeric values</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Example:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class Product {
+    @NotNull
+    @Positive
+    private Long id;
+
+    @NotBlank
+    @Size(min = 3, max = 100)
+    private String name;
+
+    @DecimalMin("0.01")
+    @DecimalMax("999999.99")
+    private BigDecimal price;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The generated schema includes validation constraints such as <code>minimum</code>, <code>maximum</code>, <code>minLength</code>, <code>maxLength</code>, and <code>pattern</code> based on the annotations. Disable Bean Validation processing using <code>mp.openapi.scan.beanvalidation=false</code> if needed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="documenting-asynchronous-operations-with-callbacks"><a class="anchor" href="#documenting-asynchronous-operations-with-callbacks"></a>Documenting asynchronous operations with callbacks</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile OpenAPI supports documenting callbacks—HTTP requests your API makes to client-provided URLs. This is useful for webhook notifications and asynchronous processing patterns.</p>
+</div>
+<div class="sect2">
+<h3 id="using-callback-annotation"><a class="anchor" href="#using-callback-annotation"></a>Using @Callback annotation</h3>
+<div class="paragraph">
+<p>Document callbacks using the <code>@Callback</code> annotation. The client provides a callback URL, and your API calls that URL when processing completes:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@POST
+@Path("/process-async")
+@Operation(summary = "Process product asynchronously")
+@APIResponse(responseCode = "202", description = "Processing initiated")
+@Callback(
+    name = "productProcessed",
+    callbackUrlExpression = "{$request.body#/callbackUrl}",
+    operations = {
+        @CallbackOperation(
+            method = "post",
+            summary = "Product processing completed",
+            requestBody = @RequestBody(
+                description = "Processing result",
+                content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = ProcessResult.class)
+                )
+            )
+        )
+    }
+)
+public Response processProductAsync(AsyncProductRequest request) {
+    // Initiate async processing
+    return Response.accepted()
+                  .entity("{\"message\": \"Processing initiated\"}")
+                  .build();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Key elements:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>callbackUrlExpression</code> - JSON Pointer to extract the callback URL from the request (e.g., <code>{$request.body#/callbackUrl}</code>)</p>
+</li>
+<li>
+<p><code>@CallbackOperation</code> - Defines the HTTP request your API will make to the client&#8217;s URL</p>
+</li>
+<li>
+<p><code>method</code> - HTTP method for the callback (typically "post")</p>
+</li>
+<li>
+<p><code>requestBody</code> - Payload your API sends to the callback URL</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The callback pattern: (1) Client sends request with callback URL, (2) API responds immediately (202 Accepted), (3) API processes asynchronously, (4) API POSTs results to client&#8217;s callback URL.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-security-schemes-in-openapi-documentation"><a class="anchor" href="#using-security-schemes-in-openapi-documentation"></a>Using security schemes in OpenAPI documentation</h2>
+<div class="sectionbody">
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>MicroProfile OpenAPI <strong>documents</strong> security requirements but does <strong>not enforce</strong> them. You must first implement access controls in your application using security frameworks (such as MicroProfile JWT, Jakarta Security, or your runtime&#8217;s security features), and then use OpenAPI annotations to document how clients should authenticate with your API.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Security is a critical aspect of API documentation. MicroProfile OpenAPI 4.1 provides comprehensive support for documenting various security schemes including API keys, HTTP authentication, OAuth2, and OpenID Connect.</p>
+</div>
+<div class="sect2">
+<h3 id="documenting-security-schemes"><a class="anchor" href="#documenting-security-schemes"></a>Documenting security schemes</h3>
+<div class="paragraph">
+<p>Security schemes are defined at the application level using <code>@SecurityScheme</code> annotations:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.microprofile.tutorial.store.product;
+
+// ...
+
+@ApplicationPath("/api")
+@OpenAPIDefinition(
+    info = @Info(
+        title = "Secured Product API",
+        version = "1.0.0",
+        description = "Product API with multiple security schemes"
+    )
+)
+@SecurityScheme(
+    securitySchemeName = "bearer",
+    type = SecuritySchemeType.HTTP,
+    description = "JWT Bearer token authentication",
+    scheme = "bearer",
+    bearerFormat = "JWT"
+)
+public class ProductRestApplication extends Application {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This example shows Bearer token authentication. You can define multiple security schemes including API keys, OAuth2, and OpenID Connect.</p>
+</div>
+<div class="sect3">
+<h4 id="applying-security-to-operations"><a class="anchor" href="#applying-security-to-operations"></a>Applying security to operations</h4>
+<div class="paragraph">
+<p>Apply security requirements to individual operations using <code>@SecurityRequirement</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@GET
+@Path("/{id}")
+@SecurityRequirement(name = "bearer")
+public Response getProduct(@PathParam("id") Long id) {
+    return Response.ok(productService.findById(id)).build();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The generated OpenAPI document includes security requirements that describe how clients must authenticate. Swagger UI displays these requirements and allows users to provide credentials before testing secured endpoints.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="security-in-swagger-ui"><a class="anchor" href="#security-in-swagger-ui"></a>Security in Swagger UI</h4>
+<div class="paragraph">
+<p>When you view the documented API in Swagger UI, security schemes appear in several ways:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A lock icon (🔒) appears next to secured operations</p>
+</li>
+<li>
+<p>An Authorize button allows testers to input credentials</p>
+</li>
+<li>
+<p>Required scopes display for each operation</p>
+</li>
+<li>
+<p>Operations can be tested with provided authentication</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This makes it easy for API consumers to understand authentication requirements and test secured endpoints interactively.</p>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -625,7 +1204,73 @@ components:
 <h2 id="summary"><a class="anchor" href="#summary"></a>Summary</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>By integrating the MicroProfile OpenAPI, developers can generate detailed, OpenAPI-compliant documentation automatically, fostering better understanding and interaction among services. By annotating <code>ProductResource</code> class, we generated API documentation as per Open API specification. This will ensure the services are readily discoverable, understandable, and usable, thereby accelerating development cycles and fostering a more robust and collaborative developer ecosystem.</p>
+<p>In this chapter, you learned how MicroProfile OpenAPI 4.1 enables automatic generation of OpenAPI v3.1-compliant documentation for your RESTful web services.</p>
+</div>
+<div class="sect2">
+<h3 id="core-concepts"><a class="anchor" href="#core-concepts"></a>Core concepts</h3>
+<div class="paragraph">
+<p>You learned about the OpenAPI Specification, a standard, language-agnostic format for describing REST APIs. You discovered how MicroProfile OpenAPI integrates this specification with Jakarta REST through annotations that automatically generate documentation from your code, keeping your API contracts synchronized with your implementation.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="key-features-demonstrated"><a class="anchor" href="#key-features-demonstrated"></a>Key features demonstrated</h3>
+<div class="paragraph">
+<p><strong>Annotation-based documentation</strong></p>
+</div>
+<div class="paragraph">
+<p>You learned to document your RESTful endpoints using core OpenAPI annotations including <code>@Operation</code>, <code>@APIResponse</code>, <code>@Tag</code>, <code>@Content</code>, and <code>@Schema</code>. You saw how to apply these annotations to Jakarta REST resources to generate complete API specifications automatically.</p>
+</div>
+<div class="paragraph">
+<p><strong>Convenience annotations</strong></p>
+</div>
+<div class="paragraph">
+<p>You explored MicroProfile OpenAPI&#8217;s convenience annotations that simplify common documentation tasks. You learned to use <code>@RequestBodySchema</code> to document request bodies concisely, <code>@APIResponseSchema</code> to document response types efficiently, and <code>@SchemaProperty</code> to define inline schema properties without creating separate classes.</p>
+</div>
+<div class="paragraph">
+<p><strong>Nullable type handling</strong></p>
+</div>
+<div class="paragraph">
+<p>You learned how MicroProfile OpenAPI 4.1 supports improved nullable type handling aligned with OpenAPI v3.1, using the <code>@Schema</code> annotation&#8217;s <code>nullable</code> property to generate standard-compliant type arrays in the specification.</p>
+</div>
+<div class="paragraph">
+<p><strong>Jakarta Bean Validation integration</strong></p>
+</div>
+<div class="paragraph">
+<p>You discovered how validation annotations like <code>@NotNull</code>, <code>@Size</code>, <code>@Min</code>, and <code>@Max</code> automatically enhance your OpenAPI documentation, providing accurate constraints and requirements without duplicating information.</p>
+</div>
+<div class="paragraph">
+<p><strong>Asynchronous operations</strong></p>
+</div>
+<div class="paragraph">
+<p>You learned to document asynchronous operations using the <code>@Callback</code> annotation, showing how your API initiates async processing and notifies clients through webhook callbacks when operations complete.</p>
+</div>
+<div class="paragraph">
+<p><strong>Security documentation</strong></p>
+</div>
+<div class="paragraph">
+<p>You explored how to document security requirements using <code>@SecurityScheme</code> and <code>@SecurityRequirement</code> annotations. You learned to apply security at both the application and operation levels using Bearer token authentication as an example.</p>
+</div>
+<div class="paragraph">
+<p><strong>Viewing and testing APIs</strong></p>
+</div>
+<div class="paragraph">
+<p>You learned how to access your generated OpenAPI specification through the <code>/openapi</code> endpoint in both YAML and JSON formats. You discovered how to use Swagger UI at <code>/openapi/ui</code> to interactively explore and test your documented APIs in a browser-based interface.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration-and-customization"><a class="anchor" href="#configuration-and-customization"></a>Configuration and customization</h3>
+<div class="paragraph">
+<p>You learned about MicroProfile OpenAPI configuration properties that control documentation behavior, including selective scanning to exclude internal endpoints and defining custom server URLs. You also learned about the option to provide static OpenAPI files that merge with generated documentation.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="practical-applications"><a class="anchor" href="#practical-applications"></a>Practical applications</h3>
+<div class="paragraph">
+<p>This annotation-driven approach keeps documentation synchronized with your implementation, avoiding the common problem of outdated specifications. The generated OpenAPI documents enable automatic client SDK generation, interactive API exploration via Swagger UI, integration with API gateways, contract testing frameworks, and API discovery in enterprise environments.</p>
+</div>
+<div class="paragraph">
+<p>Your APIs are now well-documented, standards-compliant, and easily discoverable by consumers.</p>
+</div>
 </div>
 </div>
 </div>
