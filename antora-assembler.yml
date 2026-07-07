@@ -36,10 +36,6 @@ antora:
   extensions:
     - require: '@antora/lunr-extension'    # Search functionality
       index_latest_only: true
-    - require: '@antora/pdf-extension'     # PDF generation
-      as_attachment: true
-      filename: microprofile-tutorial.pdf
-      output_dir: ./build/assembler
 
 output:
   dir: ./build/site
