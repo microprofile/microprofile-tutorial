@@ -45,7 +45,7 @@ echo "  • Maximum Concurrent Requests: 10  (value = 10)"
 echo "  • Waiting Queue Size:          20  (waitingTaskQueue = 20)"
 echo "  • Total Capacity:              30  (10 concurrent + 20 queued)"
 echo "  • Asynchronous:                Yes (@Asynchronous)"
-echo "  • Timeout per request:         5000ms"
+echo "  • Timeout per request:         7000ms"
 echo ""
 
 echo -e "${CYAN}Expected Behavior:${NC}"

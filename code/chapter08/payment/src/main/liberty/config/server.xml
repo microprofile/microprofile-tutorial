@@ -16,6 +16,15 @@
     <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
                   id="defaultHttpEndpoint" host="*" />
     <mpMetrics authentication="false"/>
+
+    <!-- The Bulkhead on sendPaymentNotification allows 10 concurrent + 20 queued
+         executions, but Liberty's default executor sizes its thread pool to the
+         number of available CPU cores (as low as 4 on small hosts). With too few
+         real threads, @Asynchronous tasks queue behind each other, and that extra
+         wait time counts against @Timeout, producing timeouts that have nothing
+         to do with the simulated failure rate. Size the pool so the bulkhead's
+         concurrency limits - not host CPU count - govern demo behavior. -->
+    <executor id="default" coreThreads="25" maxThreads="50" />
     <webApplication location="payment.war" contextRoot="${app.context.root}"/>
     <logging traceSpecification="*=info:io.microprofile.tutorial.store.payment.*=all" maxFileSize="20" maxFiles="10" />
     

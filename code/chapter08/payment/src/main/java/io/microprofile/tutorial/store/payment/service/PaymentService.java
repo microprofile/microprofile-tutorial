@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * Each method demonstrates specific fault tolerance strategies:
  * - authorizePayment: Retry + Timeout + Fallback for transient failures
  * - checkGatewayHealth: Circuit Breaker + Timeout to prevent hammering failed services
- * - sendPaymentNotification: Asynchronous + Bulkhead + Fallback for resource isolation
+ * - sendPaymentNotification: Asynchronous + Bulkhead + Fallback (see {@link NotificationFallbackHandler}) for resource isolation
  * 
  * These patterns work together to prevent cascading failures and ensure resilient payment processing.
  */
@@ -137,21 +137,27 @@ public class PaymentService {
      * Fault Tolerance Strategy:
      * - @Asynchronous: Non-blocking execution in separate thread
      * - @Bulkhead: Limits concurrent notifications (max 10 concurrent, queue up to 20)
-     * - @Timeout: Prevents stuck notification threads (5 second limit)
+     * - @Timeout: Prevents stuck notification threads (7 second limit)
      * - @Fallback: Logs failed notifications for later retry
-     * 
+     *
      * Uses CompletionStage (not Future) to ensure fault tolerance annotations
      * react properly to asynchronous failures. With CompletionStage, exceptions
      * in exceptionally-completed stages trigger @Retry, @CircuitBreaker, and @Fallback.
-     * 
+     *
+     * Timeout is set to 7s rather than the ~2s task time alone: a request queued
+     * behind a full bulkhead (10 concurrent, 20 queued) can wait up to two full
+     * rounds (~4s) before it even starts executing, then take ~2s to run. A
+     * tighter timeout would fire on legitimately-queued work, not just genuinely
+     * stuck calls, muddying the demo of Bulkhead vs Timeout behavior.
+     *
      * @param paymentId Payment identifier
      * @param recipient Notification recipient email/phone
      * @return CompletionStage that completes when notification is sent
      */
     @Asynchronous
     @Bulkhead(value = 10, waitingTaskQueue = 20)
-    @Timeout(5000)
-    @Fallback(fallbackMethod = "fallbackSendNotification")
+    @Timeout(7000)
+    @Fallback(NotificationFallbackHandler.class)
     public CompletionStage<String> sendPaymentNotification(
         String paymentId,
         String recipient
@@ -171,25 +177,6 @@ public class PaymentService {
 
         logger.info("Notification sent successfully for payment: " + paymentId);
         return CompletableFuture.completedFuture("Notification sent successfully");
-    }
-
-    /**
-     * Fallback for notification - logs failure for later retry.
-     * 
-     * @param paymentId Payment identifier
-     * @param recipient Notification recipient
-     * @return CompletionStage indicating notification was queued
-     */
-    public CompletionStage<String> fallbackSendNotification(
-        String paymentId, 
-        String recipient
-    ) {
-        logger.warning("Failed to send notification for payment: " + paymentId);
-        
-        // In production: queue notification for retry, use backup channel (SMS if email failed), etc.
-        return CompletableFuture.completedFuture(
-            "Notification queued for retry"
-        );
     }
 
     /**
