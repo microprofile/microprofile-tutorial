@@ -1,4 +1,4 @@
-= Payment Service
+= Payment Service — MicroProfile Telemetry 2.1
 :toc: macro
 :toclevels: 3
 :icons: font
@@ -7,937 +7,725 @@
 
 toc::[]
 
-This microservice is part of the Jakarta EE 10 and MicroProfile 6.1-based e-commerce application. It handles payment processing and transaction management.
+This microservice demonstrates MicroProfile Telemetry 2.1 integrated with the LGTM observability stack (Loki, Grafana, Tempo, Mimir/Prometheus) via an OpenTelemetry Collector. It is part of the Chapter 09 MicroProfile tutorial.
 
-== Features
+The service processes payments with full fault tolerance (retry, fallback, circuit breaker, bulkhead, timeout) and exports **traces**, **metrics**, and **logs** over OTLP to the LGTM stack.
 
-* Payment transaction processing
-* Dynamic configuration management via MicroProfile Config
-* RESTful API endpoints with JSON support
-* Custom ConfigSource implementation
-* OpenAPI documentation
-* **MicroProfile Fault Tolerance with Retry Policies**
-* **Circuit Breaker protection for external services**
-* **Fallback mechanisms for service resilience**
-* **Bulkhead pattern for concurrency control**
-* **Timeout protection for long-running operations**
+== Architecture
 
-== MicroProfile Fault Tolerance Implementation
-
-The Payment Service implements comprehensive fault tolerance patterns using MicroProfile Fault Tolerance annotations:
-
-=== Retry Policies
-
-The service implements different retry strategies based on operation criticality:
-
-==== Payment Authorization Retry (@Retry)
-* **Max Retries**: 3 attempts
-* **Delay**: 1000ms with 500ms jitter
-* **Max Duration**: 10 seconds
-* **Retry On**: RuntimeException, WebApplicationException
-* **Use Case**: Standard payment authorization with exponential backoff
-
-[source,java]
 ----
-@Retry(
-    maxRetries = 3,
-    delay = 2000,
-    maxDuration = 10000
-    jitter = 500,
-    retryOn = {RuntimeException.class, WebApplicationException.class}
-)
+ Payment Service (Open Liberty)
+    │  MicroProfile Telemetry 2.1
+    │  OTLP gRPC → port 24317 (Codespaces)
+    ▼              port 4317  (local)
+ OpenTelemetry Collector
+    ├──► Tempo      (traces)  — port 14317 → Tempo:4317
+    ├──► Loki       (logs)    — HTTP → Loki:3100/otlp
+    └──► Prometheus (metrics) — scrape endpoint :8889
+              │
+              ▼
+         Grafana (unified dashboard) — port 13000
 ----
 
-=== Circuit Breaker Protection
+== Prerequisites
 
-Payment capture operations use circuit breaker pattern:
-
-[source,java]
-----
-@CircuitBreaker(
-    failureRatio = 0.5,
-    requestVolumeThreshold = 4,
-    delay = 5000
-)
-----
-
-* **Failure Ratio**: 50% failure rate triggers circuit opening
-* **Request Volume**: Minimum 4 requests for evaluation
-* **Recovery Delay**: 5 seconds before attempting recovery
-
-=== Timeout Protection
-
-Operations with potential long delays are protected with timeouts:
-
-[source,java]
-----
-@Timeout(value = 3000)
-----
-
-=== Bulkhead Pattern
-
-The bulkhead pattern limits concurrent requests to prevent system overload:
-
-[source,java]
-----
-@Bulkhead(value = 5)
-----
-
-* **Concurrent Requests**: Limited to 5 concurrent requests
-* **Excess Requests**: Rejected immediately instead of queuing
-* **Use Case**: Protect service from traffic spikes and cascading failures
-
-=== Fallback Mechanisms
-
-All critical operations have fallback methods that provide graceful degradation:
-
-* **Payment Authorization Fallback**: Returns service unavailable with retry instructions
-
-== Endpoints
-
-=== GET /payment/api/payment-config
-* Returns all current payment configuration values
-* Example: `GET http://localhost:9080/payment/api/payment-config`
-* Response: `{"gateway.endpoint":"https://api.paymentgateway.com"}`
-
-=== POST /payment/api/payment-config
-* Updates a payment configuration value
-* Example: `POST http://localhost:9080/payment/api/payment-config`
-* Request body: `{"key": "payment.gateway.endpoint", "value": "https://new-api.paymentgateway.com"}`
-* Response: `{"key":"payment.gateway.endpoint","value":"https://new-api.paymentgateway.com","message":"Configuration updated successfully"}`
-
-=== POST /payment/api/authorize
-* Processes a payment authorization with retry policy
-* **Retry Configuration**: 3 attempts, 1s delay, 500ms jitter
-* **Fallback**: Service unavailable response
-* Example: `POST http://localhost:9080/payment/api/authorize`
-* Request body: `{"cardNumber":"4111111111111111", "cardHolderName":"Test User", "expiryDate":"12/25", "securityCode":"123", "amount":100.00}`
-* Response: `{"status":"success", "message":"Payment authorized successfully", "transactionId":"TXN1234567890", "amount":100.00}`
-* Fallback Response: `{"status":"failed", "message":"Payment gateway unavailable. Please try again later.", "fallback":true}`
-
-=== POST /payment/api/payment-config/process-example
-* Example endpoint demonstrating payment processing with configuration
-* Example: `POST http://localhost:9080/payment/api/payment-config/process-example`
-* Request body: `{"cardNumber":"4111111111111111", "cardHolderName":"Test User", "expiryDate":"12/25", "securityCode":"123", "amount":100.00}`
-* Response: `{"amount":100.00,"message":"Payment processed successfully","status":"success","configUsed":{"gatewayEndpoint":"https://new-api.paymentgateway.com"}}`
-
-== Building and Running the Service
-
-=== Prerequisites
-
-* JDK 17 or higher
-* Maven 3.6.0 or higher
-
-=== Local Development
-
-[source,bash]
-----
-# Build the application
-mvn clean package
-
-# Run the application with Liberty
-mvn liberty:run
-----
-
-The server will start on port 9080 (HTTP) and 9081 (HTTPS).
-
-=== Docker
-
-[source,bash]
-----
-# Build and run with Docker
-./run-docker.sh
-----
+* JDK 21 or higher
+* Maven 3.9.0 or higher
+* Docker and Docker Compose
 
 == Project Structure
 
-* `src/main/java/io/microprofile/tutorial/PaymentRestApplication.java` - Jakarta Restful web service application class
-* `src/main/java/io/microprofile/tutorial/store/payment/config/` - Configuration classes
-* `src/main/java/io/microprofile/tutorial/store/payment/resource/` - REST resource endpoints
-* `src/main/java/io/microprofile/tutorial/store/payment/service/` - Business logic services
-* `src/main/java/io/microprofile/tutorial/store/payment/entity/` - Data models
-* `src/main/resources/META-INF/services/` - Service provider configuration
-* `src/main/liberty/config/` - Liberty server configuration
+----
+code/chapter09/
+├── docker-compose.yml          # LGTM + OTel Collector stack
+├── otel-collector-config.yml   # OTel Collector pipeline config
+├── prometheus.yml              # Prometheus scrape config
+├── tempo-config.yaml           # Grafana Tempo v3 config
+└── payment/
+    ├── pom.xml
+    └── src/main/
+        ├── java/io/microprofile/tutorial/store/payment/
+        │   ├── entity/PaymentDetails.java
+        │   ├── exception/
+        │   ├── resource/PaymentResource.java   # REST endpoints
+        │   └── service/PaymentService.java     # Business logic + telemetry
+        ├── liberty/config/server.xml           # Open Liberty features
+        └── resources/META-INF/
+            └── microprofile-config.properties  # OTLP / sampler config
+----
 
-== Custom ConfigSource
+== LGTM Observability Stack
 
-The Payment Service implements a custom MicroProfile ConfigSource named `PaymentServiceConfigSource` that provides payment-specific configuration with high priority (ordinal: 600).
+All observability infrastructure lives in `code/chapter09/`. Start from that directory.
 
-=== Available Configuration Properties
+=== docker-compose.yml
 
-[cols="1,2,2", options="header"]
+The stack exposes ports offset from the defaults to avoid conflicts in GitHub Codespaces:
+
+[options="header"]
 |===
-|Property
-|Description
-|Default Value
-
-|payment.gateway.endpoint
-|Payment gateway endpoint URL
-|https://api.paymentgateway.com
+|Service |Image |Host Port |Container Port |Purpose
+|Grafana |grafana/grafana:latest |13000 |3000 |Unified dashboard
+|Prometheus |prom/prometheus:latest |19090 |9090 |Metrics storage
+|Loki |grafana/loki:latest |13100 |3100 |Log storage
+|Tempo |grafana/tempo:latest |13200, 14317, 14318 |3200, 4317, 4318 |Trace storage
+|OTel Collector |otel/opentelemetry-collector-contrib:latest |24317, 24318 |4317, 4318 |Telemetry gateway
 |===
 
-=== Testing ConfigSource Endpoints
+IMPORTANT: `dns_search: []` is set on every service. Without it, Docker's embedded DNS in GitHub Codespaces appends an Azure search domain (e.g. `gjgsbu0qvyie5dgfl5s3ewuwyc.ax.internal.cloudapp.net`) to short hostnames like `tempo`, causing `no such host` errors when Grafana tries to connect to its data sources.
 
-You can test the ConfigSource endpoints using curl or any REST client:
-
-[source,bash]
+[source,yaml]
 ----
-# Get current configuration
-curl -s http://localhost:9080/payment/api/payment-config | json_pp
+version: '3.8'
 
-# Update configuration property
-curl -s -X POST -H "Content-Type: application/json" \
-  -d '{"key":"payment.gateway.endpoint", "value":"https://new-api.paymentgateway.com"}' \
-  http://localhost:9080/payment/api/payment-config | json_pp
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "13000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+    dns_search: []
+    networks:
+      - observability
 
-# Test payment processing with the configuration
-curl -s -X POST -H "Content-Type: application/json" \
-  -d '{"cardNumber":"4111111111111111", "cardHolderName":"Test User", "expiryDate":"12/25", "securityCode":"123", "amount":100.00}' \
-  http://localhost:9080/payment/api/payment-config/process-example | json_pp
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "19090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-storage:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    dns_search: []
+    networks:
+      - observability
 
-# Test basic payment authorization
-curl -s -X POST -H "Content-Type: application/json" \
-  http://localhost:9080/payment/api/authorize | json_pp
-----
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "13100:3100"
+    volumes:
+      - loki-storage:/loki
+    dns_search: []
+    networks:
+      - observability
 
-=== Implementation Details
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    ports:
+      - "13200:3200"
+      - "14317:4317"
+      - "14318:4318"
+    volumes:
+      - tempo-storage:/var/tempo
+      - ./tempo-config.yaml:/etc/tempo/tempo-config.yaml
+    command: [ "-config.file=/etc/tempo/tempo-config.yaml" ]
+    dns_search: []
+    networks:
+      - observability
 
-The custom ConfigSource is implemented in the following classes:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    ports:
+      - "24317:4317"
+      - "24318:4318"
+      - "19411:9411"
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+    command: [ "--config=/etc/otel-collector-config.yml" ]
+    depends_on:
+      - loki
+      - prometheus
+      - tempo
+    dns_search: []
+    networks:
+      - observability
 
-* `PaymentServiceConfigSource.java` - Implements the MicroProfile ConfigSource interface
-* `PaymentConfig.java` - Utility class for accessing configuration properties
+volumes:
+  grafana-storage:
+  prometheus-storage:
+  loki-storage:
+  tempo-storage:
 
-Example usage in application code:
-
-[source,java]
-----
-// Inject standard MicroProfile Config
-@Inject
-@ConfigProperty(name="payment.gateway.endpoint")
-private String endpoint;
-
-// Or use the utility class
-String gatewayUrl = PaymentConfig.getConfigProperty("payment.gateway.endpoint");
-----
-
-The custom ConfigSource provides a higher priority (ordinal: 600) than system properties and environment variables, allowing for service-specific defaults while still enabling override via standard mechanisms.
-
-=== MicroProfile Config Sources
-
-MicroProfile Config uses a prioritized set of configuration sources. The payment service uses the following configuration sources in order of priority (highest to lowest):
-
-1. Custom ConfigSource (`PaymentServiceConfigSource`) - Ordinal: 600
-2. System properties - Ordinal: 400
-3. Environment variables - Ordinal: 300
-4. microprofile-config.properties file - Ordinal: 100
-
-==== Updating Configuration Values
-
-You can update configuration properties through different methods:
-
-===== 1. Using the REST API (runtime)
-
-This uses the custom ConfigSource and persists only for the current server session:
-
-[source,bash]
-----
-curl -X POST -H "Content-Type: application/json" \
-  -d '{"key":"payment.gateway.endpoint", "value":"https://test-api.paymentgateway.com"}' \
-  http://localhost:9080/payment/api/payment-config
-----
-
-===== 2. Using System Properties (startup)
-
-[source,bash]
-----
-# Linux/macOS
-mvn liberty:run -Dpayment.gateway.endpoint=https://sys-api.paymentgateway.com
-
-# Windows
-mvn liberty:run "-Dpayment.gateway.endpoint=https://sys-api.paymentgateway.com"
-----
-
-===== 3. Using Environment Variables (startup)
-
-Environment variable names must follow the MicroProfile Config convention (uppercase with underscores):
-
-[source,bash]
-----
-# Linux/macOS
-export PAYMENT_GATEWAY_ENDPOINT=https://env-api.paymentgateway.com
-mvn liberty:run
-
-# Windows PowerShell
-$env:PAYMENT_GATEWAY_ENDPOINT="https://env-api.paymentgateway.com"
-mvn liberty:run
-
-# Windows CMD
-set PAYMENT_GATEWAY_ENDPOINT=https://env-api.paymentgateway.com
-mvn liberty:run
+networks:
+  observability:
+    driver: bridge
 ----
 
-===== 4. Using microprofile-config.properties File
+=== otel-collector-config.yml
 
-Edit the file at `src/main/resources/META-INF/microprofile-config.properties`:
+The OTel Collector receives all three signals on OTLP ports and fans them out to the appropriate backend.
 
-[source,properties]
+[source,yaml]
 ----
-# Update the endpoint
-payment.gateway.endpoint=https://config-api.paymentgateway.com
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 10s
+    send_batch_size: 1024
+
+exporters:
+  debug:
+    verbosity: detailed
+
+  otlp_grpc/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+  otlp_http/loki:
+    endpoint: http://loki:3100/otlp
+    tls:
+      insecure: true
+
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp_grpc/tempo, debug]
+
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus, debug]
+
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp_http/loki, debug]
 ----
 
-Then rebuild and restart the application:
+NOTE: The `debug` exporter prints received telemetry to the collector's stdout. Use `docker compose logs otel-collector` to confirm data is flowing. Remove it in production to reduce noise.
 
-[source,bash]
+=== tempo-config.yaml
+
+Grafana Tempo v3 removed the top-level `ingester` field. Use this minimal v3-compatible configuration:
+
+[source,yaml]
 ----
-mvn clean package liberty:run
+server:
+  http_listen_port: 3200
+  log_level: info
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /var/tempo/wal
+    local:
+      path: /var/tempo/blocks
 ----
 
-==== Testing Configuration Changes
+=== prometheus.yml
 
-After changing a configuration property, you can verify it was updated by calling:
+Prometheus scrapes itself and the OTel Collector's Prometheus exporter endpoint:
 
-[source,bash]
+[source,yaml]
 ----
-curl http://localhost:9080/payment/api/payment-config
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['otel-collector:8889']
 ----
 
-== Documentation
+== Payment Service Configuration
 
-=== OpenAPI
+=== server.xml — Open Liberty Features
 
-The payment service automatically generates OpenAPI documentation using MicroProfile OpenAPI annotations.
-
-* OpenAPI UI: `http://localhost:9080/payment/api/openapi-ui/`
-* OpenAPI JSON: `http://localhost:9080/payment/api/openapi`
-
-=== MicroProfile Config Specification
-
-For more information about MicroProfile Config, refer to the official documentation:
-
-* https://download.eclipse.org/microprofile/microprofile-config-3.1/microprofile-config-spec-3.1.html
-
-=== Related Resources
-
-* MicroProfile: https://microprofile.io/
-* Jakarta EE: https://jakarta.ee/
-* Open Liberty: https://openliberty.io/
-
-== Troubleshooting
-
-=== Common Issues
-
-==== Port Conflicts
-
-If you encounter a port conflict when starting the server, you can change the ports in the `pom.xml` file:
+The service runs on the `microProfile-7.1` platform, which includes MicroProfile Telemetry 2.1:
 
 [source,xml]
 ----
-<liberty.var.default.http.port>9080</liberty.var.default.http.port>
-<liberty.var.default.https.port>9081</liberty.var.default.https.port>
+<server description="MicroProfile Tutorial Liberty Server">
+    <featureManager>
+        <platform>microProfile-7.1</platform>
+        <platform>jakartaEE-10.0</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>mpConfig</feature>
+        <feature>mpOpenAPI</feature>
+        <feature>mpHealth</feature>
+        <feature>mpMetrics</feature>
+        <feature>mpTelemetry</feature>
+        <feature>mpFaultTolerance</feature>
+    </featureManager>
+
+    <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
+                  id="defaultHttpEndpoint" host="*" />
+    <mpMetrics authentication="false"/>
+    <webApplication location="payment.war" contextRoot="${app.context.root}"/>
+</server>
 ----
 
-==== ConfigSource Not Loading
-
-If the custom ConfigSource is not loading, check the following:
-
-1. Verify the service provider configuration file exists at:
-   `src/main/resources/META-INF/services/org.eclipse.microprofile.config.spi.ConfigSource`
-
-2. Ensure it contains the correct fully qualified class name:
-   `io.microprofile.tutorial.store.payment.config.PaymentServiceConfigSource`
-
-==== Deployment Errors
-
-For CWWKZ0004E deployment errors, check the server logs at:
-`target/liberty/wlp/usr/servers/mpServer/logs/messages.log`
-
-== Testing Fault Tolerance Features
-
-=== Automated Test Scripts
-
-The Payment Service includes several test scripts to demonstrate and validate fault tolerance features:
-
-==== test-payment-basic.sh
-
-Basic functionality test to verify core payment operations:
-
-* Configuration retrieval
-* Simple payment processing
-* Error handling
-
-[source,bash]
-----
-# Test basic payment operations
-chmod +x test-payment-basic.sh
-./test-payment-basic.sh
-----
-
-==== test-payment-retry.sh
-Tests various retry scenarios with different triggers:
-
-* Normal payment processing (successful)
-* Failed payment with retry (card ending in "0000")
-* Verification with random failures
-* Invalid input handling
-
-[source,bash]
-----
-# Test retry scenarios
-chmod +x test-payment-retry.sh
-./test-payment-retry.sh
-----
-
-==== test-payment-concurrent-load.sh
-
-Tests the service under concurrent load:
-
-* Multiple simultaneous requests
-* Observing thread handling
-* Response time analysis
-
-[source,bash]
-----
-# Test service under concurrent load
-chmod +x test-payment-concurrent-load.sh
-./test-payment-concurrent-load.sh
-----
-
-==== test-payment-async.sh
-
-Analyzes asynchronous processing behavior:
-
-* Response time measurement
-* Thread utilization
-* Future completion patterns
-
-[source,bash]
-----
-# Analyze asynchronous processing
-chmod +x test-payment-async.sh
-./test-payment-async.sh
-----
-
-==== test-payment-bulkhead.sh
-Demonstrates the bulkhead pattern by sending concurrent requests:
-
-* Concurrent request handling
-* Bulkhead limit verification (5 requests)
-* Rejection of excess requests
-* Service recovery after load reduction
-
-[source,bash]
-----
-# Test bulkhead functionality with concurrent requests
-chmod +x test-payment-bulkhead.sh
-./test-payment-bulkhead.sh
-----
-
-==== test-payment-async-analysis.sh
-
-Analyzes asynchronous processing behavior:
-
-* Response time measurement
-* Thread utilization
-* Future completion patterns
-
-[source,bash]
-----
-# Analyze asynchronous processing
-chmod +x test-payment-async-analysis.sh
-./test-payment-async-analysis.sh
-----
-
-=== Running the Tests
-
-To run any of these test scripts:
-
-[source,bash]
-----
-# Make the script executable
-chmod +x test-payment-bulkhead.sh
-
-# Run the script
-./test-payment-bulkhead.sh
-----
-
-You can also run all test scripts in sequence:
-
-[source,bash]
-----
-# Run all test scripts
-for script in test-payment-*.sh; do
-  echo "Running $script..."
-  chmod +x $script
-  ./$script
-  echo "----------------------------------------"
-  sleep 2
-done
-----
-
-== Configuration Properties
-
-=== Fault Tolerance Configuration
-
-The following properties can be configured via MicroProfile Config:
-
-[cols="1,2,2", options="header"]
-|===
-|Property
-|Description
-|Default Value
-
-|payment.gateway.endpoint
-|Payment gateway endpoint URL
-|https://api.paymentgateway.com
-
-|payment.retry.maxRetries
-|Maximum retry attempts for payment operations
-|3
-
-|payment.retry.delay
-|Delay between retry attempts (milliseconds)
-|1000
-
-|payment.circuitbreaker.failureRatio
-|Circuit breaker failure ratio threshold
-|0.5
-
-|payment.circuitbreaker.requestVolumeThreshold
-|Minimum requests for circuit breaker evaluation
-|4
-
-|payment.timeout.duration
-|Timeout duration for payment operations (milliseconds)
-|3000
-
-|payment.bulkhead.value
-|Maximum concurrent requests for bulkhead
-|5
-|===
-
-== Fault Tolerance Implementation Details
-
-=== Server Configuration
-
-The MicroProfile Fault Tolerance feature is enabled in the Liberty server configuration:
-
-[source,xml]
-----
-<feature>mpFaultTolerance</feature>
-----
-
-=== Code Implementation
-
-==== PaymentService Class
-
-The PaymentService class is annotated with `@ApplicationScoped` to ensure proper fault tolerance behavior:
-
-[source,java]
-----
-@ApplicationScoped
-public class PaymentService {
-    // ...
-}
-----
-
-==== Authorization Method
-
-[source,java]
-----
-@Retry(
-    maxRetries = 3,
-    delay = 1000,
-    jitter = 500,
-    maxDuration = 10000,
-    retryOn = {RuntimeException.class, WebApplicationException.class}
-)
-@Fallback(fallbackMethod = "fallbackPaymentAuthorization")
-public PaymentResponse processPayment(PaymentRequest request) {
-    // Payment processing logic
-}
-
-public PaymentResponse fallbackPaymentAuthorization(PaymentRequest request) {
-    // Fallback logic for payment authorization
-    return new PaymentResponse("failed", "Payment gateway unavailable. Please try again later.", true);
-}
-----
-
-=== Key Implementation Benefits
-
-==== 1. Resilience
-- Service continues operating despite external service failures
-- Automatic recovery from transient failures
-- Protection against cascading failures
-
-==== 2. User Experience
-- Reduced timeout errors through retry mechanisms
-- Graceful degradation with meaningful error messages
-- Improved service availability
-
-==== 3. Operational Excellence
-- Configurable fault tolerance parameters
-- Comprehensive logging and monitoring
-- Clear separation of concerns between business logic and resilience
-
-==== 4. Enterprise Readiness
-- Production-ready fault tolerance patterns
-- Compliance with microservices best practices
-- Integration with MicroProfile ecosystem
-
-== MicroProfile Fault Tolerance Patterns
-
-=== Retry Pattern
-
-The retry pattern allows the service to automatically retry failed operations:
-
-* **@Retry**: Automatically retries failed operations
-* **Parameters**: maxRetries, delay, jitter, maxDuration, retryOn, abortOn
-* **Use Case**: Transient failures in external service calls
-
-=== Circuit Breaker Pattern
-
-The circuit breaker pattern prevents cascading failures:
-
-* **@CircuitBreaker**: Tracks failure rates and opens circuit when threshold is reached
-* **Parameters**: failureRatio, requestVolumeThreshold, delay
-* **States**: Closed (normal), Open (failing), Half-Open (testing recovery)
-* **Use Case**: Protect against downstream service failures
-
-=== Timeout Pattern
-
-The timeout pattern prevents operations from hanging indefinitely:
-
-* **@Timeout**: Sets maximum duration for operations
-* **Parameters**: value, unit
-* **Use Case**: Prevent indefinite waiting for slow external services
-
-=== Bulkhead Pattern
-
-The bulkhead pattern limits concurrent requests:
-
-* **@Bulkhead**: Sets maximum concurrent executions
-* **Parameters**: value, waitingTaskQueue (for async)
-* **Use Case**: Prevent system overload during traffic spikes
-
-=== Fallback Pattern
-
-The fallback pattern provides alternatives when operations fail:
-
-* **@Fallback**: Specifies alternative method when operation fails
-* **Parameters**: fallbackMethod, applyOn, skipOn
-* **Use Case**: Graceful degradation for failed operations
-
-== Fault Tolerance Best Practices
-
-=== Configuring Retry Policies
-
-When configuring retry policies, consider these best practices:
-
-* **Operation Criticality**: Use more aggressive retry policies for critical operations
-* **Retry Delay**: Implement exponential backoff for external service calls
-* **Jitter**: Add random jitter to prevent thundering herd problems
-* **Max Duration**: Set an overall timeout to prevent excessive retries
-* **Abort Conditions**: Define specific exceptions that should abort retry attempts
-
-=== Circuit Breaker Configuration
-
-For effective circuit breaker implementation:
-
-* **Failure Ratio**: Set appropriate threshold based on expected error rates (typically 0.3-0.5)
-* **Request Volume**: Set minimum request count to prevent premature circuit opening
-* **Recovery Delay**: Allow sufficient time for downstream services to recover
-* **Monitoring**: Track circuit state transitions for operational visibility
-
-=== Bulkhead Strategies
-
-Choose the appropriate bulkhead strategy:
-
-* **Synchronous Bulkhead**: Limits concurrent executions for thread-constrained systems
-* **Asynchronous Bulkhead**: Provides a waiting queue for manageable load spikes
-* **Isolation Levels**: Consider using separate bulkheads for different types of operations
-
-=== Fallback Implementation
-
-Implement effective fallback mechanisms:
-
-* **Graceful Degradation**: Return partial results when possible
-* **Meaningful Responses**: Provide clear error messages to clients
-* **Operation Queuing**: Queue failed operations for later processing
-* **Fallback Chain**: Implement multiple fallback levels for critical operations
-
-=== Combining Fault Tolerance Annotations
-
-When combining multiple fault tolerance annotations:
-
-* **Execution Order**: Understand the execution order (Fallback → Retry → CircuitBreaker → Timeout → Bulkhead)
-* **Compatibility**: Ensure annotations work together as expected
-* **Resource Impact**: Consider the resource impact of combined annotations
-* **Testing**: Test all combinations of annotation behaviors
-
-== Troubleshooting Fault Tolerance Issues
-
-=== Common Fault Tolerance Issues
-
-==== 1. Ineffective Retry Policies
-
-**Symptoms**:
-* Operations fail without retrying
-* Excessive retries causing performance issues
-
-**Solutions**:
-* Verify exceptions match retryOn parameter
-* Check that delay and jitter are appropriate
-* Ensure maxDuration allows sufficient time for retries
-
-==== 2. Circuit Breaker Problems
-
-**Symptoms**:
-* Circuit opens too frequently
-* Circuit never opens despite failures
-* Circuit remains open indefinitely
-
-**Solutions**:
-* Adjust failureRatio based on expected error rates
-* Increase requestVolumeThreshold if premature opening occurs
-* Verify that delay allows sufficient recovery time
-* Ensure exceptions are properly handled
-
-==== 3. Timeout Issues
-
-**Symptoms**:
-* Operations timeout too quickly
-* Timeouts not triggering as expected
-
-**Solutions**:
-* Adjust timeout duration based on operation complexity
-* Ensure timeout is shorter than upstream timeouts
-* Verify that timeout unit is properly specified
-
-==== 4. Bulkhead Restrictions
-
-**Symptoms**:
-* Too many rejections during normal load
-* Service overloaded despite bulkhead
-
-**Solutions**:
-* Adjust bulkhead value based on resource capacity
-* Consider using asynchronous bulkheads with waiting queue
-* Implement client-side load balancing for better distribution
-
-==== 5. Fallback Failures
-
-**Symptoms**:
-* Fallbacks not triggering despite failures
-* Fallbacks throwing unexpected exceptions
-
-**Solutions**:
-* Verify fallback method signature matches original method
-* Ensure fallback method handles exceptions properly
-* Check that fallback logic is fully tested
-
-=== Diagnosing with Metrics
-
-MicroProfile Metrics provides valuable insight into fault tolerance behavior:
-
-[source,bash]
-----
-# Total number of retry attempts
-curl https://localhost:9080/metrics?name=ft_retry_retries_total
-
-# Bulkhead calls total
-curl http://localhost:9080/metrics?name=ft_bulkhead_calls_total
-
-# Timeout execution duration
-curl http://localhost:9080/payment/metrics/application?name=ft_timeout_executionDuration_nanoseconds
-----
-
-=== Server Log Analysis
-
-Liberty server logs provide detailed information about fault tolerance operations:
-
-[source,bash]
-----
-tail -f target/liberty/wlp/usr/servers/mpServer/logs/messages.log | grep -E "Retry|CircuitBreaker|Timeout|Bulkhead|Fallback"
-----
-
-Look for messages indicating:
-* Retry attempts and success/failure
-* Circuit breaker state transitions
-* Timeout exceptions
-* Bulkhead rejections
-* Fallback method invocations
-
-== Resources and References
-
-=== MicroProfile Fault Tolerance Specification
-
-For detailed information about MicroProfile Fault Tolerance, refer to:
-
-* https://download.eclipse.org/microprofile/microprofile-fault-tolerance-4.0/microprofile-fault-tolerance-spec-4.0.html
-
-=== API Documentation
-
-* https://download.eclipse.org/microprofile/microprofile-fault-tolerance-4.0/apidocs/
-
-=== Fault Tolerance Guides
-
-* https://openliberty.io/guides/microprofile-fallback.html
-* https://openliberty.io/guides/retry-timeout.html
-* https://openliberty.io/guides/circuit-breaker.html
-* https://openliberty.io/guides/bulkhead.html
-
-=== Best Practices Resources
-
-* https://microprofile.io/
-* https://www.ibm.com/docs/en/was-liberty/base?topic=liberty-microprofile-fault-tolerance
-
-== MicroProfile Telemetry Implementation
-
-The Payment Service implements distributed tracing using MicroProfile Telemetry 1.1, which is based on OpenTelemetry standards. This enables end-to-end visibility of payment transactions across microservices and external dependencies.
-
-=== Telemetry Configuration
-
-The service is configured to send telemetry data to Jaeger, enabling comprehensive transaction monitoring:
-
-==== Application Configuration (microprofile-config.properties)
+=== microprofile-config.properties — Telemetry Settings
 
 [source,properties]
 ----
 # MicroProfile Telemetry Configuration
 otel.service.name=payment-service
 otel.sdk.disabled=false
-otel.metrics.exporter=none
-otel.logs.exporter=none
+
+# OTLP Exporter Configuration
+# Use port 4317 locally; use port 24317 when running in GitHub Codespaces
+otel.exporter.otlp.endpoint=http://localhost:24317
+otel.traces.exporter=otlp
+otel.metrics.exporter=otlp
+otel.logs.exporter=otlp
+
+# Sampling — always sample, respecting parent decision
+otel.traces.sampler=parentbased_always_on
 ----
 
-=== Automatic Instrumentation
+IMPORTANT: When running locally (not in Codespaces), change the endpoint to `http://localhost:4317` to match the OTel Collector's standard OTLP gRPC port. In Codespaces the host port is `24317`.
 
-MicroProfile Telemetry provides automatic instrumentation for:
+== Code Implementation
 
-* Jakarta Restful Web Services endpoints (inbound and outbound HTTP requests)
-* CDI method invocations 
-* MicroProfile Rest Client calls
+=== PaymentService.java — CDI Telemetry Injection
 
-This enables tracing without modifying application code, capturing:
-
-* HTTP request information (method, URL, status code)
-* Transaction timing and duration
-* Service dependencies and call hierarchy
-
-=== Manual Instrumentation
-
-For enhanced visibility, the Payment Service also implements manual instrumentation:
+MicroProfile Telemetry 2.1 exposes `Tracer` and `Meter` as CDI beans. Inject them directly — do not use `GlobalOpenTelemetry.get*()`:
 
 [source,java]
 ----
-private Tracer tracer;   // Injected tracer for OpenTelemetry
+@ApplicationScoped
+public class PaymentService {
 
-@PostConstruct
-public void init() {
-    // Programmatic tracer access - the correct approach
-    this.tracer = GlobalOpenTelemetry.getTracer("payment-service", "1.0.0");
-    logger.info("Tracer initialized successfully");
-}
+    @Inject
+    Tracer tracer;           // io.opentelemetry.api.trace.Tracer
 
-// Create explicit span with business context
-Span span = tracer.spanBuilder("payment.process")
-    .setAttribute("payment.amount", paymentDetails.getAmount().toString())
-    .setAttribute("payment.method", "credit_card")
-    .setAttribute("payment.service", "payment-service")
-    .startSpan();
+    @Inject
+    Meter meter;             // io.opentelemetry.api.metrics.Meter
 
-try (io.opentelemetry.context.Scope scope = span.makeCurrent()) {
-    // Business logic here
-    span.addEvent("Starting payment processing");
-    
-    // Add result information
-    span.setStatus(StatusCode.OK);
-} catch (Exception e) {
-    // Record error details
-    span.recordException(e);
-    span.setStatus(StatusCode.ERROR, e.getMessage());
-    throw e;
-} finally {
-    span.end();  // Always end the span
+    private LongCounter paymentAttemptsCounter;
+
+    @PostConstruct
+    public void init() {
+        paymentAttemptsCounter = meter
+                .counterBuilder("payment.attempts")
+                .setDescription("Number of payment attempts by result")
+                .setUnit("1")
+                .build();
+    }
 }
 ----
 
-=== Key Telemetry Points
+NOTE: The `Meter` is used in `@PostConstruct` to build instruments — not in `init()` directly on the `Tracer`, which is used per-request. Building instruments in `@PostConstruct` ensures they are registered once at startup.
 
-The service captures telemetry at critical transaction points:
+=== Manual Span Creation
 
-1. **Payment Authorization**: Complete trace of payment authorization flow
-2. **Payment Verification**: Detailed verification steps with fraud check results
-3. **External Service Calls**: Timing of gateway communications
-4. **Retry Operations**: Visibility into retry attempts and fallbacks
-5. **Error Handling**: Detailed error context and fault tolerance behavior
+The `processPayment` method creates a child span with business attributes:
 
-=== Business Context Enrichment
+[source,java]
+----
+@Asynchronous
+@Timeout(3000)
+@Retry(maxRetries = 3, delay = 2000, jitter = 500,
+       retryOn = PaymentProcessingException.class,
+       abortOn = CriticalPaymentException.class)
+@Fallback(fallbackMethod = "fallbackProcessPayment")
+@Bulkhead(value = 5)
+public CompletionStage<String> processPayment(PaymentDetails paymentDetails)
+        throws PaymentProcessingException {
 
-Traces are enriched with business context to enable business-oriented analysis:
+    Span span = tracer.spanBuilder("payment.process")
+            .setAttribute("payment.amount", paymentDetails.getAmount().toString())
+            .setAttribute("payment.method", "credit_card")
+            .setAttribute("payment.service", "payment-service")
+            .startSpan();
 
-* **Payment Amounts**: Track transaction values for business insights
-* **Payment Methods**: Categorize by payment method for pattern analysis
-* **Transaction IDs**: Correlate with order management systems
-* **Processing Time**: Measure critical business SLAs
-* **Error Categories**: Classify errors for targeted improvements
+    try (Scope scope = span.makeCurrent()) {
+        span.setAttribute("payment.status", "IN_PROGRESS");
+        span.addEvent("Starting payment processing");
 
-=== Viewing Telemetry Data
+        // ... business logic ...
 
-Telemetry data can be viewed in Jaeger UI:
+        paymentAttemptsCounter.add(1,
+            Attributes.of(AttributeKey.stringKey("result"), "success"));
+        span.setAttribute("payment.status", "SUCCESS");
+        span.setStatus(StatusCode.OK);
+        span.addEvent("Payment processed successfully");
+        return CompletableFuture.completedFuture("{\"status\":\"success\",...}");
+    } finally {
+        span.end();
+    }
+}
+----
+
+The `payment.attempts` counter is incremented with a `result` attribute on every outcome: `success`, `failed`, or `fallback`. This enables per-outcome metrics in Prometheus.
+
+=== Circuit Breaker — checkGatewayHealth
+
+[source,java]
+----
+@CircuitBreaker(requestVolumeThreshold = 4, failureRatio = 0.75,
+                delay = 1000, successThreshold = 2)
+public boolean checkGatewayHealth() {
+    // Simulates a network call to the payment gateway
+    simulateNetworkCall(200);
+    if (Math.random() > 0.9) {
+        throw new RuntimeException("Payment gateway not responding");
+    }
+    return true;
+}
+----
+
+=== Async Notification — sendPaymentNotification
+
+[source,java]
+----
+@Asynchronous
+@Bulkhead(5)
+public CompletionStage<String> sendPaymentNotification(
+        String paymentId, String recipient) {
+    simulateNetworkCall(300);
+    return CompletableFuture.completedFuture(
+            "Notification sent to " + recipient + " for payment " + paymentId);
+}
+----
+
+== API Endpoints
+
+Base URL: `http://localhost:9080/payment`
+
+[options="header"]
+|===
+|Method |Path |Description |Fault Tolerance
+|POST |`/authorize?amount={value}` |Process payment by amount |`@Retry`, `@Fallback`, `@Bulkhead`, `@Timeout`, `@Asynchronous`
+|POST |`/payments` |Process payment with full card details |`@Retry`, `@Fallback`, `@Bulkhead`, `@Timeout`, `@Asynchronous`
+|POST |`/verify` |Verify payment — runs validation, fraud check, funds check |`@Asynchronous`
+|GET |`/health/gateway` |Check gateway health |`@CircuitBreaker`
+|POST |`/notify/{paymentId}?recipient={email}` |Send async payment notification |`@Asynchronous`, `@Bulkhead`
+|===
+
+OpenAPI UI: http://localhost:9080/openapi/ui/
+
+=== PaymentDetails request body
+
+Used by `POST /payments` and `POST /verify`:
+
+[source,json]
+----
+{
+  "cardNumber":     "4111111111111111",
+  "cardHolderName": "Test User",
+  "expiryDate":     "12/25",
+  "securityCode":   "123",
+  "amount":         99.99
+}
+----
+
+NOTE: Card numbers ending in `0000` trigger a fraud-check failure in the verification flow. Amounts above `1000` trigger an insufficient-funds failure.
+
+== Building and Running
+
+=== Step 1 — Start the LGTM observability stack
+
+Open a terminal and run from the `code/chapter09/` directory:
 
 [source,bash]
 ----
-# Start Jaeger container (if not already running)
-docker run --rm --name jaeger \
-  -p 16686:16686 \
-  -p 4317:4317 \
-  -p 4318:4318 \
-  -p 5778:5778 \
-  -p 9411:9411 \
-  jaegertracing/jaeger:2.7.0
-
-# Access Jaeger UI
-open http://localhost:16686
+cd code/chapter09
+docker compose up -d
+docker compose ps
 ----
 
-In the Jaeger UI:
-1. Select "payment-service" from the Service dropdown
-2. Choose an operation or search by transaction attributes
-3. Explore the full transaction trace across services
+Expected: all five services (`grafana`, `prometheus`, `loki`, `tempo`, `otel-collector`) show status `running`.
 
-=== Troubleshooting Telemetry
-
-If telemetry data is not appearing in Jaeger:
-
-1. **Verify Jaeger is running** with OTLP ports exposed (4317, 4318)
-2. **Check Liberty server configuration** in server.xml
-3. **Validate application configuration** in microprofile-config.properties
-4. **Ensure trace application is enabled** with `<trace enabled="true" type="ALL" />`
-5. **Check network connectivity** between the service and Jaeger
-6. **Inspect Liberty server logs** for telemetry-related messages
-
-=== Testing Telemetry
-
-To generate and verify telemetry data:
+Verify each backend is healthy:
 
 [source,bash]
 ----
-# Generate sample telemetry with payment request
-curl -X POST -H "Content-Type: application/json" \
-  -d '{"cardNumber":"4111-1111-1111-1111", "cardHolderName":"Test User", "expiryDate":"12/25", "securityCode":"123", "amount":75.50}' \
-  http://localhost:9080/payment/api/payments
-
-# Check for payment service in Jaeger UI services dropdown
-curl -s http://localhost:16686/api/services
+curl -s http://localhost:13200/ready     # Tempo  → "ready"
+curl -s http://localhost:13100/ready     # Loki   → "ready"
+curl -s http://localhost:19090/-/healthy # Prometheus → "Prometheus Server is Healthy."
 ----
 
-=== Benefits of Telemetry Implementation
+=== Step 2 — Configure Grafana data sources
 
-1. **End-to-End Transaction Visibility**: Follow payment flows across services
-2. **Performance Monitoring**: Identify bottlenecks and optimization opportunities
-3. **Error Detection**: Quickly locate and diagnose failures
-4. **Dependency Analysis**: Understand service dependencies and impacts
-5. **Business Insights**: Correlate technical metrics with business outcomes
-6. **Operational Excellence**: Improve MTTR and system reliability
+Open Grafana at http://localhost:13000 (login: `admin` / `admin`).
+
+Go to *Connections → Data sources → Add data source* and add:
+
+[options="header"]
+|===
+|Type |Name |URL
+|Prometheus |Prometheus |`http://prometheus:9090`
+|Loki |Loki |`http://loki:3100`
+|Tempo |Tempo |`http://tempo:3200`
+|===
+
+Click *Save & test* for each. All three should show a success message.
+
+NOTE: Use the Docker service names (`prometheus`, `loki`, `tempo`) as hostnames — not `localhost`. Grafana runs inside the same Docker network as the backends, so service-name DNS resolution works.
+
+=== Step 3 — Build and start the payment service
+
+Open a second terminal from the `code/chapter09/payment/` directory:
+
+[source,bash]
+----
+cd code/chapter09/payment
+mvn clean package
+mvn liberty:run
+----
+
+Wait for the message:
+
+----
+[AUDIT] CWWKF0011I: The server mpServer is ready to run a smarter planet.
+----
+
+The service is now available at http://localhost:9080/payment.
+
+=== Step 4 — Generate telemetry traffic
+
+Run the following to exercise all telemetry paths:
+
+[source,bash]
+----
+# 1. Simple authorize (retry + fallback path)
+curl -s -X POST "http://localhost:9080/payment/api/authorize?amount=75.50"
+
+# 2. Full payment with card details (creates payment.process span)
+curl -s -X POST "http://localhost:9080/payment/api/payments-config/process-example" \
+  -H "Content-Type: application/json" \
+  -d '{"cardNumber":"4111111111111111","cardHolderName":"Test User","expiryDate":"12/25","securityCode":"123","amount":99.99}'
+----
+
+Run each command several times to produce enough data for Grafana to display.
+
+== Verifying Telemetry in Grafana
+
+=== Traces in Tempo
+
+1. Open Grafana → *Explore* → select *Tempo*
+2. Switch to the *Search* tab
+3. Set *Service Name* = `payment-service`
+4. Click *Run query*
+
+You should see recent traces. Click any trace to expand the span tree. Look for:
+
+* Root HTTP span: `POST /payment/api`
+* Child span: `payment.process` with attributes `payment.amount`, `payment.method`, `payment.status`
+* For the verify flow: `validatePaymentDetails`, `performFraudCheck`, `verifyFundsAvailability`, `recordTransaction` steps appear as log events on the span
+
+The following screenshot shows all payment-service traces listed in Tempo after generating traffic:
+
+image::../images/grafana-tempo-all-payment-traces.png[Grafana Tempo — all payment-service traces,role="related thumb right"]
+
+You can filter by span name (e.g. `GET /payment/api/health/gateway`) to narrow down traces for a specific endpoint:
+
+image::../images/grafana-tempo-gateway-health-traces.png[Grafana Tempo — gateway health check traces filtered by span name,role="related thumb right"]
+
+Click any row to open the trace detail panel. The example below shows the full span tree for a `POST /payment/api/authorize` request:
+
+image::../images/grafana-tempo-authorize-trace-detail.png[Grafana Tempo — POST /payment/api/authorize trace detail with span tree,role="related thumb right"]
+
+=== Logs in Loki
+
+The following screenshot shows Loki logs for the payment-service, including the log volume histogram and individual log lines with `traceId` links back to Tempo:
+
+image::../images/grafana-loki-payment-service-logs.png[Grafana Loki — payment-service logs with volume histogram and trace correlation,role="related thumb right"]
+
+1. Open Grafana → *Explore* → select *Loki*
+2. Enter one of these LogQL queries:
++
+[source]
+----
+{exporter="OTLP"}
+----
++
+or filter by service:
++
+[source]
+----
+{service_name="payment-service"}
+----
++
+3. Look for log lines that contain `traceId` — click the trace link to jump directly to the correlated trace in Tempo.
+
+=== Metrics in Prometheus
+
+The following screenshot shows the `payment_attempts_total` counter plotted over time, broken down by `result` label (`failed` and `success`):
+
+image::../images/grafana-prometheus-payment-attempts-metric.png[Grafana Prometheus — payment_attempts_total metric time series by result label,role="related thumb right"]
+
+1. Open Grafana → *Explore* → select *Prometheus* (or use http://localhost:19090 directly)
+2. Query the custom payment counter:
++
+[source]
+----
+payment_attempts_total
+----
++
+3. Break it down by result label:
++
+[source]
+----
+payment_attempts_total{result="success"}
+payment_attempts_total{result="failed"}
+payment_attempts_total{result="fallback"}
+----
++
+4. Also query HTTP server metrics emitted automatically by MicroProfile Telemetry:
++
+[source]
+----
+http_server_request_duration_seconds_count
+----
++
+5. Fault tolerance metrics from MicroProfile Fault Tolerance:
++
+[source]
+----
+ft_retry_calls_total
+ft_circuitbreaker_state_total
+ft_bulkhead_calls_total
+----
+
+== Troubleshooting
+
+=== Payment service cannot reach OTel Collector
+
+Symptom in Liberty logs:
+
+----
+Failed to export logs. The request could not be executed.
+Failed to connect to localhost/[0:0:0:0:0:0:0:1]:24317
+----
+
+Cause: The `otel.exporter.otlp.endpoint` in `microprofile-config.properties` points to the wrong port.
+
+Fix: In GitHub Codespaces use port `24317`; locally use `4317`:
+
+[source,properties]
+----
+# Codespaces
+otel.exporter.otlp.endpoint=http://localhost:24317
+
+# Local Docker
+otel.exporter.otlp.endpoint=http://localhost:4317
+----
+
+=== Grafana data source "Failed to connect to Tempo/Loki/Prometheus"
+
+Symptom:
+
+----
+Get "http://tempo:3200/api/echo": dial tcp: lookup tempo on 127.0.0.11:53: no such host
+----
+
+Cause: GitHub Codespaces injects an Azure DNS search domain. Docker's embedded DNS (127.0.0.11) appends it to short names like `tempo`, producing an NXDOMAIN.
+
+Fix: The `docker-compose.yml` already sets `dns_search: []` on every service to suppress the search domain. If you see this error, ensure you are using the latest `docker-compose.yml` and recreate all containers:
+
+[source,bash]
+----
+cd code/chapter09
+docker compose down
+docker compose up -d
+----
+
+=== Tempo container exits immediately
+
+Symptom in `docker compose logs tempo`:
+
+----
+field ingester not found in type app.Config
+----
+
+Cause: Tempo v3 removed the `ingester` top-level key. Ensure `tempo-config.yaml` does not contain an `ingester:` section. The configuration in this repo is already v3-compatible.
+
+=== Loki container exits immediately
+
+Symptom in `docker compose logs loki`:
+
+----
+/etc/loki/local-config.yml does not exist
+----
+
+Cause: An override `command:` was pointing to a `.yml` file but the image default uses `.yaml`. The `docker-compose.yml` in this repo does not override the Loki command, so the image default applies and the container starts correctly.
+
+=== No traces appear in Tempo
+
+1. Confirm the OTel Collector is receiving data:
++
+[source,bash]
+----
+docker compose logs --tail=30 otel-collector
+----
++
+You should see `ResourceSpans` logged by the `debug` exporter.
+
+2. Confirm `otel.sdk.disabled=false` in `microprofile-config.properties`.
+
+3. Confirm the service restarted after the config change:
++
+[source,bash]
+----
+# Stop (Ctrl+C in the mvn liberty:run terminal), then restart
+mvn liberty:run
+----
+
+== Clean Up
+
+[source,bash]
+----
+# Stop the payment service (Ctrl+C in the mvn liberty:run terminal)
+mvn liberty:stop
+
+# Stop and remove all LGTM containers and volumes
+cd code/chapter09
+docker compose down -v
+----
+
+== Related Resources
+
+* https://microprofile.io/specifications/microprofile-telemetry/[MicroProfile Telemetry 2.1 Specification]
+* https://opentelemetry.io/docs/[OpenTelemetry Documentation]
+* https://grafana.com/docs/tempo/[Grafana Tempo]
+* https://grafana.com/docs/loki/[Grafana Loki]
+* https://openliberty.io/docs/latest/microprofile-telemetry.html[Open Liberty MicroProfile Telemetry]

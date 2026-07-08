@@ -11,8 +11,10 @@ import io.microprofile.tutorial.store.payment.exception.PaymentProcessingExcepti
 import io.microprofile.tutorial.store.payment.service.PaymentService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.Consumes;
@@ -22,10 +24,13 @@ import jakarta.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.util.concurrent.CompletionStage;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @RequestScoped
 @Path("/")
 public class PaymentResource {
+
+    private static final Logger logger = Logger.getLogger(PaymentResource.class.getName());
     
     @Inject
     @ConfigProperty(name = "payment.gateway.endpoint")
@@ -129,6 +134,74 @@ public class PaymentResource {
         } catch (Exception e) {
             throw new PaymentProcessingException("Payment verification failed: " + e.getMessage());
         }
+    }
+
+    @GET
+    @Path("/health/gateway")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Check gateway health", description = "Check payment gateway health with circuit breaker protection")
+    @APIResponses(value = {
+        @APIResponse(responseCode = "200", description = "Gateway is healthy"),
+        @APIResponse(responseCode = "503", description = "Gateway is unavailable")
+    })
+    public Response checkGatewayHealth() {
+        try {
+            boolean healthy = paymentService.checkGatewayHealth();
+
+            if (healthy) {
+                return Response.ok()
+                    .entity("{\"status\":\"healthy\",\"message\":\"Payment gateway is operational\"}")
+                    .build();
+            }
+
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity("{\"status\":\"unhealthy\",\"message\":\"Payment gateway is not responding\"}")
+                .build();
+        } catch (Exception e) {
+            logger.warning("Gateway health check failed: " + e.getMessage());
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity("{\"status\":\"circuit_open\",\"message\":\"Circuit breaker is open - gateway appears to be down\"}")
+                .build();
+        }
+    }
+
+    @POST
+    @Path("/notify/{paymentId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Send payment notification", description = "Send asynchronous payment notification with bulkhead protection")
+    @APIResponses(value = {
+        @APIResponse(responseCode = "200", description = "Notification sent or queued"),
+        @APIResponse(responseCode = "503", description = "Bulkhead rejected request")
+    })
+    public CompletionStage<Response> sendNotification(
+        @PathParam("paymentId") String paymentId,
+        @QueryParam("recipient") String recipient
+    ) {
+
+        if (recipient == null || recipient.isEmpty()) {
+            recipient = "default@example.com";
+        }
+
+        return paymentService.sendPaymentNotification(paymentId, recipient)
+            .thenApply(result -> {
+                logger.info("Notification result: " + result);
+                return Response.ok()
+                    .entity("{\"status\":\"success\",\"message\":\"" + result + "\"}")
+                    .build();
+            })
+            .exceptionally(ex -> {
+                logger.warning("Notification failed: " + ex.getMessage());
+
+                if (ex.getMessage() != null && ex.getMessage().contains("BulkheadException")) {
+                    return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                        .entity("{\"status\":\"rejected\",\"message\":\"Too many concurrent notifications - please try again later\"}")
+                        .build();
+                }
+
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"status\":\"error\",\"message\":\"Notification processing failed\"}")
+                    .build();
+            });
     }
 
 }
