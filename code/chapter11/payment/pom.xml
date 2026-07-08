@@ -19,8 +19,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     
     <!-- Liberty configuration -->
-    <liberty.var.default.http.port>9080</liberty.var.default.http.port>
-    <liberty.var.default.https.port>9081</liberty.var.default.https.port>
+    <liberty.var.default.http.port>9050</liberty.var.default.http.port>
+    <liberty.var.default.https.port>9051</liberty.var.default.https.port>
     
     <liberty.var.app.context.root>payment</liberty.var.app.context.root>
   

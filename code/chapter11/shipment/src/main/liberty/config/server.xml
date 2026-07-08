@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="MicroProfile Shipment Service Server">
+
+    <featureManager>
+        <platform>microProfile-7.1</platform>
+        <platform>jakartaEE-10.0</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>beanValidation</feature>
+        <feature>mpConfig</feature>
+        <feature>mpOpenAPI</feature>
+        <feature>mpHealth</feature>
+        <feature>mpMetrics</feature>
+        <feature>mpFaultTolerance</feature>
+    </featureManager>
+
+    <httpEndpoint httpPort="8060" httpsPort="9060"
+                  id="defaultHttpEndpoint" host="*" />
+
+    <mpMetrics authentication="false"/>
+
+    <webApplication location="shipment.war" contextRoot="${app.context.root}"/>
+</server>

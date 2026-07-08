@@ -3,6 +3,7 @@ package io.microprofile.tutorial.store.inventory.resource;
 import io.microprofile.tutorial.store.inventory.entity.Inventory;
 import io.microprofile.tutorial.store.inventory.service.InventoryService;
 import io.microprofile.tutorial.store.inventory.dto.Product;
+import io.microprofile.tutorial.store.inventory.dto.InventoryWithProductInfo;
 
 import java.net.URI;
 import java.util.List;
@@ -262,5 +263,49 @@ public class InventoryResource {
                     .entity("{\"message\": \"Product not found\"}")
                     .build();
         }
+    }
+
+    @GET
+    @Path("/{id}/with-product-info")
+    @Operation(summary = "Get inventory enriched with product information",
+               description = "Returns an inventory item along with product details from the catalog service")
+    @APIResponse(
+        responseCode = "200",
+        description = "Inventory item enriched with product information",
+        content = @Content(
+            mediaType = MediaType.APPLICATION_JSON,
+            schema = @Schema(implementation = InventoryWithProductInfo.class)
+        )
+    )
+    @APIResponse(
+        responseCode = "404",
+        description = "Inventory not found"
+    )
+    public InventoryWithProductInfo getInventoryWithProductInfo(
+        @Parameter(description = "ID of the inventory item", required = true)
+        @PathParam("id") Long id) {
+        return inventoryService.getInventoryWithProductInfo(id);
+    }
+
+    @POST
+    @Path("/bulk")
+    @Operation(summary = "Bulk create inventory items", description = "Creates multiple inventory items in a single request, validating each against the catalog service")
+    @APIResponse(
+        responseCode = "201",
+        description = "Inventory items created",
+        content = @Content(
+            mediaType = MediaType.APPLICATION_JSON,
+            schema = @Schema(type = SchemaType.ARRAY, implementation = Inventory.class)
+        )
+    )
+    @APIResponse(
+        responseCode = "409",
+        description = "Inventory for one or more products already exists"
+    )
+    public Response createBulkInventories(
+        @Parameter(description = "Inventory items to create", required = true)
+        @NotNull List<@Valid Inventory> inventories) {
+        List<Inventory> created = inventoryService.createBulkInventories(inventories);
+        return Response.status(Response.Status.CREATED).entity(created).build();
     }
 }

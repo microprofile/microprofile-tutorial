@@ -21,8 +21,8 @@
     <lombok.version>1.18.36</lombok.version>
 
     <!-- Liberty configuration -->
-    <liberty.var.default.http.port>6050</liberty.var.default.http.port>
-    <liberty.var.default.https.port>6051</liberty.var.default.https.port>
+    <liberty.var.default.http.port>7050</liberty.var.default.http.port>
+    <liberty.var.default.https.port>7051</liberty.var.default.https.port>
     
     <liberty.var.app.context.root>inventory</liberty.var.app.context.root>
   </properties>

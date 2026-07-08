@@ -54,7 +54,7 @@
       <plugin>
         <groupId>io.openliberty.tools</groupId>
         <artifactId>liberty-maven-plugin</artifactId>
-        <version>3.8.2</version>
+        <version>3.11.2</version>
         <configuration>
           <serverName>userServer</serverName>
           <include>runnable</include>

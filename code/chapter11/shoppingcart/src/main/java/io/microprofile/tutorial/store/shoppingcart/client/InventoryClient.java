@@ -35,10 +35,10 @@ public class InventoryClient {
      * @param quantity The requested quantity
      * @return true if the product is available in the requested quantity, false otherwise
      */
-    // @Retry(maxRetries = 3, delay = 1000, jitter = 200, unit = ChronoUnit.MILLIS)
-    // @Timeout(value = 5, unit = ChronoUnit.SECONDS)
-    // @CircuitBreaker(requestVolumeThreshold = 4, failureRatio = 0.5, delay = 10000, successThreshold = 2)
-    // @Fallback(fallbackMethod = "checkProductAvailabilityFallback")
+    @Retry(maxRetries = 3, delay = 1000, jitter = 200)
+    @Timeout(value = 5, unit = ChronoUnit.SECONDS)
+    @CircuitBreaker(requestVolumeThreshold = 4, failureRatio = 0.5, delay = 10000, successThreshold = 2)
+    @Fallback(fallbackMethod = "checkProductAvailabilityFallback")
     public boolean checkProductAvailability(Long productId, int quantity) {
         LOGGER.info(String.format("Checking availability for product %d, quantity %d", productId, quantity));
         
