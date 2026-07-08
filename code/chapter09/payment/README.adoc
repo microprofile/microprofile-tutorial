@@ -527,7 +527,7 @@ Run the following to exercise all telemetry paths:
 [source,bash]
 ----
 # 1. Simple authorize (retry + fallback path)
-curl -s -X POST "http://localhost:9080/payment/authorize?amount=75.50"
+curl -s -X POST "http://localhost:9080/payment/api/authorize?amount=75.50"
 
 # 2. Full payment with card details (creates payment.process span)
 curl -s -X POST "http://localhost:9080/payment/api/payments-config/process-example" \
