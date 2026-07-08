@@ -7,15 +7,8 @@
 
 == Overview
 
-This project demonstrates a microservices-based e-commerce application built with Jakarta EE and MicroProfile, running on Open Liberty runtime. The application is composed of multiple independent services that work together to provide a complete e-commerce solution.
-
-[.lead]
-A practical demonstration of MicroProfile capabilities for building cloud-native Java microservices.
-
-[IMPORTANT]
-====
-This project is part of the official MicroProfile API Tutorial.
-====
+This project demonstrates a microservices-based e-commerce application built with Jakarta EE and MicroProfile, running on Open Liberty runtime. 
+The application is composed of multiple independent services that work together to provide a complete e-commerce solution.
 
 == Services
 
@@ -44,13 +37,14 @@ The application is split into the following microservices:
 |Handles shipping orders, tracking, and delivery status updates
 
 |Payment Service
-|Processes payments and manages payment methods and transactions
+|Processes payments and manages payment methods and transactions. Demonstrates MicroProfile Rest Client 4.0 features including CDI injection, ResponseExceptionMapper, custom filters, and programmatic client creation.
 |===
 
 == Technology Stack
 
 * *Jakarta EE 10.0*: For enterprise Java standardization
-* *MicroProfile 6.1*: For cloud-native APIs
+* *MicroProfile 7.x*: For cloud-native APIs
+* *MicroProfile Rest Client 4.0*: Type-safe REST service consumption
 * *Open Liberty*: Lightweight, flexible runtime for Java microservices
 * *Maven*: For project management and builds
 
@@ -58,8 +52,8 @@ The application is split into the following microservices:
 
 === Prerequisites
 
-* JDK 17 or later
-* Maven 3.6 or later
+* JDK 21 or later
+* Maven 3.9 or later
 * Docker (optional for containerized deployment)
 
 === Running the Application
@@ -68,43 +62,24 @@ The application is split into the following microservices:
 +
 [source,bash]
 ----
-git clone https://github.com/your-username/liberty-rest-app.git
-cd liberty-rest-app
+git clone https://github.com/microprofile/microprofile-tutorial.git
+cd code/chapter11
 ----
 
-2. Start each microservice individually:
+2. Start each microservice individually (each command is run from `code/chapter11/`):
 
-==== User Service
 [source,bash]
 ----
-cd user
-mvn liberty:run
+cd user && mvn liberty:run        # http://localhost:6050/user
+cd inventory && mvn liberty:run   # http://localhost:7050/inventory
+cd order && mvn liberty:run       # http://localhost:8050/order
+cd catalog && mvn liberty:run     # http://localhost:5050/catalog
+cd payment && mvn liberty:run     # http://localhost:9050/payment
+cd shoppingcart && mvn liberty:run # http://localhost:4050/shoppingcart
+cd shipment && mvn liberty:run    # http://localhost:8060/shipment
 ----
-The service will be available at http://localhost:6050/user
 
-==== Inventory Service
-[source,bash]
-----
-cd inventory
-mvn liberty:run
-----
-The service will be available at http://localhost:7050/inventory
-
-==== Order Service
-[source,bash]
-----
-cd order
-mvn liberty:run
-----
-The service will be available at http://localhost:8050/order
-
-==== Catalog Service
-[source,bash]
-----
-cd catalog
-mvn liberty:run
-----
-The service will be available at http://localhost:9050/catalog
+See each service's own `README.adoc` for detailed build, run, and testing instructions.
 
 === Building the Application
 
@@ -133,10 +108,9 @@ Or manually:
 [source,bash]
 ----
 # Build all projects first
-cd user && mvn clean package && cd ..
-cd inventory && mvn clean package && cd ..
-cd order && mvn clean package && cd ..
-cd catalog && mvn clean package && cd ..
+for svc in user inventory order catalog payment shoppingcart shipment; do
+  (cd "$svc" && mvn clean package)
+done
 
 # Start all services
 docker-compose up -d
@@ -147,155 +121,46 @@ This will start all services in Docker containers with the following endpoints:
 * User Service: http://localhost:6050/user
 * Inventory Service: http://localhost:7050/inventory
 * Order Service: http://localhost:8050/order
-* Catalog Service: http://localhost:9050/catalog
+* Catalog Service: http://localhost:5050/catalog
+* Payment Service: http://localhost:9050/payment
+* Shopping Cart Service: http://localhost:4050/shoppingcart
+* Shipment Service: http://localhost:8060/shipment
 
 == API Documentation
 
-Each microservice provides its own OpenAPI documentation, available at:
+Each microservice provides its own OpenAPI documentation at the server root (not under the service's context root):
 
-* User Service: http://localhost:6050/user/openapi
-* Inventory Service: http://localhost:7050/inventory/openapi
-* Order Service: http://localhost:8050/order/openapi
-* Catalog Service: http://localhost:9050/catalog/openapi
+* User Service: http://localhost:6050/openapi
+* Inventory Service: http://localhost:7050/openapi
+* Order Service: http://localhost:8050/openapi
+* Catalog Service: http://localhost:5050/openapi
+* Payment Service: http://localhost:9050/openapi
+* Shopping Cart Service: http://localhost:4050/openapi
+* Shipment Service: http://localhost:8060/openapi
+
+== MicroProfile Rest Client 4.0 Features
+
+Several services demonstrate MicroProfile Rest Client 4.0:
+
+* *Inventory Service* showcases the three core usage patterns — CDI-injected `@RestClient`, programmatic `RestClientBuilder` (including the 4.0 `baseUri(String)` convenience method), and `AutoCloseable` client interfaces. See `inventory/README.adoc` for the full walkthrough and code samples.
+* *Payment Service* builds on this with `ResponseExceptionMapper` custom error handling, `ClientRequestFilter`/`ClientResponseFilter` cross-cutting concerns, and additional `RestClientBuilder` scenarios (dynamic/environment-specific configuration, batch processing). See `payment/README.adoc` for the full set of examples.
 
 == Testing the Services
 
-=== User Service
-
-[source,bash]
-----
-# Get all users
-curl -X GET http://localhost:6050/user/api/users
-
-# Create a new user
-curl -X POST http://localhost:6050/user/api/users \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Jane Doe",
-    "email": "jane@example.com",
-    "passwordHash": "password123",
-    "address": "123 Main St",
-    "phoneNumber": "555-123-4567"
-  }'
-
-# Get a user by ID
-curl -X GET http://localhost:6050/user/api/users/1
-
-# Update a user
-curl -X PUT http://localhost:6050/user/api/users/1 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Jane Smith",
-    "email": "jane@example.com",
-    "passwordHash": "password123",
-    "address": "456 Oak Ave",
-    "phoneNumber": "555-123-4567"
-  }'
-
-# Delete a user
-curl -X DELETE http://localhost:6050/user/api/users/1
-----
-
-=== Inventory Service
-
-[source,bash]
-----
-# Get all inventory items
-curl -X GET http://localhost:7050/inventory/api/inventories
-
-# Create a new inventory item
-curl -X POST http://localhost:7050/inventory/api/inventories \
-  -H "Content-Type: application/json" \
-  -d '{
-    "productId": 101,
-    "quantity": 25
-  }'
-
-# Get inventory by ID
-curl -X GET http://localhost:7050/inventory/api/inventories/1
-
-# Get inventory by product ID
-curl -X GET http://localhost:7050/inventory/api/inventories/product/101
-
-# Update inventory
-curl -X PUT http://localhost:7050/inventory/api/inventories/1 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "productId": 101,
-    "quantity": 50
-  }'
-
-# Update product quantity
-curl -X PATCH http://localhost:7050/inventory/api/inventories/product/101/quantity/75
-
-# Delete inventory
-curl -X DELETE http://localhost:7050/inventory/api/inventories/1
-----
-
-=== Order Service
-
-[source,bash]
-----
-# Get all orders
-curl -X GET http://localhost:8050/order/api/orders
-
-# Create a new order
-curl -X POST http://localhost:8050/order/api/orders \
-  -H "Content-Type: application/json" \
-  -d '{
-    "userId": 1,
-    "totalPrice": 149.98,
-    "status": "CREATED",
-    "orderItems": [
-      {
-        "productId": 101,
-        "quantity": 2,
-        "priceAtOrder": 49.99
-      },
-      {
-        "productId": 102,
-        "quantity": 1,
-        "priceAtOrder": 50.00
-      }
-    ]
-  }'
-
-# Get order by ID
-curl -X GET http://localhost:8050/order/api/orders/1
-
-# Update order status
-curl -X PATCH http://localhost:8050/order/api/orders/1/status/PAID
-
-# Get items for an order
-curl -X GET http://localhost:8050/order/api/orders/1/items
-
-# Delete order
-curl -X DELETE http://localhost:8050/order/api/orders/1
-----
-
-=== Catalog Service
-
-[source,bash]
-----
-# Get all products
-curl -X GET http://localhost:9050/catalog/api/products
-
-# Get a product by ID
-curl -X GET http://localhost:9050/catalog/api/products/1
-
-# Search products
-curl -X GET "http://localhost:9050/catalog/api/products/search?keyword=laptop"
-----
+Each service's own `README.adoc` (`user`, `inventory`, `order`, `catalog`, `payment`, `shipment`, `shoppingcart`) documents its full endpoint list and `curl` examples for testing — refer to those for up-to-date, service-specific instructions rather than duplicating them here. In particular, `payment/README.adoc` includes a comprehensive, step-by-step walkthrough of the MicroProfile Rest Client 4.0 patterns (injected `@RestClient`, `RestClientBuilder`, `ResponseExceptionMapper`, custom filters) demonstrated against the Catalog Service.
 
 == Project Structure
 
 [source]
 ----
-liberty-rest-app/
+chapter11/
 ├── user/               # User management service
 ├── inventory/          # Inventory management service
 ├── order/              # Order management service
-└── catalog/            # Product catalog service
+├── catalog/            # Product catalog service
+├── payment/            # Payment processing service
+├── shoppingcart/       # Shopping cart service
+└── shipment/           # Shipment tracking service
 ----
 
 Each service follows a similar internal structure:
@@ -308,7 +173,7 @@ service/
 │   │   ├── java/      # Java source code
 │   │   ├── liberty/   # Liberty server configuration
 │   │   └── webapp/    # Web resources
-│   └── test/          # Test code
+│   └── test/          # Test code (where present)
 └── pom.xml            # Maven configuration
 ----
 
@@ -320,13 +185,3 @@ service/
 * *Metrics*: Performance monitoring
 * *OpenAPI*: API documentation
 * *Rest Client*: Type-safe REST clients
-
-== Development
-
-=== Adding a New Service
-
-1. Create a new directory for your service
-2. Copy the basic structure from an existing service
-3. Update the `pom.xml` file with appropriate details
-4. Implement your service-specific functionality
-5. Configure the Liberty server in `src/main/liberty/config/`

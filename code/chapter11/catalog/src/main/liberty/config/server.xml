@@ -2,8 +2,8 @@
 <server description="MicroProfile Catalog Service Server">
 
     <featureManager>
+        <platform>microProfile-7.1</platform>
         <platform>jakartaEE-10.0</platform>
-        <platform>microProfile-6.1</platform>
         <feature>restfulWS</feature>
         <feature>jsonp</feature>
         <feature>jsonb</feature>

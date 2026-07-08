@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 /**
  * REST resource for shipment operations.
  */
-@Path("/api/shipments")
+@Path("/shipments")
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

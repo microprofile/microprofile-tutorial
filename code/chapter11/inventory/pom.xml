@@ -14,15 +14,15 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.release>21</maven.compiler.release>
     <jakarta.jakartaee-api.version>10.0.0</jakarta.jakartaee-api.version>
-    <microprofile.version>6.1</microprofile.version>
-    <liberty.version>23.0.0.3</liberty.version>
-    <lombok.version>1.18.24</lombok.version>
+    <microprofile.version>7.1</microprofile.version>
+    <liberty.version>25.0.0.1</liberty.version>
+    <lombok.version>1.18.36</lombok.version>
 
     <!-- Liberty configuration -->
-    <liberty.var.default.http.port>6050</liberty.var.default.http.port>
-    <liberty.var.default.https.port>6051</liberty.var.default.https.port>
+    <liberty.var.default.http.port>7050</liberty.var.default.http.port>
+    <liberty.var.default.https.port>7051</liberty.var.default.https.port>
     
     <liberty.var.app.context.root>inventory</liberty.var.app.context.root>
   </properties>

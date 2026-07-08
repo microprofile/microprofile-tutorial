@@ -1,6 +1,6 @@
 package io.microprofile.tutorial.store.payment.service;
 
-import io.microprofile.tutorial.store.payment.client.ProductClientJson;
+import io.microprofile.tutorial.store.payment.client.ProductJakartaRestClient;
 import io.microprofile.tutorial.store.payment.dto.product.Product;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -67,7 +67,7 @@ public class ProductIntegrationService {
         LOGGER.info("Fetching product details for ID: " + productId);
         
         try {
-            Product[] allProducts = ProductClientJson.getProductsWithJsonp(catalogServiceUrl);
+            Product[] allProducts = ProductJakartaRestClient.getProductsWithJsonp(catalogServiceUrl);
             
             if (allProducts != null) {
                 for (Product product : allProducts) {
@@ -98,7 +98,7 @@ public class ProductIntegrationService {
         LOGGER.info("Fetching products in price range: " + minPrice + " - " + maxPrice);
         
         try {
-            Product[] allProducts = ProductClientJson.getProductsWithJsonp(catalogServiceUrl);
+            Product[] allProducts = ProductJakartaRestClient.getProductsWithJsonp(catalogServiceUrl);
             
             if (allProducts == null) {
                 LOGGER.warning("No products returned from catalog service");
@@ -129,7 +129,7 @@ public class ProductIntegrationService {
         LOGGER.info("Fetching all products");
         
         try {
-            Product[] products = ProductClientJson.getProductsWithJsonp(catalogServiceUrl);
+            Product[] products = ProductJakartaRestClient.getProductsWithJsonp(catalogServiceUrl);
             
             if (products != null) {
                 LOGGER.info("Retrieved " + products.length + " products");

@@ -8,7 +8,6 @@ import io.microprofile.tutorial.store.inventory.client.ProductServiceClient;
 import io.microprofile.tutorial.store.inventory.dto.Product;
 import io.microprofile.tutorial.store.inventory.dto.InventoryWithProductInfo;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,16 +51,15 @@ public class InventoryService {
         LOGGER.fine("Checking product availability for ID: " + productId);
         
         try {
-            // Demonstrate RestClientBuilder usage - build a REST client programmatically
-            URI catalogServiceUri = URI.create("http://localhost:5050/catalog/api");
-            
+            // Demonstrate RestClientBuilder usage with MP Rest Client 4.0
+            // Using new baseUri(String) method - no need for URI.create()
             ProductServiceClient dynamicClient = RestClientBuilder.newBuilder()
-                    .baseUri(catalogServiceUri)
+                    .baseUri("http://localhost:5050/catalog/api")
                     .connectTimeout(5, TimeUnit.SECONDS)
                     .readTimeout(10, TimeUnit.SECONDS)
                     .build(ProductServiceClient.class);
             
-            LOGGER.fine("Built dynamic REST client for catalog service at: " + catalogServiceUri);
+            LOGGER.fine("Built dynamic REST client for catalog service using baseUri(String)");
             
             Product product = dynamicClient.getProductById(productId);
             boolean available = product != null;
@@ -460,6 +458,7 @@ public class InventoryService {
     /**
      * Demonstrates advanced RestClientBuilder usage with custom configuration.
      * This method builds a REST client with specific timeout and error handling settings.
+     * Uses MicroProfile Rest Client 4.0 baseUri(String) convenience method.
      *
      * @param productId The product ID to check
      * @return Product details if found, null otherwise
@@ -468,11 +467,10 @@ public class InventoryService {
         LOGGER.info("Getting product details using custom RestClientBuilder for ID: " + productId);
         
         try {
-            // Build REST client with custom configuration
-            URI catalogServiceUri = URI.create("http://localhost:5050/catalog/api");
-            
+            // Build REST client with custom configuration using MP Rest Client 4.0
+            // Using baseUri(String) - no URI.create() needed
             ProductServiceClient customClient = RestClientBuilder.newBuilder()
-                    .baseUri(catalogServiceUri)
+                    .baseUri("http://localhost:5050/catalog/api")
                     .connectTimeout(3, TimeUnit.SECONDS)      // Custom connect timeout
                     .readTimeout(8, TimeUnit.SECONDS)         // Custom read timeout
                     .build(ProductServiceClient.class);

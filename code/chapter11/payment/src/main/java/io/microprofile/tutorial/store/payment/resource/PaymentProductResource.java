@@ -1,6 +1,6 @@
 package io.microprofile.tutorial.store.payment.resource;
 
-import io.microprofile.tutorial.store.payment.client.ProductClientJson;
+import io.microprofile.tutorial.store.payment.client.ProductJakartaRestClient;
 import io.microprofile.tutorial.store.payment.dto.product.Product;
 import io.microprofile.tutorial.store.payment.service.ProductIntegrationService;
 
@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * REST resource demonstrating how to use ProductClientJson.getProductsWithJsonp 
+ * REST resource demonstrating how to use ProductJakartaRestClient.getProductsWithJsonp 
  * within REST endpoints for the Payment service.
  */
 @ApplicationScoped
@@ -52,7 +52,7 @@ public class PaymentProductResource {
         LOGGER.info("REST: Fetching all products for payment processing");
         
         try {
-            Product[] products = ProductClientJson.getProductsWithJsonp(catalogServiceUrl);
+            Product[] products = ProductJakartaRestClient.getProductsWithJsonp(catalogServiceUrl);
             
             if (products != null) {
                 LOGGER.info("Successfully retrieved " + products.length + " products");
@@ -95,7 +95,7 @@ public class PaymentProductResource {
         LOGGER.info("REST: Fetching products from URL: " + catalogUrl);
         
         try {
-            Product[] products = ProductClientJson.getProductsWithJsonp(catalogUrl);
+            Product[] products = ProductJakartaRestClient.getProductsWithJsonp(catalogUrl);
             
             Map<String, Object> result = new HashMap<>();
             result.put("sourceUrl", catalogUrl);

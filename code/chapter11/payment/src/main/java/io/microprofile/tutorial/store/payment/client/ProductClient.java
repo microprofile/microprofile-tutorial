@@ -1,52 +1,67 @@
 package io.microprofile.tutorial.store.payment.client;
 
-import io.microprofile.tutorial.store.payment.dto.product.Product;
-import jakarta.json.JsonArray;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
-public class ProductClient {
-    public static Product[] getProductsWithJsonb(String targetUrl) {
-        // This method would typically make a REST call to fetch products.
-        // For now, we return an empty array as a placeholder.
-        Client client = ClientBuilder.newClient();
-        Response response = client.target(targetUrl)
-                .request(MediaType.APPLICATION_JSON)
-                .get();
-        
-        Product[] products = response.readEntity(Product[].class);
-        response.close();
-        client.close();
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 
-        return products;
-    }
+import io.microprofile.tutorial.store.payment.dto.product.Product;
+import io.microprofile.tutorial.store.payment.exception.ProductNotFoundException;
 
-    public static Product[] getProductsWithJsonp(String targetUrl) {
-        // Default URL for product service
-        String defaultUrl = "http://localhost:6050/products";
-        Client client = ClientBuilder.newClient();
-        Response response = client.target(targetUrl != null ? targetUrl : defaultUrl)
-                .request(MediaType.APPLICATION_JSON)
-                .get();
+import java.util.List;
 
-        JsonArray jsonArray = response.readEntity(JsonArray.class);
-        response.close();
-        client.close();
-    
-        return collectProducts(jsonArray);
-    }
-    
-    private static Product[] collectProducts(JsonArray jsonArray) {
-        Product[] products = new Product[jsonArray.size()];
-        for (int i = 0; i < jsonArray.size(); i++) {
-            Product product = new Product();
-            product.setId(jsonArray.getJsonObject(i).getJsonNumber("id").longValue());
-            product.setName(jsonArray.getJsonObject(i).getString("name"));
-            product.setPrice(jsonArray.getJsonObject(i).getJsonNumber("price").doubleValue());
-            products[i] = product;
-        }
-        return products;
-    }
+/**
+ * MicroProfile Rest Client interface for the Catalog/Product Service.
+ * 
+ * This interface demonstrates:
+ * - @RegisterRestClient annotation to register as a REST client
+ * - @RegisterProvider to register custom exception mapper
+ * - configKey for external configuration via MicroProfile Config
+ * - Type-safe method definitions with Jakarta REST annotations
+ * - Automatic implementation generation by MicroProfile runtime
+ * - Custom error handling via ResponseExceptionMapper
+ * 
+ * Configuration properties (in microprofile-config.properties):
+ * - catalog-service/mp-rest/url=http://localhost:5050/catalog/api
+ * - catalog-service/mp-rest/scope=jakarta.enterprise.context.ApplicationScoped
+ * 
+ * This interface extends AutoCloseable to support try-with-resources pattern
+ * when using RestClientBuilder for programmatic client creation.
+ */
+@RegisterRestClient(configKey = "catalog-service")
+@RegisterProvider(ProductServiceResponseExceptionMapper.class)
+@Path("/products")
+@Produces(MediaType.APPLICATION_JSON)
+public interface ProductClient extends AutoCloseable {
+
+    /**
+     * Retrieves all products from the catalog service.
+     * 
+     * @return List of all products
+     * @throws RuntimeException if service returns 5xx error
+     */
+    @GET
+    List<Product> getAllProducts();
+
+    /**
+     * Retrieves a specific product by its ID.
+     * 
+     * Example usage: productClient.getProductById(1L)
+     * Resulting HTTP request: GET /products/1
+     * 
+     * Demonstrates checked exception handling:
+     * - Throws ProductNotFoundException if product not found (404)
+     * - Method must declare this checked exception in throws clause
+     * 
+     * @param id The product ID
+     * @return The product with the specified ID
+     * @throws ProductNotFoundException if product is not found (404)
+     */
+    @GET
+    @Path("/{id}")
+    Product getProductById(@PathParam("id") Long id) throws ProductNotFoundException;
 }

@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<server description="MicroProfile User Service Server">
+<server description="MicroProfile Order Service Server">
 
     <featureManager>
-        <feature>restfulWS-3.1</feature>
-        <feature>jsonp-2.1</feature>
-        <feature>jsonb-3.0</feature>
-        <feature>cdi-4.0</feature>
-        <feature>microProfile-6.1</feature>
+        <platform>microProfile-7.1</platform>
+        <platform>jakartaEE-10.0</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>beanValidation</feature>
+        <feature>mpOpenAPI</feature>
     </featureManager>
 
     <httpEndpoint httpPort="8050" httpsPort="8051"
                   id="defaultHttpEndpoint" host="*" />
 
-    <webApplication location="order.war" contextRoot="/order"/>
+    <webApplication location="order.war" contextRoot="${app.context.root}"/>
 </server>

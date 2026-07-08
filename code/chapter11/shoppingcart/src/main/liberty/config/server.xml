@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<server description="MicroProfile User Service Server">
+<server description="MicroProfile Shopping Cart Service Server">
 
     <featureManager>
-        <feature>restfulWS-3.1</feature>
-        <feature>jsonp-2.1</feature>
-        <feature>jsonb-3.0</feature>
-        <feature>cdi-4.0</feature>
-        <feature>microProfile-6.1</feature>
+        <platform>microProfile-7.1</platform>
+        <platform>jakartaEE-10.0</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>beanValidation</feature>
+        <feature>pages</feature>
+        <feature>mpConfig</feature>
+        <feature>mpOpenAPI</feature>
+        <feature>mpFaultTolerance</feature>
+        <feature>mpHealth</feature>
     </featureManager>
 
-    <httpEndpoint httpPort="6030" httpsPort="6031"
+    <httpEndpoint httpPort="4050" httpsPort="4051"
                   id="defaultHttpEndpoint" host="*" />
 
-    <webApplication location="shoppingcart.war" contextRoot="/shoppingcart"/>
+    <webApplication location="shoppingcart.war" contextRoot="${app.context.root}"/>
 </server>

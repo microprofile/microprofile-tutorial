@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<server description="MicroProfile User Service Server">
+<server description="MicroProfile Shipment Service Server">
 
     <featureManager>
-        <feature>restfulWS-3.1</feature>
-        <feature>jsonp-2.1</feature>
-        <feature>jsonb-3.0</feature>
-        <feature>cdi-4.0</feature>
-        <feature>servlet-6.0</feature>
-        <feature>pages-3.1</feature>
-        <feature>microProfile-6.1</feature>
+        <platform>microProfile-7.1</platform>
+        <platform>jakartaEE-10.0</platform>
+        <feature>restfulWS</feature>
+        <feature>jsonp</feature>
+        <feature>jsonb</feature>
+        <feature>cdi</feature>
+        <feature>beanValidation</feature>
+        <feature>mpConfig</feature>
+        <feature>mpOpenAPI</feature>
+        <feature>mpHealth</feature>
+        <feature>mpMetrics</feature>
+        <feature>mpFaultTolerance</feature>
     </featureManager>
 
-    <httpEndpoint httpPort="6040" httpsPort="6041"
+    <httpEndpoint httpPort="8060" httpsPort="9060"
                   id="defaultHttpEndpoint" host="*" />
 
-    <webApplication location="shipment.war" contextRoot="/shipment"/>
+    <mpMetrics authentication="false"/>
+
+    <webApplication location="shipment.war" contextRoot="${app.context.root}"/>
 </server>

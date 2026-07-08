@@ -39,7 +39,6 @@ buildNumber.properties
 .liberty/
 .factorypath
 wlp/
-liberty/
 
 # IntelliJ IDEA
 .idea/

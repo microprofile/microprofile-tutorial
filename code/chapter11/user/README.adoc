@@ -13,7 +13,6 @@ The User Management Service is responsible for user operations including:
 
 * User registration and management
 * User profile information
-* Basic authentication
 
 This service demonstrates MicroProfile and Jakarta EE technologies in a microservice architecture.
 
@@ -26,8 +25,8 @@ The User Management Service uses the following technologies:
 ** Context and Dependency Injection (CDI 4.0)
 ** Bean Validation 3.0
 ** JSON-B 3.0
-* MicroProfile 6.1
-** OpenAPI 3.1
+* MicroProfile 7.1
+** OpenAPI 4.1
 * Open Liberty
 * Maven
 
@@ -41,7 +40,6 @@ user/
 │   │   ├── java/
 │   │   │   └── io/microprofile/tutorial/store/user/
 │   │   │       ├── entity/       # Domain objects
-│   │   │       ├── exception/    # Custom exceptions
 │   │   │       ├── repository/   # Data access layer
 │   │   │       ├── resource/     # REST endpoints
 │   │   │       ├── service/      # Business logic
@@ -54,7 +52,6 @@ user/
 │   │   │       └── microprofile-config.properties
 │   │   └── webapp/
 │   │       └── index.html        # Welcome page
-│   └── test/                     # Unit and integration tests
 └── pom.xml                       # Maven configuration
 ----
 
@@ -87,8 +84,8 @@ The service exposes the following RESTful endpoints:
 +
 [source,bash]
 ----
-git clone https://github.com/your-org/liberty-rest-app.git
-cd liberty-rest-app/user
+git clone https://github.com/microprofile/microprofile-tutorial.git
+cd code/chapter11/user
 ----
 
 2. Build the project:
@@ -122,7 +119,7 @@ To build and run using Docker:
 docker build -t microprofile-tutorial/user-service .
 
 # Run the container
-docker run -p 6050:6050 microprofile-tutorial/user-service
+docker run -p 6050:6050 -p 6051:6051 microprofile-tutorial/user-service
 ----
 
 == Configuration
@@ -160,39 +157,25 @@ http://localhost:6050/openapi
 
 == Exception Handling
 
-The service includes a comprehensive exception handling strategy:
-
-* Custom exceptions for domain-specific errors
-* Global exception mapping to appropriate HTTP status codes
-* Consistent error response format
-
-Error responses follow this structure:
-
-[source,json]
-----
-{
-  "errorCode": "user_not_found",
-  "message": "User with ID 123 not found",
-  "timestamp": "2023-04-15T14:30:45Z"
-}
-----
+`UserService` reports error conditions by throwing `jakarta.ws.rs.WebApplicationException` with a plain
+message and the appropriate HTTP status; there are no custom exception classes or exception mappers in
+this module, and error responses are not JSON-structured.
 
 Common error scenarios:
 
-* 400 Bad Request - Invalid input data
 * 404 Not Found - Requested user doesn't exist
 * 409 Conflict - Email address already in use
+
+NOTE: Bean Validation constraint violations on `User` (e.g. an empty name or invalid email on
+create/update) return 400 Bad Request via the default `beanValidation` provider, not through
+`UserService`.
 
 == Testing
 
 === Running Tests
 
-Execute unit and integration tests with:
-
-[source,bash]
-----
-mvn test
-----
+This module does not currently have a `src/test` directory; `mvn test` will run without executing
+any tests.
 
 === Testing with cURL
 
@@ -218,7 +201,7 @@ curl -X POST http://localhost:6050/user/api/users \
     "email": "john@example.com",
     "passwordHash": "hashed_password",
     "address": "123 Main St",
-    "phone": "+1234567890"
+    "phoneNumber": "+1234567890"
   }'
 ----
 
@@ -232,7 +215,7 @@ curl -X PUT http://localhost:6050/user/api/users/1 \
     "email": "john@example.com",
     "passwordHash": "hashed_password",
     "address": "456 New Address",
-    "phone": "+1234567890"
+    "phoneNumber": "+1234567890"
   }'
 ----
 
@@ -270,11 +253,11 @@ For production use, consider implementing a proper database persistence layer.
 
 === Logs
 
-* Liberty server logs are in `target/liberty/wlp/usr/servers/defaultServer/logs/`
+* Liberty server logs are in `target/liberty/wlp/usr/servers/userServer/logs/`
 * Application logs use standard JDK logging with info level by default
 
 == Further Resources
 
 * https://jakarta.ee/specifications/restful-ws/3.1/jakarta-restful-ws-spec-3.1.html[Jakarta RESTful Web Services Specification]
 * https://openliberty.io/docs/latest/documentation.html[Open Liberty Documentation]
-* https://download.eclipse.org/microprofile/microprofile-6.1/microprofile-spec-6.1.html[MicroProfile 6.1 Specification]
+* https://download.eclipse.org/microprofile/microprofile-7.1/microprofile-spec-7.1.html[MicroProfile 7.1 Specification]

@@ -7,7 +7,7 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-public class ProductClientJson {
+public class ProductJakartaRestClient {
    public static Product[] getProductsWithJsonb(String targetUrl) {
        // This method would typically make a REST call to fetch products.
        // For now, we return an empty array as a placeholder.

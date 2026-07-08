@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<server description="MicroProfile User Service Server">
+<server description="MicroProfile Payment Service Server">
 
     <featureManager>
+        <platform>microProfile-7.1</platform>
         <platform>jakartaEE-10.0</platform>
-        <platform>microProfile-6.1</platform>
         <feature>restfulWS</feature>
         <feature>jsonp</feature>
         <feature>jsonb</feature>
         <feature>cdi</feature>
         <feature>mpConfig</feature>
-        <feature>mpOpenAPI</feature>
+        <feature>mpOpenAPI-4.1</feature>
+        <feature>mpHealth</feature>
         <feature>mpJwt</feature>
+        <feature>mpRestClient-4.0</feature>
     </featureManager>
 
     <httpEndpoint httpPort="9050" httpsPort="9051"

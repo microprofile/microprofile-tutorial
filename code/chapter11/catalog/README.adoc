@@ -9,7 +9,7 @@ toc::[]
 
 == Overview
 
-The MicroProfile Catalog Service is a modern Jakarta EE 10 application built with MicroProfile 6.1 specifications and running on Open Liberty. This service provides a RESTful API for product catalog management with enhanced MicroProfile features.
+The MicroProfile Catalog Service is a modern Jakarta EE 10 application built with MicroProfile 7.1 specifications and running on Open Liberty. This service provides a RESTful API for product catalog management with enhanced MicroProfile features.
 
 This project demonstrates the key capabilities of MicroProfile OpenAPI and in-memory persistence architecture.
 
@@ -161,13 +161,11 @@ mp.openapi.scan=true
 
 # Maintenance mode configuration
 product.maintenanceMode=false
-product.maintenanceMessage=The product catalog service is currently in maintenance mode. Please try again later.
 ----
 
 The maintenance mode configuration allows dynamic control of service availability:
 
 * `product.maintenanceMode` - When set to `true`, the service returns a 503 Service Unavailable response
-* `product.maintenanceMessage` - Customizable message displayed when the service is in maintenance mode
 
 ==== Maintenance Mode Implementation
 
@@ -178,17 +176,12 @@ The service checks the maintenance mode configuration before processing requests
 @Inject
 @ConfigProperty(name="product.maintenanceMode", defaultValue="false")
 private boolean maintenanceMode;
-    
-@Inject
-@ConfigProperty(name="product.maintenanceMessage", 
-                defaultValue="The product catalog service is currently in maintenance mode. Please try again later.")
-private String maintenanceMessage;
 
 // In request handling method
-if (maintenance.isMaintenanceMode()) {
+if (maintenanceMode) {
     return Response
             .status(Response.Status.SERVICE_UNAVAILABLE)
-            .entity(maintenance.getMaintenanceMessage())
+            .entity("Service is under maintenance")
             .build();
 }
 ----
@@ -198,6 +191,8 @@ This pattern enables:
 * Graceful service degradation during maintenance periods
 * Dynamic control without redeployment (when using external configuration sources)
 * Clear communication to API consumers
+
+NOTE: The maintenance message is currently a fixed string in `ProductResource`. There is no `product.maintenanceMessage` configuration property; customizing the message requires a code change.
 
 == Architecture
 
@@ -243,7 +238,7 @@ mvn clean package
 docker build -t catalog-service .
 
 # Run the container
-docker run -d -p 5050:5050 --name catalog-service catalog-service
+docker run -d -p 5050:5050 -p 5051:5051 --name catalog-service catalog-service
 ----
 
 ==== AtomicLong in Containerized Environments
@@ -299,7 +294,9 @@ catalog/
 │   │   │   └── io/microprofile/tutorial/store/
 │   │   │       └── product/
 │   │   │           ├── entity/          # Domain entities
+│   │   │           ├── repository/      # In-memory data access layer
 │   │   │           ├── resource/        # REST resources
+│   │   │           ├── service/         # Business logic
 │   │   │           └── ProductRestApplication.java
 │   │   ├── liberty/
 │   │   │   └── config/
@@ -311,7 +308,6 @@ catalog/
 │   │       ├── index.html              # Landing page with API documentation
 │   │       └── WEB-INF/
 │   │           └── web.xml             # Web application configuration
-│   └── test/                           # Test classes
 └── pom.xml                             # Maven build file
 ----
 
@@ -329,8 +325,8 @@ To build and run the application:
 [source,bash]
 ----
 # Clone the repository
-git clone https://github.com/yourusername/liberty-rest-app.git
-cd code/catalog
+git clone https://github.com/microprofile/microprofile-tutorial.git
+cd code/chapter11/catalog
 
 # Build the application
 mvn clean package
@@ -349,7 +345,7 @@ mvn liberty:run
 curl -X GET http://localhost:5050/openapi
 
 # Check if service is in maintenance mode
-curl -X GET http://localhost:5050/api/products
+curl -X GET http://localhost:5050/catalog/api/products
 ----
 
 To view the Swagger UI, open the following URL in your browser:
@@ -364,18 +360,24 @@ The application uses the following Liberty server configuration:
 
 [source,xml]
 ----
-<server description="MicroProfile Tutorial Liberty Server">
+<server description="MicroProfile Catalog Service Server">
+
     <featureManager>
+        <platform>microProfile-7.1</platform>
         <platform>jakartaEE-10.0</platform>
-        <platform>microProfile-6.1</platform>
         <feature>restfulWS</feature>
         <feature>jsonp</feature>
         <feature>jsonb</feature>
         <feature>cdi</feature>
         <feature>mpConfig</feature>
         <feature>mpOpenAPI</feature>
+        <feature>mpHealth</feature>
+        <feature>mpMetrics</feature>
+        <feature>mpTelemetry</feature>
+        <feature>mpFaultTolerance</feature>
+        <feature>mpJwt</feature>
+        <feature>mpRestClient</feature>
     </featureManager>
-
     <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
                   id="defaultHttpEndpoint" host="*" />
     <webApplication location="catalog.war" contextRoot="${app.context.root}"/>
@@ -393,22 +395,27 @@ To add a new endpoint:
 3. Add OpenAPI annotations for documentation
 4. Implement the business logic
 
-Example:
+The service already follows this pattern for its `/search` endpoint, which delegates the actual
+filtering to `ProductService`/`ProductRepository` rather than filtering in the resource class:
 
 [source,java]
 ----
 @GET
 @Path("/search")
 @Produces(MediaType.APPLICATION_JSON)
-@Operation(summary = "Search products", description = "Search products by name")
+@Operation(summary = "Search products", description = "Search products by criteria")
 @APIResponses({
-    @APIResponse(responseCode = "200", description = "Products matching search criteria")
+    @APIResponse(responseCode = "200", description = "Search results",
+                content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = Product.class)))
 })
-public Response searchProducts(@QueryParam("name") String name) {
-    List<Product> matchingProducts = products.stream()
-        .filter(p -> p.getName().toLowerCase().contains(name.toLowerCase()))
-        .collect(Collectors.toList());
-    return Response.ok(matchingProducts).build();
+public Response searchProducts(
+        @QueryParam("name") String name,
+        @QueryParam("description") String description,
+        @QueryParam("minPrice") Double minPrice,
+        @QueryParam("maxPrice") Double maxPrice) {
+    List<Product> results = productService.searchProducts(name, description, minPrice, maxPrice);
+    return Response.ok(results).build();
 }
 ----
 
@@ -495,8 +502,6 @@ public Product createProduct(Product product) {
 
 This implementation ensures ID integrity while supporting both system-generated and client-provided IDs.
 
-This enables scanning of OpenAPI annotations in the application.
-
 == Troubleshooting
 
 === Common Issues
@@ -505,8 +510,6 @@ This enables scanning of OpenAPI annotations in the application.
 * *Concurrent modification exceptions*: Ensure proper use of thread-safe collections and operations
 * *Service always in maintenance mode*: Check the `product.maintenanceMode` property in `microprofile-config.properties`
 * *API returning 503 responses*: The service is likely in maintenance mode; set `product.maintenanceMode=false` in configuration
-* *OpenAPI documentation not available*: Make sure `mp.openapi.scan=true` is set in the properties file
-* *Concurrent modification exceptions*: Ensure proper use of thread-safe collections and operations
 
 === Thread Safety Troubleshooting
 
@@ -579,7 +582,7 @@ Server logs can be found at:
 
 [source]
 ----
-target/liberty/wlp/usr/servers/defaultServer/logs/
+target/liberty/wlp/usr/servers/mpServer/logs/
 ----
 
 == Resources
@@ -597,7 +600,7 @@ The application includes a user-friendly HTML landing page (`index.html`) that p
 
 ==== Maintenance Mode Configuration in the UI
 
-The index.html page is designed to work seamlessly with the maintenance mode configuration. When maintenance mode is enabled via the `product.maintenanceMode` property, all API endpoints return a 503 Service Unavailable response with the configured maintenance message.
+The index.html page is designed to work seamlessly with the maintenance mode configuration. When maintenance mode is enabled via the `product.maintenanceMode` property, all API endpoints return a 503 Service Unavailable response with a fixed maintenance message.
 
 The landing page displays comprehensive documentation about the API regardless of the maintenance state, allowing developers to continue learning about the API even when the service is undergoing maintenance.
 

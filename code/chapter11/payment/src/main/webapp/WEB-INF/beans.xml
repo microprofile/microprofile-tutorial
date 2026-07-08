@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="https://jakarta.ee/xml/ns/jakartaee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee 
+                           https://jakarta.ee/xml/ns/jakartaee/beans_4_0.xsd"
+       version="4.0"
+       bean-discovery-mode="all">
+    <!-- 
+        CDI 4.0 (Jakarta EE 10) configuration
+        
+        bean-discovery-mode="all" enables:
+        - Discovery of all classes in the archive, even without bean-defining annotations
+        - Required for MicroProfile Rest Client interfaces to be properly registered
+        - Ensures @RegisterRestClient interfaces can be injected with @Inject @RestClient
+    -->
+</beans>

@@ -7,7 +7,7 @@ A comprehensive Jakarta EE and MicroProfile-based REST service for inventory man
 
 == Overview
 
-The Inventory Service is a production-ready microservice built with Jakarta EE 10.0 and MicroProfile 6.1, showcasing comprehensive REST client integration patterns with the Catalog Service. This service demonstrates three different approaches to MicroProfile Rest Client usage:
+The Inventory Service is a microservice built with Jakarta EE 10.0 and MicroProfile 7.1, showcasing comprehensive REST client integration patterns with the Catalog Service. This service demonstrates three different approaches to MicroProfile Rest Client usage:
 
 * **Injected REST Client** (`@RestClient`) for standard operations
 * **RestClientBuilder** with custom timeouts for availability checks  
@@ -35,7 +35,6 @@ The Inventory Service is a production-ready microservice built with Jakarta EE 1
 * Comprehensive exception handling
 * Transaction management for atomic operations
 * OpenAPI documentation with Swagger UI
-* Health checks and service monitoring
 
 == Running the Application
 
@@ -245,28 +244,26 @@ curl -X POST http://localhost:7050/inventory/api/inventories/bulk \
 [source,bash]
 ----
 
-# Filter by location
-curl -X GET "http://localhost:6050/inventory/api/inventories?location=Warehouse%20A"
-
 # Filter by minimum quantity
-curl -X GET "http://localhost:6050/inventory/api/inventories?minQuantity=10"
+curl -X GET "http://localhost:7050/inventory/api/inventories?minQuantity=10"
+
+# Filter by maximum quantity
+curl -X GET "http://localhost:7050/inventory/api/inventories?maxQuantity=100"
+
+# Paginate results
+curl -X GET "http://localhost:7050/inventory/api/inventories?page=0&size=10"
 ----
 
-== Test Scripts
+== Automated Tests
 
-Comprehensive test scripts are available to test all functionality:
+JUnit tests are provided under `src/test/java`:
 
-* **`test-inventory-endpoints.sh`** - Complete test suite covering all endpoints and MicroProfile Rest Client features
-* **`quick-test-commands.sh`** - Quick reference commands for manual testing
-* **`TEST-SCRIPTS-README.md`** - Detailed documentation of test scenarios and expected responses
+* **`InventoryServiceTest`** - Unit tests for `InventoryService` business logic
+* **`InventoryServiceIntegrationTest`** - Integration-style tests exercising the service layer
 
 [source,bash]
 ----
-# Run comprehensive test suite
-./test-inventory-endpoints.sh
-
-# View test documentation
-cat TEST-SCRIPTS-README.md
+mvn test
 ----
 
 == Configuration
@@ -284,22 +281,30 @@ product-service/mp-rest/readTimeout=10000
 product-service/mp-rest/followRedirects=true
 ----
 
-**RestClientBuilder Configuration** (programmatic):
+**RestClientBuilder Configuration** (programmatic, using the MP Rest Client 4.0 `baseUri(String)` convenience method):
 [source,java]
 ----
-# Availability check client (5s/10s timeout)
-URI catalogServiceUri = URI.create("http://localhost:5050/catalog/api");
+// Availability check client (5s/10s timeout)
+RestClientBuilder.newBuilder()
+        .baseUri("http://localhost:5050/catalog/api")
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .build(ProductServiceClient.class);
 
-# Product info client (3s/8s timeout)  
-URI catalogServiceUri = URI.create("http://localhost:5050/catalog/api");
+// Product info client (3s/8s timeout)
+RestClientBuilder.newBuilder()
+        .baseUri("http://localhost:5050/catalog/api")
+        .connectTimeout(3, TimeUnit.SECONDS)
+        .readTimeout(8, TimeUnit.SECONDS)
+        .build(ProductServiceClient.class);
 ----
 
 == OpenAPI Documentation
 
 View the complete API documentation:
 
-* **Swagger UI**: http://localhost:7050/inventory/api/openapi-ui/
-* **OpenAPI JSON**: http://localhost:7050/inventory/api/openapi
+* **Swagger UI**: http://localhost:7050/openapi/ui
+* **OpenAPI JSON**: http://localhost:7050/openapi
 * **Service Landing Page**: http://localhost:7050/inventory/
 
 == Project Structure
@@ -308,16 +313,23 @@ View the complete API documentation:
 ----
 inventory/
 ├── src/
-│   └── main/
-│       ├── java/                              # Java source files
-│       │   └── io/microprofile/tutorial/store/inventory/
-│       │       ├── entity/                    # Domain entities
-│       │       ├── exception/                 # Custom exceptions
-│       │       ├── service/                   # Business logic
-│       │       └── resource/                  # REST endpoints
-│       ├── liberty/
-│       │   └── config/                        # Liberty server configuration
-│       └── webapp/                            # Web resources
+│   ├── main/
+│   │   ├── java/                              # Java source files
+│   │   │   └── io/microprofile/tutorial/store/inventory/
+│   │   │       ├── client/                    # MicroProfile Rest Client interface
+│   │   │       ├── dto/                       # Data transfer objects
+│   │   │       ├── entity/                    # Domain entities
+│   │   │       ├── exception/                 # Custom exceptions
+│   │   │       ├── repository/                # In-memory data access layer
+│   │   │       ├── service/                   # Business logic
+│   │   │       └── resource/                  # REST endpoints
+│   │   ├── liberty/
+│   │   │   └── config/                        # Liberty server configuration
+│   │   ├── resources/
+│   │   │   └── META-INF/
+│   │   │       └── microprofile-config.properties  # REST client configuration
+│   │   └── webapp/                            # Web resources
+│   └── test/                                  # Unit and integration tests
 └── pom.xml                                    # Project dependencies and build
 ----
 

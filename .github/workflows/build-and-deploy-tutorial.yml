@@ -74,10 +74,11 @@ jobs:
           bundler-cache: false
 
       # Install Antora CLI, site generator, and advanced extensions
+      # Versions are pinned to avoid breakage from alpha/pre-release updates
       - name: Install Antora and Extensions
         run: |
-          npm install @antora/cli @antora/site-generator-default
-          npm install @antora/lunr-extension @antora/pdf-extension @asciidoctor/tabs
+          npm install @antora/cli@3.1.10 @antora/site-generator-default@3.1.10
+          npm install "@antora/lunr-extension@1.0.0-alpha.10" "@antora/pdf-extension@1.0.0-alpha.11" "@asciidoctor/tabs@1.0.0-beta.6"
           gem install asciidoctor-pdf asciidoctor-kroki asciidoctor-plantuml
 
       # Make update-repo-url.sh executable and run it to update URLs
@@ -196,12 +197,13 @@ jobs:
           bundler-cache: false
 
       # Install Antora CLI, site generator, and advanced extensions
+      # Versions are pinned to avoid breakage from alpha/pre-release updates
       - name: Install Antora and Extensions
         run: |
-          npm install @antora/cli @antora/site-generator-default
-          npm install @antora/lunr-extension @antora/pdf-extension @asciidoctor/tabs
+          npm install @antora/cli@3.1.10 @antora/site-generator-default@3.1.10
+          npm install "@antora/lunr-extension@1.0.0-alpha.10" "@antora/pdf-extension@1.0.0-alpha.11" "@asciidoctor/tabs@1.0.0-beta.6"
           gem install asciidoctor-pdf asciidoctor-kroki asciidoctor-plantuml
-      
+
       # Verify that Antora was installed correctly (useful for debugging)
       - name: Verify Antora Installation
         run: npm list @antora/cli @antora/site-generator-default || echo "Antora packages are not installed."
